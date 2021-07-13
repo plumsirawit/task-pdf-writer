@@ -16,5 +16,5 @@ a {
 }
 
 .EasyMDEContainer .CodeMirror {
-  border: none;
+  border: none !important;
 }
