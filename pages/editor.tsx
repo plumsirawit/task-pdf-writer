@@ -1,4 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { saveAs } from "file-saver";
+
 const SimpleMDE = dynamic(() => import("react-simplemde-editor"), {
   ssr: false,
 });
@@ -26,11 +28,20 @@ export default function Editor() {
     });
   }, [markdownInput]);
   const generatePdf = () => {};
+  const saveMarkdown = () => {
+    saveAs(
+      new Blob([markdownInput], { type: "text/plain;charset=utf-8" }),
+      "document.md"
+    );
+  };
   return (
     <div className={styles.container}>
       <div className={styles.topbar}>
         <button onClick={generatePdf} className={styles.button}>
           Generate PDF
+        </button>
+        <button onClick={saveMarkdown} className={styles.button}>
+          Save Markdown
         </button>
       </div>
       <div className={styles.panelcontainer}>
