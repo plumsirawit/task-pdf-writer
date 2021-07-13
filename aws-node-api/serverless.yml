@@ -35,12 +35,18 @@ layers:
     description: wkhtmltox binaries for pdf/image generation
     package:
       artifact: wkhtmltox-0.12.6-4.amazonlinux2_lambda.zip
+  pdfgenLayer:
+    name: pdfgen
+    description: static files for pdf generation
+    package:
+      artifact: pdfgen.zip
 
 functions:
   pdf:
     handler: handler-pdf.handler
     layers:
       - { Ref: WkhtmltoxLayerLambdaLayer }
+      - { Ref: PdfgenLayerLambdaLayer }
     environment:
       FONTCONFIG_PATH: /opt/fonts
     timeout: 30
