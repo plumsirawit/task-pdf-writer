@@ -43,6 +43,7 @@ functions:
       - { Ref: WkhtmltoxLayerLambdaLayer }
     environment:
       FONTCONFIG_PATH: /opt/fonts
+    timeout: 30
     events:
       - http:
           path: pdf/
