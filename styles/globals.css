@@ -14,3 +14,7 @@ a {
 * {
   box-sizing: border-box;
 }
+
+.EasyMDEContainer .CodeMirror {
+  border: none;
+}
