@@ -1,0 +1,78 @@
+html {
+    height: 100%;
+}
+
+.container {
+    height: 505px;
+    margin-top: 130px;
+    margin-bottom: 150px;
+}
+
+.wrapper {
+    height: 100%;
+    width: 44%;
+    margin-right: 28%;
+    float: right;
+}
+
+.panel {
+    height: 100%;
+    border-radius: 0;
+}
+
+.panel-body {
+    padding: 0 10%;
+    height: 100%;
+}
+
+.remember-me {
+    width: 100%;
+    margin-bottom: 20px;
+    min-height: 22px;
+}
+
+.remember-me span {
+    vertical-align: middle;
+}
+
+.submit-form {
+    text-align: center;
+}
+
+.form-control {
+    border-radius: 0;
+    margin-bottom: 16px;
+    height: 46px;
+    line-height: 44px;
+    font-size: 16px;
+    padding: 0 15px;
+    direction: ltr;
+}
+
+input[type="checkbox"] {
+    margin: 3px 3px 3px 4px;
+    -webkit-appearance: checkbox;
+    -moz-appearance: checkbox;
+}
+
+.img-container {
+    width: 100%;
+    text-align: center;
+}
+
+.img-container img {
+    width: 60%;
+}
+
+.btn-login {
+    border-radius: 0;
+}
+
+.login-error {
+    min-height: 25px;
+}
+
+.login-error span {
+    color: red;
+    font-size: 12px;
+}
