@@ -25,25 +25,33 @@ export default function Editor() {
       throwOnError: false,
     });
   }, [markdownInput]);
+  const generatePdf = () => {};
   return (
-    <div className="row">
-      <div className={`${styles["col-6"]} ${styles["edit-pane"]}`}>
-        <SimpleMDE
-          onChange={setMarkdownInput}
-          options={useMemo(
-            () => ({
-              toolbar: false,
-              spellChecker: false,
-              status: false,
-            }),
-            []
-          )}
-        />
+    <div className={styles.container}>
+      <div className={styles.topbar}>
+        <button onClick={generatePdf} className={styles.button}>
+          Generate PDF
+        </button>
       </div>
-      <div
-        className={`${styles["col-6"]} ${styles["preview-pane"]} ${styles["markdown-body"]} markdown-body`}
-        ref={outputRef}
-      ></div>
+      <div className={styles.panelcontainer}>
+        <div className={`${styles["col-6"]} ${styles["edit-pane"]}`}>
+          <SimpleMDE
+            onChange={setMarkdownInput}
+            options={useMemo(
+              () => ({
+                toolbar: false,
+                spellChecker: false,
+                status: false,
+              }),
+              []
+            )}
+          />
+        </div>
+        <div
+          className={`${styles["col-6"]} ${styles["preview-pane"]} ${styles["markdown-body"]} markdown-body`}
+          ref={outputRef}
+        ></div>
+      </div>
     </div>
   );
 }
