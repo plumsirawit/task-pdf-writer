@@ -1,0 +1,18 @@
+{
+  "name": "aws-python-api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "serverless offline"
+  },
+  "author": "plumsirawit",
+  "license": "MIT",
+  "dependencies": {
+    "serverless": "^2.51.2"
+  },
+  "devDependencies": {
+    "serverless-offline": "^7.0.0"
+  }
+}

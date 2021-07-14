@@ -1,0 +1,21 @@
+org: s6007589
+app: task-pdf-writer
+service: aws-python-api
+
+frameworkVersion: "2"
+
+provider:
+  name: aws
+  runtime: python3.8
+  lambdaHashingVersion: "20201221"
+
+functions:
+  hello:
+    handler: handler.hello
+    events:
+      - http:
+          path: /hello
+          method: get
+
+plugins:
+  - serverless-offline
