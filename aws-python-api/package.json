@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "serverless offline"
+    "dev": "serverless offline",
+    "deploy": "serverless deploy -v"
   },
   "author": "plumsirawit",
   "license": "MIT",

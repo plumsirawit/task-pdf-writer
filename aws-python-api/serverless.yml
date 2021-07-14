@@ -8,8 +8,29 @@ provider:
   name: aws
   runtime: python3.8
   lambdaHashingVersion: "20201221"
+  stage: dev
+  region: ap-southeast-1
   environment:
     DJANGO_SETTINGS_MODULE: settings
+
+package:
+  individually: true
+  patterns:
+    - "!node_modules/**"
+    - "!__pycache__/**"
+    - "!*.zip"
+
+layers:
+  wkhtmltoxLayer:
+    name: wkhtmltox
+    description: wkhtmltox binaries for pdf/image generation
+    package:
+      artifact: wkhtmltox-0.12.6-4.amazonlinux2_lambda.zip
+  xvfbLayer:
+    name: xvfb
+    description: xvfb helpers for pdf generation
+    package:
+      artifact: xvfb-layer.zip
 
 functions:
   hello:
@@ -24,7 +45,20 @@ functions:
       - http:
           path: /render
           method: post
+  genpdf:
+    handler: handler.genpdf
+    layers:
+      - { Ref: WkhtmltoxLayerLambdaLayer }
+      - { Ref: XvfbLayerLambdaLayer }
+    events:
+      - http:
+          path: /genpdf
+          method: post
 
 plugins:
   - serverless-offline
   - serverless-python-requirements
+
+custom:
+  pythonRequirements:
+    dockerizePip: non-linux

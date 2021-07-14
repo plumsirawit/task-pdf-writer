@@ -31,6 +31,7 @@ DEBUG = True
 ALLOWED_HOSTS = ['*']
 
 WKHTMLTOPDF_CMD_OPTIONS = {
+    'enable-local-file-access': None,
     'page-size': 'A4',
     'margin-left': '0.75in',
     'margin-right': '0.75in',
