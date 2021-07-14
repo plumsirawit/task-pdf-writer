@@ -8,6 +8,8 @@ provider:
   name: aws
   runtime: python3.8
   lambdaHashingVersion: "20201221"
+  environment:
+    DJANGO_SETTINGS_MODULE: settings
 
 functions:
   hello:
@@ -16,6 +18,13 @@ functions:
       - http:
           path: /hello
           method: get
+  render:
+    handler: handler.render
+    events:
+      - http:
+          path: /render
+          method: post
 
 plugins:
   - serverless-offline
+  - serverless-python-requirements
