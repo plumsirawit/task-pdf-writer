@@ -1,0 +1,276 @@
+/*
+Global
+============================= */
+
+@import url(../fonts/SourceSansPro/SourceSansPro.css);
+/* @import url(../fonts/IRANSans/IRANSans.css); */
+
+/*@import url(https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,300,400,600);*/
+
+
+body {
+    font-family: Arial, serif;
+    color: #666;
+    font-size: 16px;
+    font-weight: 400;
+    -webkit-font-smoothing: antialiased;
+    font-smoothing: antialiased;
+}
+
+p {
+    line-height: 24px
+}
+
+a {
+    color: #0088cc;
+}
+
+a:hover {
+    text-decoration: none;
+}
+
+.container h1, .container h2, .container h3, .container h4 {
+    font-family: 'Source Sans Pro', arial, sans-serif;
+}
+
+.container h1 {
+    font-size: 36px;
+    font-weight: 200;
+    color: #555;
+    margin: 60px 0 30px;
+}
+
+.container h2 {
+    font-size: 30px;
+    font-weight: 300;
+    color: #444;
+    margin: 40px 0 20px;
+}
+
+.container h3 {
+    font-size: 20px;
+    font-weight: 400;
+    margin: 20px 0;
+}
+
+.container h4 {
+    font-size: 18px;
+    font-weight: 400
+}
+
+.table-version thead tr td {
+    font-size: 18px;
+    font-weight: 700;
+    text-align: center;
+}
+
+.table-version tbody tr {
+    cursor: pointer;
+}
+
+.table-version tbody tr td:last-child {
+    text-align: right;
+}
+
+.btn:focus {
+    outline: none !important;
+}
+
+.btn-active {
+    background-color: #ddd;
+}
+
+.table th {
+    font-family: "Source Sans Pro", arial, sans-serif;
+    font-size: 1.2em;
+    font-weight: 400;
+}
+
+.table>tbody>tr>td, .table>tbody>tr>th {
+    vertical-align: middle;
+}
+
+/* ioi2019 */
+.table td,  th {
+    text-align: center;
+}
+
+.modal-header {
+    background-color: #f5f5f5;
+}
+
+.table-center * {
+    text-align: center;
+}
+
+.panel {
+    border-radius: 0;
+}
+
+.main-content {
+    margin-bottom: 100px;
+}
+
+.fa-btn {
+    cursor: pointer;
+}
+
+#diff-selectbox {
+    width: 20%;
+    font-size: 12px;
+    padding: 0px 6px;
+}
+
+.btn.active {
+    background-color: green !important;
+}
+
+.text-container {
+    background: #f6f6f6;
+    padding: 15px;
+    color: #555;
+}
+
+#btn-container>.panel {
+    margin-bottom: 0 !important;
+}
+
+#left-container {
+    padding-right: 0;
+}
+
+#right-container {
+    padding-left: 0;
+}
+
+#left-container .panel-body,
+#right-container .panel-body,
+#middle-container .panel-body {
+    padding: 0;
+}
+
+.navbar {
+    margin-bottom: 0;
+    border-radius: 0;
+}
+
+.panel {
+    border-radius: 0;
+}
+
+.btn-container {
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-width: 0 1px;
+}
+
+.edit-pane {
+    float: left;
+    width: 50%;
+    border: 1px solid #ddd;
+    min-height: 800px;
+    background-color: #FFFFFF;
+}
+
+.preview-pane {
+    border: 1px solid #ddd;
+    background-color: #f6f6f6;
+    border-left: 0px;
+    min-height: 800px;
+    padding: 15px;
+    width: 50%;
+    float: right;
+    color: #333;
+}
+
+div.CodeMirror {
+    border: 0px;
+}
+
+.toast {
+    opacity: .95 !important;
+}
+
+.revisions .circle {
+    width: 8px;
+    height: 8px;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+    background: #dad;
+    display: inline-block;
+}
+
+.revisions .circle.saved {
+    background: #dad;
+}
+
+.revisions .circle.autosaved {
+    background: #aaa;
+}
+
+#left_rtl_plain_text_box .editor-content {
+    font-family: IRANSans, Tahoma, Arial;
+    font-size: 90%;
+    color: #333;
+}
+
+#left_ltr_plain_text_box {
+	display: none;
+}
+
+/* persian markdown editor */
+#wmd-input {
+    background-color: #fff;
+    padding: 15px !important;
+}
+
+code::before, code::after,
+.md-code::before, .md-code::after,
+.math::before, .math::after {
+    content: "‎";   /* the string contains an invisible &lrm; character */
+}
+
+.katex-html {
+    direction: ltr;
+}
+
+code, pre {
+    font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
+}
+
+/* Default text fonts */
+
+.rendered_content {
+    font-family: CustomTextFont, Arial, serif;
+}
+
+.rendered_content[dir="rtl"] {
+    font-family: CustomTextFont, IRANSans, Tahoma, Arial;
+}
+
+.rendered_content[dir="rtl"] th {
+    text-align: start;
+}
+
+/* Default text fonts per language */
+
+.rendered_content[lang="ja"] {
+    font-family: CustomTextFont, 'TakaoPGothic', Arial, serif;
+}
+
+.rendered_content[lang="kr"] {
+    font-family: CustomTextFont, 'NanumMyeongjo', Arial, serif;
+}
+
+.rendered_content[lang="th"] {
+    font-family: CustomTextFont, 'Loma', Arial, serif;
+}
+
+.rendered_content[lang="zh"] {
+    font-family: CustomTextFont, 'PMingLiU', Arial, serif;
+}
+
+.rendered_content[lang="si"] {
+    font-family: CustomTextFont, 'NotoSansSinhala-Regular', Arial, serif;
+}
