@@ -80,6 +80,14 @@ def genpdf(event, context):
         "message": output_file_content,
         "input": event
     }
-    response = {"statusCode": 200, "body": json.dumps(body)}
+    response = {
+        "statusCode": 200,
+        "body": json.dumps(body),
+        'headers': {
+            'Access-Control-Allow-Headers': 'Content-Type',
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'OPTIONS,POST,GET'
+        }
+    }
     shutil.rmtree('/tmp/static')
     return response
