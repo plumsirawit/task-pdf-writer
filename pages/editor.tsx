@@ -27,7 +27,28 @@ export default function Editor() {
       throwOnError: false,
     });
   }, [markdownInput]);
-  const generatePdf = () => {};
+  const generatePdf = async () => {
+    const resp = await fetch(
+      "https://973i5k6wjg.execute-api.ap-southeast-1.amazonaws.com/dev/genpdf",
+      {
+        body: JSON.stringify({
+          content: markdownInput,
+          contest_full_title: "CONTEST_FULL_TITLE",
+          contest_title: "CONTEST_TITLE",
+          contest: "CONTEST",
+          task_name: "TASK_NAME",
+          country: "COUNTRY",
+          language: "LANG",
+          language_code: "LANGCODE",
+          contest_date: "CONTEST_DATE",
+        }),
+        method: "post",
+      }
+    );
+    const respJson = await resp.json();
+    const buffer = Buffer.from(respJson.message, "base64");
+    saveAs(new Blob([buffer], { type: "application/pdf" }), "document.pdf");
+  };
   const saveMarkdown = () => {
     saveAs(
       new Blob([markdownInput], { type: "text/plain;charset=utf-8" }),
