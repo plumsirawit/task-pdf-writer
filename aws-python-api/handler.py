@@ -43,7 +43,8 @@ def render_pdf_template(body):
         'static_path': 'static',
         'images_path': '',
         'text_font_base64': False,
-        'contest_date': body['contest_date']
+        'contest_date': body['contest_date'],
+        'image_base64': body['image_base64']
     }
     return render_to_string('pdf-template.html', context=render_context)
 

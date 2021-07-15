@@ -10,6 +10,15 @@ import styles from "../styles/Editor.module.css";
 import dynamic from "next/dynamic";
 import marked from "../utils/initMarked";
 import renderMathInElement from "katex/dist/contrib/auto-render";
+
+const toBase64 = (file: File) =>
+  new Promise<string | undefined>((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result?.toString());
+    reader.onerror = (error) => reject(error);
+  });
+
 export default function Editor() {
   const outputRef = useRef<HTMLDivElement>(null);
   const [markdownInput, setMarkdownInput] = useState<string>("hello, world");
@@ -40,8 +49,14 @@ export default function Editor() {
   const [language, setLanguage] = useState<string>("LANGUAGE");
   const [languageCode, setLanguageCode] = useState<string>("LANGCODE");
   const [contestDate, setContestDate] = useState<string>("CONTEST_DATE");
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const generatePdf = async () => {
     setPdfLoading(true);
+    let imageBase64 = "";
+    const file = fileInputRef?.current?.files?.item(0);
+    if (file) {
+      imageBase64 = (await toBase64(file)) ?? "";
+    }
     const resp = await fetch(
       "https://973i5k6wjg.execute-api.ap-southeast-1.amazonaws.com/dev/genpdf",
       {
@@ -55,6 +70,7 @@ export default function Editor() {
           language: language,
           language_code: languageCode,
           contest_date: contestDate,
+          image_base64: imageBase64,
         }),
         method: "post",
       }
@@ -128,10 +144,7 @@ export default function Editor() {
             onChange={(e) => setContestDate(e.target.value)}
             placeholder="Contest Date"
           />
-        </div>
-      </Modal>
-      <div className={styles.container}>
-        <div className={styles.topbar}>
+          <input type="file" ref={fileInputRef} multiple={false} />
           <button
             onClick={generatePdf}
             className={styles.button}
@@ -142,17 +155,21 @@ export default function Editor() {
                 <MoonLoader size="15" color="white" css="display: block" />
               </div>
             ) : (
-              <>Generate PDF</>
+              <>Generate</>
             )}
           </button>
-          <button onClick={saveMarkdown} className={styles.button}>
-            Save Markdown
-          </button>
+        </div>
+      </Modal>
+      <div className={styles.container}>
+        <div className={styles.topbar}>
           <button
             onClick={() => setModalIsOpen(true)}
             className={styles.button}
           >
-            Settings
+            Generate PDF
+          </button>
+          <button onClick={saveMarkdown} className={styles.button}>
+            Save Markdown
           </button>
         </div>
         <div className={styles.panelcontainer}>
