@@ -6,7 +6,10 @@ frameworkVersion: "2"
 
 provider:
   name: aws
-  runtime: python3.8
+  ecr:
+    images:
+      appimage:
+        path: ./
   lambdaHashingVersion: "20201221"
   stage: dev
   region: ap-southeast-1
@@ -20,36 +23,49 @@ package:
     - "!__pycache__/**"
     - "!*.zip"
 
-layers:
-  wkhtmltoxLayer:
-    name: wkhtmltox
-    description: wkhtmltox binaries for pdf/image generation
-    package:
-      artifact: wkhtmltox-0.12.6-4.amazonlinux2_lambda.zip
-  xvfbLayer:
-    name: xvfb
-    description: xvfb helpers for pdf generation
-    package:
-      artifact: xvfb-layer.zip
+# layers:
+#   wkhtmltoxLayer:
+#     name: wkhtmltox
+#     description: wkhtmltox binaries for pdf/image generation
+#     package:
+#       artifact: wkhtmltox-0.12.6-4.amazonlinux2_lambda.zip
+#   xvfbLayer:
+#     name: xvfb
+#     description: xvfb helpers for pdf generation
+#     package:
+#       artifact: xvfb-layer.zip
 
 functions:
-  hello:
-    handler: handler.hello
+  hello2:
+    # handler: handler.hello
+    image:
+      name: appimage
+      command:
+        - handler.hello
     events:
       - http:
           path: /hello
           method: get
-  render:
-    handler: handler.render
+  render2:
+    # handler: handler.render
+    image:
+      name: appimage
+      command:
+        - handler.render
     events:
       - http:
           path: /render
           method: post
-  genpdf:
-    handler: handler.genpdf
-    layers:
-      - { Ref: WkhtmltoxLayerLambdaLayer }
-      - { Ref: XvfbLayerLambdaLayer }
+  genpdf2:
+    image:
+      name: appimage
+      command:
+        - handler.genpdf
+    # handler: handler.genpdf
+    # layers:
+    #   - { Ref: WkhtmltoxLayerLambdaLayer }
+    #   - { Ref: XvfbLayerLambdaLayer }
+    timeout: 60
     events:
       - http:
           path: /genpdf
@@ -57,7 +73,7 @@ functions:
 
 plugins:
   - serverless-offline
-  - serverless-python-requirements
+  # - serverless-python-requirements
 
 custom:
   pythonRequirements:
