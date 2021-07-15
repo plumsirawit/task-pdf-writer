@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { saveAs } from "file-saver";
+import { MoonLoader } from "react-spinners";
+import Modal from "react-modal";
 
 const SimpleMDE = dynamic(() => import("react-simplemde-editor"), {
   ssr: false,
@@ -8,6 +10,15 @@ import styles from "../styles/Editor.module.css";
 import dynamic from "next/dynamic";
 import marked from "../utils/initMarked";
 import renderMathInElement from "katex/dist/contrib/auto-render";
+
+const toBase64 = (file: File) =>
+  new Promise<string | undefined>((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result?.toString());
+    reader.onerror = (error) => reject(error);
+  });
+
 export default function Editor() {
   const outputRef = useRef<HTMLDivElement>(null);
   const [markdownInput, setMarkdownInput] = useState<string>("hello, world");
@@ -27,25 +38,45 @@ export default function Editor() {
       throwOnError: false,
     });
   }, [markdownInput]);
+  const [pdfLoading, setPdfLoading] = useState<boolean>(false);
+  const [contestFullTitle, setContestFullTitle] = useState<string>(
+    "CONTEST_FULL_TITLE"
+  );
+  const [contestTitle, setContestTitle] = useState<string>("CONTEST_TITLE");
+  const [contest, setContest] = useState<string>("CONTEST");
+  const [taskName, setTaskName] = useState<string>("TASK_NAME");
+  const [country, setCountry] = useState<string>("COUNTRY");
+  const [language, setLanguage] = useState<string>("LANGUAGE");
+  const [languageCode, setLanguageCode] = useState<string>("LANGCODE");
+  const [contestDate, setContestDate] = useState<string>("CONTEST_DATE");
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const generatePdf = async () => {
+    setPdfLoading(true);
+    let imageBase64 = "";
+    const file = fileInputRef?.current?.files?.item(0);
+    if (file) {
+      imageBase64 = (await toBase64(file)) ?? "";
+    }
     const resp = await fetch(
       "https://973i5k6wjg.execute-api.ap-southeast-1.amazonaws.com/dev/genpdf",
       {
         body: JSON.stringify({
           content: markdownInput,
-          contest_full_title: "CONTEST_FULL_TITLE",
-          contest_title: "CONTEST_TITLE",
-          contest: "CONTEST",
-          task_name: "TASK_NAME",
-          country: "COUNTRY",
-          language: "LANG",
-          language_code: "LANGCODE",
-          contest_date: "CONTEST_DATE",
+          contest_full_title: contestFullTitle,
+          contest_title: contestTitle,
+          contest: contest,
+          task_name: taskName,
+          country: country,
+          language: language,
+          language_code: languageCode,
+          contest_date: contestDate,
+          image_base64: imageBase64,
         }),
         method: "post",
       }
     );
     const respJson = await resp.json();
+    setPdfLoading(false);
     const buffer = Buffer.from(respJson.message, "base64");
     saveAs(new Blob([buffer], { type: "application/pdf" }), "document.pdf");
   };
@@ -55,35 +86,112 @@ export default function Editor() {
       "document.md"
     );
   };
+  const [modalIsOpen, setModalIsOpen] = useState<boolean>(false);
+  Modal.setAppElement("#__next");
   return (
-    <div className={styles.container}>
-      <div className={styles.topbar}>
-        <button onClick={generatePdf} className={styles.button}>
-          Generate PDF
-        </button>
-        <button onClick={saveMarkdown} className={styles.button}>
-          Save Markdown
-        </button>
-      </div>
-      <div className={styles.panelcontainer}>
-        <div className={`${styles["col-6"]} ${styles["edit-pane"]}`}>
-          <SimpleMDE
-            onChange={setMarkdownInput}
-            options={useMemo(
-              () => ({
-                toolbar: false,
-                spellChecker: false,
-                status: false,
-              }),
-              []
-            )}
+    <>
+      <Modal isOpen={modalIsOpen} contentLabel="Example Modal">
+        <div className={styles.modal}>
+          <div className={styles.modalrow}>
+            <h2>Parameter Setings</h2>
+            <button onClick={() => setModalIsOpen(false)}>Close</button>
+          </div>
+          <input
+            type="text"
+            value={contestFullTitle}
+            onChange={(e) => setContestFullTitle(e.target.value)}
+            placeholder="Contest Full Title"
           />
+          <input
+            type="text"
+            value={contestTitle}
+            onChange={(e) => setContestTitle(e.target.value)}
+            placeholder="Contest Title"
+          />
+          <input
+            type="text"
+            value={contest}
+            onChange={(e) => setContest(e.target.value)}
+            placeholder="Contest"
+          />
+          <input
+            type="text"
+            value={taskName}
+            onChange={(e) => setTaskName(e.target.value)}
+            placeholder="Task Name"
+          />
+          <input
+            type="text"
+            value={country}
+            onChange={(e) => setCountry(e.target.value)}
+            placeholder="Country Code"
+          />
+          <input
+            type="text"
+            value={language}
+            onChange={(e) => setLanguage(e.target.value)}
+            placeholder="Language"
+          />
+          <input
+            type="text"
+            value={languageCode}
+            onChange={(e) => setLanguageCode(e.target.value)}
+            placeholder="Language Code"
+          />
+          <input
+            type="text"
+            value={contestDate}
+            onChange={(e) => setContestDate(e.target.value)}
+            placeholder="Contest Date"
+          />
+          <input type="file" ref={fileInputRef} multiple={false} />
+          <button
+            onClick={generatePdf}
+            className={styles.button}
+            disabled={pdfLoading}
+          >
+            {pdfLoading ? (
+              <div className={styles.spinnerwrapper}>
+                <MoonLoader size="15" color="white" css="display: block" />
+              </div>
+            ) : (
+              <>Generate</>
+            )}
+          </button>
         </div>
-        <div
-          className={`${styles["col-6"]} ${styles["preview-pane"]} ${styles["markdown-body"]} markdown-body`}
-          ref={outputRef}
-        ></div>
+      </Modal>
+      <div className={styles.container}>
+        <div className={styles.topbar}>
+          <button
+            onClick={() => setModalIsOpen(true)}
+            className={styles.button}
+          >
+            Generate PDF
+          </button>
+          <button onClick={saveMarkdown} className={styles.button}>
+            Save Markdown
+          </button>
+        </div>
+        <div className={styles.panelcontainer}>
+          <div className={`${styles["col-6"]} ${styles["edit-pane"]}`}>
+            <SimpleMDE
+              onChange={setMarkdownInput}
+              options={useMemo(
+                () => ({
+                  toolbar: false,
+                  spellChecker: false,
+                  status: false,
+                }),
+                []
+              )}
+            />
+          </div>
+          <div
+            className={`${styles["col-6"]} ${styles["preview-pane"]} ${styles["markdown-body"]} markdown-body`}
+            ref={outputRef}
+          ></div>
+        </div>
       </div>
-    </div>
+    </>
   );
 }

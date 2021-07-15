@@ -29,9 +29,13 @@
 }
 
 .button {
+  min-width: 10em;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   margin: 1rem;
   padding: 0.5rem;
-  text-align: left;
+  text-align: center;
   color: #eaeaea;
   text-decoration: none;
   border: 1px solid #eaeaea;
@@ -47,8 +51,20 @@
   cursor: pointer;
 }
 
+.button:disabled {
+  color: #918787;
+  border-color: #918787;
+  cursor: not-allowed;
+  background-color: #4b5055;
+}
+
+.spinnerwrapper {
+  text-align: left;
+}
+
 .topbar {
   background-color: #212529;
+  display: flex;
 }
 
 .container {
@@ -60,4 +76,23 @@
 .panelcontainer {
   display: flex;
   flex: 1;
+}
+
+.modal {
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.modalrow {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.modal > input {
+  margin-top: 20px;
 }
