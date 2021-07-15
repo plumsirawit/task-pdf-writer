@@ -4,6 +4,7 @@ from uuid import uuid4
 from django.template.loader import render_to_string
 from django.conf import settings
 import os
+import shutil
 
 import pdfkit
 from xvfbwrapper import Xvfb
@@ -68,6 +69,7 @@ def convert_html_to_pdf(html, pdf_file_path):
         print(e)
 
 def genpdf(event, context):
+    shutil.copytree('/usr/src/app/static', '/tmp/static')
     body = json.loads(event['body'])
     rendered_html = render_pdf_template(body)
     output_file_path = '/tmp/{}.html'.format(str(uuid4()))
@@ -79,4 +81,5 @@ def genpdf(event, context):
         "input": event
     }
     response = {"statusCode": 200, "body": json.dumps(body)}
+    shutil.rmtree('/tmp/static')
     return response
