@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { saveAs } from "file-saver";
-
+import { MoonLoader } from "react-spinners";
 const SimpleMDE = dynamic(() => import("react-simplemde-editor"), {
   ssr: false,
 });
@@ -27,7 +27,9 @@ export default function Editor() {
       throwOnError: false,
     });
   }, [markdownInput]);
+  const [pdfLoading, setPdfLoading] = useState<boolean>(false);
   const generatePdf = async () => {
+    setPdfLoading(true);
     const resp = await fetch(
       "https://973i5k6wjg.execute-api.ap-southeast-1.amazonaws.com/dev/genpdf",
       {
@@ -46,6 +48,7 @@ export default function Editor() {
       }
     );
     const respJson = await resp.json();
+    setPdfLoading(false);
     const buffer = Buffer.from(respJson.message, "base64");
     saveAs(new Blob([buffer], { type: "application/pdf" }), "document.pdf");
   };
@@ -58,8 +61,18 @@ export default function Editor() {
   return (
     <div className={styles.container}>
       <div className={styles.topbar}>
-        <button onClick={generatePdf} className={styles.button}>
-          Generate PDF
+        <button
+          onClick={generatePdf}
+          className={styles.button}
+          disabled={pdfLoading}
+        >
+          {pdfLoading ? (
+            <div className={styles.spinnerwrapper}>
+              <MoonLoader size="15" color="white" css="display: block" />
+            </div>
+          ) : (
+            <>Generate PDF</>
+          )}
         </button>
         <button onClick={saveMarkdown} className={styles.button}>
           Save Markdown
