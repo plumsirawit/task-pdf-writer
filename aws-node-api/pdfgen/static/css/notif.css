@@ -1,0 +1,67 @@
+.notif-dropdown-menu {
+    width: 300px;
+    max-height: 450px;
+    overflow-y: auto;
+}
+
+.notif-dropdown-menu li {
+    float: left;
+    border-bottom: 1px solid #eee;
+    width: 100%;
+}
+
+.notif-dropdown-menu li.notif-unread,
+.notif-dropdown-menu li.notif-unread>a:hover {
+    background-color: #ddd;
+}
+
+.notif-dropdown-menu li:last-child {
+    border-bottom: none;
+}
+
+.notif-dropdown-menu li a {
+    float: left;
+    width: 100%;
+    cursor: pointer;
+    white-space: normal;
+}
+
+.notif-dropdown-menu li a span.notif-title {
+    width: 100%;
+    float: left;
+    font-weight: bold;
+}
+
+.notif-dropdown-menu li a span.notif-description {
+    width: 100%;
+    float: left;
+    font-size: 11px;
+}
+
+.notif-badge {
+    width: 20px;
+    height: 20px;
+    background-color: red;
+    color: white;
+    position: absolute;
+    text-align: center;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.notif-dropdown-menu li.see-all a:hover {
+    background-color: transparent;
+}
+
+.notif-dropdown-menu li.see-all {
+    margin-top: 3px;
+}
+
+.notif-dropdown-menu li.see-all a {
+    font-size: 11px;
+    color: gray;
+}
+
+.notification {
+    cursor: pointer;
+}
