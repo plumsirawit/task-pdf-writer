@@ -1,25 +1,35 @@
 import { withAuthUser, useAuthUser } from "next-firebase-auth";
 import Head from "next/head";
 import styles from "../styles/Register.module.css";
-import firebase from "firebase/app";
-import "firebase/auth";
 import { useState } from "react";
 import { MoonLoader } from "react-spinners";
+import { callRegisterApi } from "./api/register";
+
 export default withAuthUser()(function Register() {
-  const AuthUser = useAuthUser();
+  const authUser = useAuthUser();
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [confirmPassword, setConfirmPassword] = useState<string>("");
   const [fullName, setFullName] = useState<string>("");
   const [displayName, setDisplayName] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const register = () => {
+  const register = async () => {
     setIsLoading(true);
-    return firebase
-      .auth()
-      .createUserWithEmailAndPassword(email, password)
-      .catch((e) => alert(e.message))
-      .finally(() => setIsLoading(false));
+    if (password !== confirmPassword) {
+      alert("Password confirmation mismatch");
+      setIsLoading(false);
+      return;
+    }
+    const resp = await callRegisterApi(authUser, {
+      email,
+      password,
+      fullname: fullName,
+      displayname: displayName,
+    });
+    if (!resp?.message) {
+      alert(resp?.error);
+    }
+    setIsLoading(false);
   };
   return (
     <div className={styles.container}>
