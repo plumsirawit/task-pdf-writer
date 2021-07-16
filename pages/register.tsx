@@ -1,11 +1,15 @@
-import { withAuthUser, useAuthUser } from "next-firebase-auth";
+import { withAuthUser, useAuthUser, AuthAction } from "next-firebase-auth";
 import Head from "next/head";
 import styles from "../styles/Register.module.css";
 import { useState } from "react";
 import { MoonLoader } from "react-spinners";
 import { callRegisterApi } from "./api/register";
+import firebase from "firebase/app";
+import "firebase/auth";
 
-export default withAuthUser()(function Register() {
+export default withAuthUser({
+  whenAuthed: AuthAction.REDIRECT_TO_APP,
+})(function Register() {
   const authUser = useAuthUser();
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
@@ -29,6 +33,10 @@ export default withAuthUser()(function Register() {
     if (!resp?.message) {
       alert(resp?.error);
     }
+    await firebase
+      .auth()
+      .signInWithEmailAndPassword(email, password)
+      .catch((e) => alert(e.message));
     setIsLoading(false);
   };
   return (
