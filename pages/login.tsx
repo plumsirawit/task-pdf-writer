@@ -58,7 +58,7 @@ export default withAuthUser({
                 <MoonLoader size="15px" color="white" css="display: block" />
               </div>
             ) : (
-              <>Register</>
+              <>Sign in</>
             )}
           </button>
         </div>
