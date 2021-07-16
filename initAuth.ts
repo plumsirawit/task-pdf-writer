@@ -1,4 +1,5 @@
 import { init } from "next-firebase-auth";
+import { firebaseConfig } from "./constants";
 
 const initAuth = () => {
   init({
@@ -6,23 +7,19 @@ const initAuth = () => {
     appPageURL: "/",
     loginAPIEndpoint: "/api/login", // required
     logoutAPIEndpoint: "/api/logout", // required
-    firebaseAuthEmulatorHost: "localhost:9099",
+    // firebaseAuthEmulatorHost: "localhost:9099",
     // Required in most cases.
     firebaseAdminInitConfig: {
       credential: {
-        projectId: "my-example-app-id",
-        clientEmail: "example-abc123@my-example-app.iam.gserviceaccount.com",
+        projectId: firebaseConfig.projectId,
+        clientEmail:
+          "firebase-adminsdk-am4ez@task-pdf-writer.iam.gserviceaccount.com",
         // The private key must not be accesssible on the client side.
         privateKey: process.env.FIREBASE_PRIVATE_KEY ?? "",
       },
-      databaseURL: "https://my-example-app.firebaseio.com",
+      databaseURL: "https://task-pdf-writer.firebaseio.com",
     },
-    firebaseClientInitConfig: {
-      apiKey: "MyExampleAppAPIKey123", // required
-      authDomain: "my-example-app.firebaseapp.com",
-      databaseURL: "https://my-example-app.firebaseio.com",
-      projectId: "my-example-app-id",
-    },
+    firebaseClientInitConfig: firebaseConfig,
     cookies: {
       name: "ExampleApp", // required
       // Keys are required unless you set `signed` to `false`.
