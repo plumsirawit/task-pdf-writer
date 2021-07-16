@@ -3,8 +3,8 @@ import { firebaseConfig } from "./constants";
 
 const initAuth = () => {
   init({
-    authPageURL: "/auth",
-    appPageURL: "/",
+    authPageURL: "/login",
+    appPageURL: "/contests",
     loginAPIEndpoint: "/api/login", // required
     logoutAPIEndpoint: "/api/logout", // required
     // firebaseAuthEmulatorHost: "localhost:9099",
