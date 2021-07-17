@@ -1,6 +1,9 @@
+import { AuthAction, withAuthUser } from "next-firebase-auth";
 import styles from "../styles/Contests.module.css";
 
-export default function Contests() {
+export default withAuthUser({
+  whenUnauthedAfterInit: AuthAction.REDIRECT_TO_LOGIN,
+})(function Contests() {
   return (
     <>
       <div className={styles.container}>
@@ -15,9 +18,6 @@ export default function Contests() {
                   <a href="#">Contest A</a>
                 </td>
                 <td className={styles.tablebtn}>
-                  <a href="#">SET</a>
-                </td>
-                <td className={styles.tablebtn}>
                   <a href="#">DEL</a>
                 </td>
               </tr>
@@ -26,18 +26,12 @@ export default function Contests() {
                   <a href="#">Contest B</a>
                 </td>
                 <td className={styles.tablebtn}>
-                  <a href="#">SET</a>
-                </td>
-                <td className={styles.tablebtn}>
                   <a href="#">DEL</a>
                 </td>
               </tr>
               <tr>
                 <td className={styles.tablects}>
                   <a href="#">Contest C</a>
-                </td>
-                <td className={styles.tablebtn}>
-                  <a href="#">SET</a>
                 </td>
                 <td className={styles.tablebtn}>
                   <a href="#">DEL</a>
@@ -49,4 +43,4 @@ export default function Contests() {
       </div>
     </>
   );
-}
+});
