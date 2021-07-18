@@ -1,0 +1,36 @@
+.topbar {
+  color: white;
+  background-color: #212529;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #383f46;
+  align-items: center;
+}
+
+.panelcontainer {
+  margin-top: 1rem;
+  flex: 1;
+  max-width: 720px;
+  width: 90%;
+  display: block;
+  color: white;
+}
+
+.panelcontainer h3 {
+  margin-bottom: 10px;
+}
+
+.row {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  align-items: center;
+  margin: 10px;
+}
