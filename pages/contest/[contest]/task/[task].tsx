@@ -54,7 +54,7 @@ export default withAuthUser({
   };
   const storeMarkdown = useMemo(
     () =>
-      debounce(() => {
+      debounce((markdownInput) => {
         if (!contestId || !taskId) {
           return;
         }
@@ -69,7 +69,7 @@ export default withAuthUser({
     fetchMarkdown();
   }, [contestId, taskId]);
   useEffect(() => {
-    storeMarkdown();
+    storeMarkdown(markdownInput);
   }, [markdownInput]);
   const [pdfLoading, setPdfLoading] = useState<boolean>(false);
   const generatePdf = async () => {
