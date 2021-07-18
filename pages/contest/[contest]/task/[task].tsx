@@ -13,6 +13,7 @@ import { useTaskId } from "../../../../utils/useTaskId";
 import firebase from "firebase/app";
 import "firebase/database";
 import debounce from "lodash.debounce";
+import toast, { Toaster } from "react-hot-toast";
 
 export default withAuthUser({
   whenUnauthedAfterInit: AuthAction.REDIRECT_TO_LOGIN,
@@ -58,18 +59,22 @@ export default withAuthUser({
         if (!contestId || !taskId) {
           return;
         }
+        toast("Saving...", {
+          position: "bottom-center",
+          icon: "💾",
+        });
         return firebase
           .database()
           .ref("tasks/" + taskId + "/markdown")
           .set(markdownInput);
-      }, 15000),
+      }, 10000),
     [contestId, taskId]
   );
   useEffect(() => {
     fetchMarkdown();
   }, [contestId, taskId]);
   useEffect(() => {
-    storeMarkdown(markdownInput);
+    markdownInput && storeMarkdown(markdownInput);
   }, [markdownInput]);
   const [pdfLoading, setPdfLoading] = useState<boolean>(false);
   const generatePdf = async () => {
@@ -117,6 +122,7 @@ export default withAuthUser({
           ></div>
         </div>
       </div>
+      <Toaster />
     </>
   );
 });
