@@ -1,5 +1,4 @@
 import { AuthAction, useAuthUser, withAuthUser } from "next-firebase-auth";
-import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "../../../components/Button";
 import { Input as DefaultInput } from "../../../components/Input";
@@ -9,6 +8,8 @@ import firebase from "firebase/app";
 import "firebase/firestore";
 import { callUpdateContestApi } from "../../api/contest/update";
 import { toBase64 } from "../../../utils/toBase64";
+import { useContestId } from "../../../utils/useContestId";
+import { useRouter } from "next/router";
 const Input = styled(DefaultInput)`
   margin-bottom: 5px;
 `;
@@ -145,13 +146,9 @@ const SettingsForm = (props: ISettingsFormProps) => {
 export default withAuthUser({
   whenUnauthedAfterInit: AuthAction.REDIRECT_TO_LOGIN,
 })(function Contest() {
-  const AuthUser = useAuthUser();
   const router = useRouter();
-  const [contestId, setContestId] = useState<string>("");
+  const contestId = useContestId();
   const [contentReady, setContentReady] = useState<boolean>(false);
-  useEffect(() => {
-    setContestId(router.query.contest as string);
-  }, [router.query]);
   const [contestFullTitle, setContestFullTitle] = useState<string>("");
   const [contestTitle, setContestTitle] = useState<string>("");
   const [contest, setContest] = useState<string>("");
@@ -193,7 +190,7 @@ export default withAuthUser({
   });
   return (
     <>
-      {contentReady && (
+      {contentReady && contestId && (
         <div className={styles.container}>
           <div className={styles.topbar}>
             <h1 className={styles.title}>Contest Settings</h1>
