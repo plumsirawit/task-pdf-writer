@@ -5,8 +5,11 @@ import styled from "styled-components";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import firebase from "firebase/app";
-import "firebase/firestore";
+import "firebase/database";
 import { useContestId } from "../../../utils/useContestId";
+import { callCreateTaskApi } from "../../api/task/create";
+import { AddButton } from "../../../components/AddButton";
+import { callListTasksApi } from "../../api/task/list";
 
 const FullButton = styled(Button)`
   margin: 0;
@@ -27,13 +30,17 @@ const FullButton = styled(Button)`
 interface ITaskRowProps {
   task: string;
   pid: string;
+  cid: string;
 }
 const TaskRow = (props: ITaskRowProps) => {
   const router = useRouter();
+  console.log(props);
   return (
     <tr>
       <td className={styles.tablects}>
-        <FullButton onClick={() => router.push(`/task/${props.pid}`)}>
+        <FullButton
+          onClick={() => router.push(`/contest/${props.cid}/task/${props.pid}`)}
+        >
           {props.task}
         </FullButton>
       </td>
@@ -60,24 +67,48 @@ export default withAuthUser({
 })(function Tasks() {
   const authUser = useAuthUser();
   const [tasks, setTasks] = useState<Task[]>([]);
-  const rows = tasks.map((task) => (
-    <TaskRow task={task.task} pid={task.pid} key={task.pid} />
-  ));
   const contestId = useContestId();
+  const rows = tasks.map((task) => (
+    <TaskRow
+      task={task.task}
+      cid={contestId ?? ""}
+      pid={task.pid}
+      key={task.pid}
+    />
+  ));
+  const fetchTasks = async () => {
+    if (!contestId) {
+      return;
+    }
+    const data = await callListTasksApi(authUser, { contestId });
+    if (!data || !data.tasks) {
+      return;
+    }
+    setTasks(
+      Object.entries(data.tasks)
+        .map(([k, v]) => ({
+          task: v.name,
+          pid: k,
+        }))
+        .sort((a, b) => (a.pid < b.pid ? -1 : 1))
+    );
+  };
   useEffect(() => {
     const uid = authUser.id;
     if (!uid || !contestId) {
       return;
     }
-    firebase
-      .firestore()
-      .collection("contests")
-      .doc(contestId)
-      .get()
-      .then((contest) => {
-        setTasks(contest.data()?.tasks ?? []);
-      });
+    fetchTasks();
   }, [authUser, contestId]);
+  const createTask = async () => {
+    if (!contestId) {
+      return;
+    }
+    await callCreateTaskApi(authUser, {
+      contestId,
+    });
+    await fetchTasks();
+  };
   return (
     <>
       <div className={styles.container}>
@@ -90,6 +121,7 @@ export default withAuthUser({
           </table>
         </div>
       </div>
+      <AddButton onClick={createTask} />
     </>
   );
 });

@@ -3,9 +3,11 @@ import { Button } from "../components/Button";
 import styles from "../styles/Contests.module.css";
 import styled from "styled-components";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import firebase from "firebase/app";
 import "firebase/firestore";
+import { AddButton } from "../components/AddButton";
+import { callCreateContestApi } from "./api/contest/create";
 
 const FullButton = styled(Button)`
   margin: 0;
@@ -37,6 +39,13 @@ const ContestRow = (props: IContestRowProps) => {
         </FullButton>
       </td>
       <td className={styles.tablebtn}>
+        <FullButton
+          onClick={() => router.push(`/contest/${props.cid}/settings`)}
+        >
+          SET
+        </FullButton>
+      </td>
+      <td className={styles.tablebtn}>
         <FullButton>DEL</FullButton>
       </td>
     </tr>
@@ -53,31 +62,44 @@ export default withAuthUser({
 })(function Contests() {
   const authUser = useAuthUser();
   const [contests, setContests] = useState<Contest[]>([]);
-  const rows = contests.map((contest) => (
-    <ContestRow contest={contest.contest} cid={contest.cid} key={contest.cid} />
-  ));
+  const rows = useMemo(
+    () =>
+      contests.map((contest) => (
+        <ContestRow
+          contest={contest.contest}
+          cid={contest.cid}
+          key={contest.cid}
+        />
+      )),
+    [contests]
+  );
   useEffect(() => {
     const uid = authUser.id;
     if (!uid) {
       return;
     }
     console.log(uid);
-    const currentContests: Contest[] = [];
-    firebase
+    return firebase
       .firestore()
       .collection("contests")
       .where("users", "array-contains", uid)
-      .get()
-      .then((contests) => {
-        contests.forEach((contest) =>
+      .orderBy(firebase.firestore.FieldPath.documentId())
+      .onSnapshot((contests) => {
+        const currentContests: Contest[] = [];
+        console.log("Start");
+        contests.forEach((contest) => {
           currentContests.push({
             contest: contest.data().title,
             cid: contest.id,
-          })
-        );
+          });
+          console.log("This time", contest.id);
+        });
         setContests(currentContests);
       });
   }, [authUser]);
+  const createContest = async () => {
+    await callCreateContestApi(authUser, {});
+  };
   return (
     <>
       <div className={styles.container}>
@@ -90,6 +112,7 @@ export default withAuthUser({
           </table>
         </div>
       </div>
+      <AddButton onClick={createContest} />
     </>
   );
 });

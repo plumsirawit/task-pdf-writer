@@ -17,7 +17,7 @@ const initAuth = () => {
         // The private key must not be accesssible on the client side.
         privateKey: process.env.FIREBASE_PRIVATE_KEY ?? "",
       },
-      databaseURL: "https://task-pdf-writer.firebaseio.com",
+      databaseURL: firebaseConfig.databaseURL,
     },
     firebaseClientInitConfig: firebaseConfig,
     cookies: {
