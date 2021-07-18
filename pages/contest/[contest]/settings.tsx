@@ -161,7 +161,6 @@ export default withAuthUser({
   const [contestDate, setContestDate] = useState<string>("");
   const [logo, setLogo] = useState<string>("https://picsum.photos/300/200"); // base64
   useEffect(() => {
-    console.log(AuthUser.id);
     if (!contestId) {
       return;
     }

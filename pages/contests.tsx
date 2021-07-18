@@ -1,8 +1,11 @@
-import { AuthAction, withAuthUser } from "next-firebase-auth";
+import { AuthAction, withAuthUser, useAuthUser } from "next-firebase-auth";
 import { Button } from "../components/Button";
 import styles from "../styles/Contests.module.css";
 import styled from "styled-components";
 import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
+import firebase from "firebase/app";
+import "firebase/firestore";
 
 const FullButton = styled(Button)`
   margin: 0;
@@ -39,9 +42,42 @@ const ContestRow = (props: IContestRowProps) => {
     </tr>
   );
 };
+
+interface Contest {
+  contest: string;
+  cid: string;
+}
+
 export default withAuthUser({
   whenUnauthedAfterInit: AuthAction.REDIRECT_TO_LOGIN,
 })(function Contests() {
+  const authUser = useAuthUser();
+  const [contests, setContests] = useState<Contest[]>([]);
+  const rows = contests.map((contest) => (
+    <ContestRow contest={contest.contest} cid={contest.cid} key={contest.cid} />
+  ));
+  useEffect(() => {
+    const uid = authUser.id;
+    if (!uid) {
+      return;
+    }
+    console.log(uid);
+    const currentContests: Contest[] = [];
+    firebase
+      .firestore()
+      .collection("contests")
+      .where("users", "array-contains", uid)
+      .get()
+      .then((contests) => {
+        contests.forEach((contest) =>
+          currentContests.push({
+            contest: contest.data().title,
+            cid: contest.id,
+          })
+        );
+        setContests(currentContests);
+      });
+  }, [authUser]);
   return (
     <>
       <div className={styles.container}>
@@ -50,11 +86,7 @@ export default withAuthUser({
         </div>
         <div className={styles.panelcontainer}>
           <table>
-            <tbody>
-              <ContestRow contest="Contest A" cid="a" />
-              <ContestRow contest="Contest B" cid="b" />
-              <ContestRow contest="Contest C" cid="c" />
-            </tbody>
+            <tbody>{rows}</tbody>
           </table>
         </div>
       </div>
