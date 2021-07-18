@@ -7,7 +7,8 @@ import styles from "../../../styles/Settings.module.css";
 import styled from "styled-components";
 import firebase from "firebase/app";
 import "firebase/firestore";
-
+import { callUpdateContestApi } from "../../api/contest/update";
+import { toBase64 } from "../../../utils/toBase64";
 const Input = styled(DefaultInput)`
   margin-bottom: 5px;
 `;
@@ -21,6 +22,7 @@ interface ISettingsFormProps {
   languageCode: string;
   contestDate: string;
   logo: string;
+  contestId: string;
 }
 
 const SettingsForm = (props: ISettingsFormProps) => {
@@ -34,7 +36,44 @@ const SettingsForm = (props: ISettingsFormProps) => {
   const [languageCode, setLanguageCode] = useState<string>(props.languageCode);
   const [contestDate, setContestDate] = useState<string>(props.contestDate);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const submitForm = () => {};
+  useEffect(() => {
+    setContestFullTitle(props.contestFullTitle);
+    setContestTitle(props.contestTitle);
+    setContest(props.contest);
+    setCountry(props.country);
+    setLanguage(props.language);
+    setLanguageCode(props.languageCode);
+    setContestDate(props.contestDate);
+  }, [props]);
+  const authUser = useAuthUser();
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const submitForm = async () => {
+    setIsLoading(true);
+    const fileInput = fileInputRef.current;
+    if (!fileInput) {
+      alert("file input not loaded");
+      setIsLoading(false);
+      return;
+    }
+    const file = fileInput.files?.[0];
+    const response = await callUpdateContestApi(authUser, {
+      contestFullTitle,
+      contestTitle,
+      contest,
+      country,
+      language,
+      languageCode,
+      contestDate,
+      logo: file && (await toBase64(file)),
+      contestId: props.contestId,
+    });
+    if (response?.error) {
+      alert(response.error);
+      setIsLoading(false);
+      return;
+    }
+    setIsLoading(false);
+  };
   return (
     <>
       <h3>Full Title</h3>
@@ -89,11 +128,14 @@ const SettingsForm = (props: ISettingsFormProps) => {
       <h3>Logo</h3>
       <div className={styles.row}>
         <span>Current Logo:</span>
-        <img src={props.logo} />
+        <img src={props.logo} className={styles.logo} />
       </div>
-
       <Input type="file" ref={fileInputRef} multiple={false} />
-      <Button onClick={submitForm} style={{ marginBottom: 40 }}>
+      <Button
+        onClick={submitForm}
+        style={{ marginBottom: 40 }}
+        disabled={isLoading}
+      >
         Update
       </Button>
     </>
@@ -136,7 +178,7 @@ export default withAuthUser({
         } else {
           setContestFullTitle(data.fulltitle);
           setContestTitle(data.title);
-          setContest(data.short);
+          setContest(data.shortname);
           setCountry(data.country);
           setLanguage(data.language);
           setLanguageCode(data.langcode);
@@ -167,6 +209,7 @@ export default withAuthUser({
               languageCode={languageCode}
               contestDate={contestDate}
               logo={logo}
+              contestId={contestId}
             />
           </div>
         </div>
