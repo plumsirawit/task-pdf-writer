@@ -8,20 +8,20 @@ import marked from "../../../../utils/initMarked";
 const SimpleMDE = dynamic(() => import("react-simplemde-editor"), {
   ssr: false,
 });
-import Modal from "react-modal";
+import { useContestId } from "../../../../utils/useContestId";
+import { useTaskId } from "../../../../utils/useTaskId";
+import firebase from "firebase/app";
+import "firebase/database";
+import debounce from "lodash.debounce";
 
 export default withAuthUser({
   whenUnauthedAfterInit: AuthAction.REDIRECT_TO_LOGIN,
 })(function Contest() {
   const router = useRouter();
-  const [contestId, setContestId] = useState<string>("");
-  const [taskId, setTaskId] = useState<string>("");
-  useEffect(() => {
-    setContestId(router.query.contest as string);
-    setTaskId(router.query.task as string);
-  }, [router.query]);
+  const contestId = useContestId();
+  const taskId = useTaskId();
   const outputRef = useRef<HTMLDivElement>(null);
-  const [markdownInput, setMarkdownInput] = useState<string>("hello, world");
+  const [markdownInput, setMarkdownInput] = useState<string>("");
   useEffect(() => {
     const outputDiv = outputRef.current;
     if (!outputDiv) {
@@ -38,6 +38,39 @@ export default withAuthUser({
       throwOnError: false,
     });
   }, [markdownInput]);
+  const fetchMarkdown = () => {
+    if (!contestId || !taskId) {
+      return;
+    }
+    return new Promise((reso) =>
+      firebase
+        .database()
+        .ref("tasks/" + taskId + "/markdown")
+        .once("value", (docs) => {
+          setMarkdownInput(docs.val());
+          reso(docs.val());
+        })
+    );
+  };
+  const storeMarkdown = useMemo(
+    () =>
+      debounce(() => {
+        if (!contestId || !taskId) {
+          return;
+        }
+        return firebase
+          .database()
+          .ref("tasks/" + taskId + "/markdown")
+          .set(markdownInput);
+      }, 15000),
+    [contestId, taskId]
+  );
+  useEffect(() => {
+    fetchMarkdown();
+  }, [contestId, taskId]);
+  useEffect(() => {
+    storeMarkdown();
+  }, [markdownInput]);
   const [pdfLoading, setPdfLoading] = useState<boolean>(false);
   const generatePdf = async () => {
     setPdfLoading(true);
@@ -48,17 +81,12 @@ export default withAuthUser({
       "document.md"
     );
   };
-  const [modalIsOpen, setModalIsOpen] = useState<boolean>(false);
-  Modal.setAppElement("#__next");
   return (
     <>
       <div className={styles.container}>
         <div className={styles.topbar}>
           <h1 className={styles.title}>Edit Task</h1>
-          <button
-            onClick={() => setModalIsOpen(true)}
-            className={styles.button}
-          >
+          <button onClick={generatePdf} className={styles.button}>
             Generate PDF
           </button>
           <button onClick={saveMarkdown} className={styles.button}>
@@ -71,6 +99,7 @@ export default withAuthUser({
         <div className={styles.panelcontainer}>
           <div className={`${styles["col-6"]} ${styles["edit-pane"]}`}>
             <SimpleMDE
+              value={markdownInput}
               onChange={setMarkdownInput}
               options={useMemo(
                 () => ({
