@@ -59,7 +59,7 @@ const handler = async (req: AuthApiRequest, res: NextApiResponse) => {
         // @ts-ignore
         tasks: admin.firestore.FieldValue.arrayRemove(taskId),
       });
-    res.status(200).send({ message: "success", taskId });
+    res.status(200).send({ message: "success" });
   } catch (e) {
     console.log("Error", e);
     res.status(500).send({ error: e.message });
