@@ -18,14 +18,6 @@ export default function Home() {
         </h1>
 
         <div className={styles.grid}>
-          <a
-            href="https://github.com/plumsirawit/task-pdf-writer"
-            className={styles.card}
-          >
-            <h2>Documentation &rarr;</h2>
-            <p>Find in-depth information about task-pdf-writer features.</p>
-          </a>
-
           <a href="/register" className={styles.card}>
             <h2>Register &rarr;</h2>
             <p>
@@ -36,6 +28,14 @@ export default function Home() {
           <a href="/login" className={styles.card}>
             <h2>Login &rarr;</h2>
             <p>Already have an account? Let's start!</p>
+          </a>
+
+          <a
+            href="https://github.com/plumsirawit/task-pdf-writer"
+            className={styles.card}
+          >
+            <h2>Documentation &rarr;</h2>
+            <p>Find in-depth information about task-pdf-writer features.</p>
           </a>
         </div>
       </main>
