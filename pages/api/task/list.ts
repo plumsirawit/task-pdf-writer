@@ -28,13 +28,18 @@ const handler = async (req: AuthApiRequest, res: NextApiResponse) => {
       .collection("contests")
       .doc(contestId)
       .get();
-    if (!contestDoc.exists) {
+    const contestData = contestDoc.data();
+    if (!contestData) {
       res.status(404).send({ error: `contest ${contestId} not found` });
       return;
     }
     const uid = req.authUser.id;
     if (!uid) {
       res.status(500).send({ error: "uid not found" });
+      return;
+    }
+    if (!contestData.users.includes(uid)) {
+      res.status(403).send({ error: "user have no access to contest" });
       return;
     }
     const docs = await new Promise((reso) =>
