@@ -41,16 +41,28 @@ export default function Home() {
       </main>
 
       <footer className={styles.footer}>
-        <a
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
+        <div className={styles.footerwrapper}>
           Powered by{" "}
-          <span className={styles.logo}>
+          <span className={styles.vercellogo}>
             <Image src="/vercel.svg" alt="Vercel Logo" width={72} height={16} />
           </span>
-        </a>
+          <span className={styles.firebaselogo}>
+            <Image
+              src="/logo-built_black.svg"
+              alt="Firebase Logo"
+              width={100}
+              height={44}
+            />
+          </span>
+          <span className={styles.firebaselogo}>
+            <Image
+              src="/powered-by-aws-white.png"
+              alt="AWS Logo"
+              width={100}
+              height={36}
+            />
+          </span>
+        </div>
       </footer>
 
       <a

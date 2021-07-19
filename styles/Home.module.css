@@ -115,15 +115,26 @@
   line-height: 1.5;
 }
 
-.logo {
+.vercellogo {
   margin-left: 0.5rem;
   background-color: white;
   border-radius: 5px;
   padding: 10px;
 }
 
-.logo > div {
+.vercellogo > div {
   display: block !important;
+}
+
+.firebaselogo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 10px;
+}
+
+.firebaselogo > div {
+  border-radius: 5px;
 }
 
 @media (max-width: 600px) {
@@ -149,4 +160,11 @@
   cursor: pointer;
   bottom: 2vmin;
   right: 2vmin;
+}
+
+.footerwrapper {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
 }
