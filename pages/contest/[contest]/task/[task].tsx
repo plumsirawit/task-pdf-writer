@@ -15,6 +15,7 @@ import "firebase/database";
 import debounce from "lodash.debounce";
 import toast, { Toaster } from "react-hot-toast";
 import { FloatingButton } from "../../../../components/FloatingButton";
+import { BlackIconSpinner } from "../../../../components/Spinner";
 import { Button } from "../../../../components/Button";
 import styled from "styled-components";
 
@@ -27,7 +28,7 @@ const RenameButton = styled(Button)`
 `;
 const PDFButton = (props: any) => (
   <FloatingButton {...props} index={2}>
-    📄
+    {props.disabled ? <BlackIconSpinner /> : "📄"}
   </FloatingButton>
 );
 const SaveButton = (props: any) => (
@@ -165,7 +166,7 @@ export default withAuthUser({
         </div>
       </div>
       <Toaster />
-      <PDFButton onClick={generatePdf} />
+      <PDFButton disabled={pdfLoading} onClick={generatePdf} />
       <SaveButton onClick={saveMarkdown} />
       <OverrideButton onClick={saveMarkdown} />
     </>
