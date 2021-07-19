@@ -29,14 +29,14 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     return;
   }
   const { email, password, fullname, displayname } = bodyDecoded.right;
-  let userCred = null;
-  try {
-    userCred = await firebaseClient
-      .auth()
-      .createUserWithEmailAndPassword(email, password);
-  } catch (e) {
-    console.log("createUser error", e);
-    res.status(400).send({ error: e.message });
+  let userCred = await firebaseClient
+    .auth()
+    .createUserWithEmailAndPassword(email, password)
+    .catch((e) => {
+      console.log("createUser error", e);
+      res.status(400).send({ error: e.message });
+    });
+  if (!userCred) {
     return;
   }
   try {

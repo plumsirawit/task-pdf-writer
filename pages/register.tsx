@@ -1,11 +1,19 @@
-import { withAuthUser, useAuthUser } from "next-firebase-auth";
+import { withAuthUser, useAuthUser, AuthAction } from "next-firebase-auth";
 import Head from "next/head";
 import styles from "../styles/Register.module.css";
 import { useState } from "react";
 import { MoonLoader } from "react-spinners";
 import { callRegisterApi } from "./api/register";
+import firebase from "firebase/app";
+import "firebase/auth";
+import { Input, InputHead } from "../components/Input";
+import { Button } from "../components/Button";
+import { Spinner } from "../components/Spinner";
+import { Card } from "../components/Card";
 
-export default withAuthUser()(function Register() {
+export default withAuthUser({
+  whenAuthed: AuthAction.REDIRECT_TO_APP,
+})(function Register() {
   const authUser = useAuthUser();
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
@@ -28,7 +36,13 @@ export default withAuthUser()(function Register() {
     });
     if (!resp?.message) {
       alert(resp?.error);
+      setIsLoading(false);
+      return;
     }
+    await firebase
+      .auth()
+      .signInWithEmailAndPassword(email, password)
+      .catch((e) => alert(e.message));
     setIsLoading(false);
   };
   return (
@@ -44,56 +58,41 @@ export default withAuthUser()(function Register() {
 
         <p className={styles.description}>Tell us who you are!</p>
 
-        <div className={styles.card}>
-          <h3 className={styles.inputhead}>Email</h3>
-          <input
+        <Card>
+          <InputHead>Email</InputHead>
+          <Input
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className={styles.input}
           />
-          <h3 className={styles.inputhead}>Password</h3>
-          <input
+          <InputHead>Password</InputHead>
+          <Input
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className={styles.input}
           />
-          <h3 className={styles.inputhead}>Confirm Password</h3>
-          <input
+          <InputHead>Confirm Password</InputHead>
+          <Input
             type="password"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
-            className={styles.input}
           />
-          <h3 className={styles.inputhead}>Full Name</h3>
-          <input
+          <InputHead>Full Name</InputHead>
+          <Input
             type="text"
             value={fullName}
             onChange={(e) => setFullName(e.target.value)}
-            className={styles.input}
           />
-          <h3 className={styles.inputhead}>Display Name</h3>
-          <input
+          <InputHead>Display Name</InputHead>
+          <Input
             type="text"
             value={displayName}
             onChange={(e) => setDisplayName(e.target.value)}
-            className={styles.input}
           />
-          <button
-            className={styles.button}
-            onClick={register}
-            disabled={isLoading}
-          >
-            {isLoading ? (
-              <div className={styles.spinnerwrapper}>
-                <MoonLoader size="15px" color="white" css="display: block" />
-              </div>
-            ) : (
-              <>Register</>
-            )}
-          </button>
-        </div>
+          <Button onClick={register} disabled={isLoading}>
+            {isLoading ? <Spinner /> : <>Register</>}
+          </Button>
+        </Card>
       </main>
     </div>
   );

@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { saveAs } from "file-saver";
 import { MoonLoader } from "react-spinners";
 import Modal from "react-modal";
-
+import { toBase64 } from "../utils/toBase64";
 const SimpleMDE = dynamic(() => import("react-simplemde-editor"), {
   ssr: false,
 });
@@ -10,14 +10,6 @@ import styles from "../styles/Editor.module.css";
 import dynamic from "next/dynamic";
 import marked from "../utils/initMarked";
 import renderMathInElement from "katex/dist/contrib/auto-render";
-
-const toBase64 = (file: File) =>
-  new Promise<string | undefined>((resolve, reject) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = () => resolve(reader.result?.toString());
-    reader.onerror = (error) => reject(error);
-  });
 
 export default function Editor() {
   const outputRef = useRef<HTMLDivElement>(null);
