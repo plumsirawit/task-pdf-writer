@@ -56,7 +56,8 @@ const handler = async (req: AuthApiRequest, res: NextApiResponse) => {
       .collection("contests")
       .doc(contestId)
       .update({
-        tasks: contestData.tasks.filter((task: string) => task !== taskId),
+        // @ts-ignore
+        tasks: admin.firestore.FieldValue.arrayRemove(taskId),
       });
     res.status(200).send({ message: "success", taskId });
   } catch (e) {
