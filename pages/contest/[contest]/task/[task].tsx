@@ -14,6 +14,32 @@ import firebase from "firebase/app";
 import "firebase/database";
 import debounce from "lodash.debounce";
 import toast, { Toaster } from "react-hot-toast";
+import { FloatingButton } from "../../../../components/FloatingButton";
+import { Button } from "../../../../components/Button";
+import styled from "styled-components";
+
+const RenameButton = styled(Button)`
+  margin: auto 0px;
+  position: absolute;
+  right: 2vmin;
+  top: calc(0.67 * 32px + 18.5px);
+  transform: translate(0%, -50%);
+`;
+const PDFButton = (props: any) => (
+  <FloatingButton {...props} index={2}>
+    📄
+  </FloatingButton>
+);
+const SaveButton = (props: any) => (
+  <FloatingButton {...props} index={1}>
+    💾
+  </FloatingButton>
+);
+const OverrideButton = (props: any) => (
+  <FloatingButton {...props} index={0}>
+    🎛️
+  </FloatingButton>
+);
 
 export default withAuthUser({
   whenUnauthedAfterInit: AuthAction.REDIRECT_TO_LOGIN,
@@ -53,6 +79,21 @@ export default withAuthUser({
         })
     );
   };
+  const [name, setName] = useState<string>("");
+  const fetchName = () => {
+    if (!contestId || !taskId) {
+      return;
+    }
+    return new Promise((reso) =>
+      firebase
+        .database()
+        .ref("tasks/" + taskId + "/name")
+        .once("value", (docs) => {
+          setName(docs.val());
+          reso(docs.val());
+        })
+    );
+  };
   const storeMarkdown = useMemo(
     () =>
       debounce((markdownInput) => {
@@ -72,6 +113,7 @@ export default withAuthUser({
   );
   useEffect(() => {
     fetchMarkdown();
+    fetchName();
   }, [contestId, taskId]);
   useEffect(() => {
     markdownInput && storeMarkdown(markdownInput);
@@ -86,20 +128,20 @@ export default withAuthUser({
       "document.md"
     );
   };
+  const promptRenameTask = () => {
+    const newName = prompt("Enter new task name", name) ?? name;
+    firebase
+      .database()
+      .ref("tasks/" + taskId + "/name")
+      .set(newName)
+      .then(() => setName(newName));
+  };
   return (
     <>
       <div className={styles.container}>
         <div className={styles.topbar}>
-          <h1 className={styles.title}>Edit Task</h1>
-          <button onClick={generatePdf} className={styles.button}>
-            Generate PDF
-          </button>
-          <button onClick={saveMarkdown} className={styles.button}>
-            Download Markdown
-          </button>
-          <button onClick={saveMarkdown} className={styles.button}>
-            Override
-          </button>
+          <h1 className={styles.title}>Edit Task: {name}</h1>
+          <RenameButton onClick={promptRenameTask}>Rename</RenameButton>
         </div>
         <div className={styles.panelcontainer}>
           <div className={`${styles["col-6"]} ${styles["edit-pane"]}`}>
@@ -123,6 +165,9 @@ export default withAuthUser({
         </div>
       </div>
       <Toaster />
+      <PDFButton onClick={generatePdf} />
+      <SaveButton onClick={saveMarkdown} />
+      <OverrideButton onClick={saveMarkdown} />
     </>
   );
 });
