@@ -13,6 +13,7 @@ import { useRouter } from "next/router";
 import { FloatingButton } from "../../../components/FloatingButton";
 import { callAddUserToContestApi } from "../../api/contest/adduser";
 import { callRemoveUserFromContestApi } from "../../api/contest/removeuser";
+import Image from "next/image";
 
 const Input = styled(DefaultInput)`
   margin-bottom: 5px;
@@ -60,7 +61,7 @@ const SettingsForm = () => {
         alert(e.message);
         router.push("/contests");
       });
-  }, [contestId]);
+  }, [contestId, router]);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const authUser = useAuthUser();
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -110,7 +111,7 @@ const SettingsForm = () => {
     };
     fileInput.addEventListener("change", cb);
     return () => fileInput.removeEventListener("change", cb);
-  }, [fileInputRef, fileInputRef.current]);
+  }, [fileInputRef]);
   return (
     <>
       {contentReady && contestId && (
@@ -167,7 +168,12 @@ const SettingsForm = () => {
           <h3>Logo</h3>
           <div className={styles.row}>
             <span>Current Logo:</span>
-            <img src={logo} className={styles.logo} />
+            <Image
+              src={logo}
+              layout="fill"
+              alt="contest logo"
+              className={styles.logo}
+            />
           </div>
           <Input type="file" ref={fileInputRef} multiple={false} />
           <Button

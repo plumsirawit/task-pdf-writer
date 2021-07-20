@@ -3,7 +3,7 @@ import { Button } from "../../../components/Button";
 import styles from "../../../styles/Contests.module.css";
 import styled from "styled-components";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useContestId } from "../../../utils/useContestId";
 import { callCreateTaskApi } from "../../api/task/create";
 import { AddButton } from "../../../components/AddButton";
@@ -119,7 +119,7 @@ export default withAuthUser({
   const authUser = useAuthUser();
   const [tasks, setTasks] = useState<Task[]>([]);
   const contestId = useContestId();
-  const fetchTasks = async () => {
+  const fetchTasks = useCallback(async () => {
     if (!contestId) {
       return;
     }
@@ -135,7 +135,7 @@ export default withAuthUser({
         }))
         .sort((a, b) => (a.pid < b.pid ? -1 : 1))
     );
-  };
+  }, [contestId, authUser]);
   const rows = tasks.map((task) => (
     <TaskRow
       task={task.task}
@@ -151,7 +151,7 @@ export default withAuthUser({
       return;
     }
     fetchTasks();
-  }, [authUser, contestId]);
+  }, [authUser, contestId, fetchTasks]);
   const createTask = async () => {
     if (!contestId) {
       return;

@@ -1,7 +1,7 @@
 import renderMathInElement from "katex/dist/contrib/auto-render";
 import { AuthAction, withAuthUser, useAuthUser } from "next-firebase-auth";
 import { useRouter } from "next/router";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import styles from "../../../../styles/Task.module.css";
 import dynamic from "next/dynamic";
 import marked from "../../../../utils/initMarked";
@@ -68,7 +68,7 @@ export default withAuthUser({
       throwOnError: false,
     });
   }, [markdownInput]);
-  const fetchMarkdown = () => {
+  const fetchMarkdown = useCallback(() => {
     if (!contestId || !taskId) {
       return;
     }
@@ -81,9 +81,9 @@ export default withAuthUser({
           reso(docs.val());
         })
     );
-  };
+  }, [contestId, taskId]);
   const [name, setName] = useState<string>("");
-  const fetchName = () => {
+  const fetchName = useCallback(() => {
     if (!contestId || !taskId) {
       return;
     }
@@ -96,24 +96,8 @@ export default withAuthUser({
           reso(docs.val());
         })
     );
-  };
+  }, [contestId, taskId]);
   const [currentUid, setCurrentUid] = useState<string>("");
-  const subscribeCurrentWriter = () => {
-    if (!contestId || !taskId) {
-      return;
-    }
-    const cb = firebase
-      .database()
-      .ref("tasks/" + taskId + "/current-uid")
-      .on("value", (docs) => {
-        setCurrentUid(docs.val());
-      });
-    return () =>
-      firebase
-        .database()
-        .ref("tasks/" + taskId + "/current-uid")
-        .off("value", cb);
-  };
   const storeMarkdown = useMemo(
     () =>
       debounce((markdownInput) => {
@@ -134,16 +118,29 @@ export default withAuthUser({
   useEffect(() => {
     fetchMarkdown();
     fetchName();
-    subscribeCurrentWriter();
-  }, [contestId, taskId]);
+    if (!contestId || !taskId) {
+      return;
+    }
+    const cb = firebase
+      .database()
+      .ref("tasks/" + taskId + "/current-uid")
+      .on("value", (docs) => {
+        setCurrentUid(docs.val());
+      });
+    return () =>
+      firebase
+        .database()
+        .ref("tasks/" + taskId + "/current-uid")
+        .off("value", cb);
+  }, [contestId, taskId, fetchMarkdown, fetchName]);
   useEffect(() => {
     if (currentUid !== authUser.id) {
       storeMarkdown.cancel();
     }
-  }, [currentUid]);
+  }, [currentUid, authUser, storeMarkdown]);
   useEffect(() => {
     markdownInput && storeMarkdown(markdownInput);
-  }, [markdownInput]);
+  }, [markdownInput, storeMarkdown]);
   const [pdfLoading, setPdfLoading] = useState<boolean>(false);
   const generatePdf = async () => {
     setPdfLoading(true);

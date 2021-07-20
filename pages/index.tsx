@@ -1,6 +1,7 @@
 import Head from "next/head";
 import Image from "next/image";
 import styles from "../styles/Home.module.css";
+import Link from "next/link";
 import { FloatingButton } from "../components/FloatingButton";
 
 export default function Home() {
@@ -18,17 +19,21 @@ export default function Home() {
         </h1>
 
         <div className={styles.grid}>
-          <a href="/register" className={styles.card}>
-            <h2>Register &rarr;</h2>
-            <p>
-              Register to discover, create, and share simple task statements.
-            </p>
-          </a>
+          <Link href="/register">
+            <a className={styles.card}>
+              <h2>Register &rarr;</h2>
+              <p>
+                Register to discover, create, and share simple task statements.
+              </p>
+            </a>
+          </Link>
 
-          <a href="/login" className={styles.card}>
-            <h2>Login &rarr;</h2>
-            <p>Already have an account? Let's start!</p>
-          </a>
+          <Link href="/login">
+            <a className={styles.card}>
+              <h2>Login &rarr;</h2>
+              <p>Already have an account? Let&apos;s start!</p>
+            </a>
+          </Link>
 
           <a
             href="https://github.com/plumsirawit/task-pdf-writer"
