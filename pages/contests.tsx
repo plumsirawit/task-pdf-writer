@@ -6,7 +6,9 @@ import { useRouter } from "next/router";
 import { useEffect, useState, useMemo } from "react";
 import firebase from "firebase/app";
 import "firebase/firestore";
+import "firebase/auth";
 import { AddButton } from "../components/AddButton";
+import { FloatingButton } from "../components/FloatingButton";
 import { callCreateContestApi } from "./api/contest/create";
 import { callDeleteContestApi } from "./api/contest/delete";
 
@@ -117,6 +119,7 @@ export default withAuthUser({
   const createContest = async () => {
     await callCreateContestApi(authUser, {});
   };
+  const logout = () => firebase.auth().signOut();
   return (
     <>
       <div className={styles.container}>
@@ -130,6 +133,9 @@ export default withAuthUser({
         </div>
       </div>
       <AddButton onClick={createContest} />
+      <FloatingButton onClick={logout} index={1}>
+        🚶
+      </FloatingButton>
     </>
   );
 });

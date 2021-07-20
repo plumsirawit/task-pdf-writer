@@ -15,7 +15,7 @@ export default withAuthUser({
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const register = () => {
+  const signIn = () => {
     setIsLoading(true);
     return firebase
       .auth()
@@ -31,7 +31,13 @@ export default withAuthUser({
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <main className={styles.main}>
+      <form
+        className={styles.main}
+        onSubmit={(e) => {
+          e.preventDefault();
+          signIn();
+        }}
+      >
         <h1 className={styles.title}>Login</h1>
 
         <p className={styles.description}>Welcome back!</p>
@@ -49,11 +55,11 @@ export default withAuthUser({
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
-          <Button onClick={register} disabled={isLoading}>
+          <Button onClick={signIn} disabled={isLoading}>
             {isLoading ? <Spinner /> : <>Sign in</>}
           </Button>
         </Card>
-      </main>
+      </form>
     </div>
   );
 });
