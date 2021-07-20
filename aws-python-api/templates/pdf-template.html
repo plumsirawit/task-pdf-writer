@@ -57,6 +57,7 @@
         text = $('#markdown').text();
         $('#preview').html(marked(text));
         renderMathInElement(document.getElementById('preview'));
+        window.setTimeout(function(){window.status="imdone";},4000);
     });
     
     IMAGES_URL = '{{ images_path }}';

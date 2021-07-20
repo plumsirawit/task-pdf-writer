@@ -38,6 +38,7 @@ WKHTMLTOPDF_CMD_OPTIONS = {
     'margin-top': '0.62in',
     'margin-bottom': '1in',
     'print-media-type': '',
+    'window-status': 'imdone'
 }
 
 
