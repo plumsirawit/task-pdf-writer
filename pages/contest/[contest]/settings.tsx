@@ -10,6 +10,10 @@ import { callUpdateContestApi } from "../../api/contest/update";
 import { toBase64 } from "../../../utils/toBase64";
 import { useContestId } from "../../../utils/useContestId";
 import { useRouter } from "next/router";
+import { FloatingButton } from "../../../components/FloatingButton";
+import { callAddUserToContestApi } from "../../api/contest/adduser";
+import { callRemoveUserFromContestApi } from "../../api/contest/removeuser";
+
 const Input = styled(DefaultInput)`
   margin-bottom: 5px;
 `;
@@ -182,6 +186,44 @@ const SettingsForm = () => {
 export default withAuthUser({
   whenUnauthedAfterInit: AuthAction.REDIRECT_TO_LOGIN,
 })(function Contest() {
+  const authUser = useAuthUser();
+  const contestId = useContestId();
+  const addUser = async () => {
+    if (!contestId) {
+      return;
+    }
+    const answer = prompt("Add user: enter another user's uid", "");
+    if (!answer) {
+      return;
+    }
+    const resp = await callAddUserToContestApi(authUser, {
+      contestId,
+      otherUserId: answer,
+    });
+    if (resp?.message === "success") {
+      alert("Success!");
+    } else {
+      alert(resp?.error);
+    }
+  };
+  const removeUser = async () => {
+    if (!contestId) {
+      return;
+    }
+    const answer = prompt("Remove user: enter another user's uid", "");
+    if (!answer) {
+      return;
+    }
+    const resp = await callRemoveUserFromContestApi(authUser, {
+      contestId,
+      otherUserId: answer,
+    });
+    if (resp?.message === "success") {
+      alert("Success!");
+    } else {
+      alert(resp?.error);
+    }
+  };
   return (
     <>
       <div className={styles.container}>
@@ -192,6 +234,12 @@ export default withAuthUser({
           <SettingsForm />
         </div>
       </div>
+      <FloatingButton index={1} onClick={removeUser}>
+        🚫
+      </FloatingButton>
+      <FloatingButton index={0} onClick={addUser}>
+        👥
+      </FloatingButton>
     </>
   );
 });
