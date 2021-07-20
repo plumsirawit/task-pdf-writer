@@ -12,7 +12,7 @@ import { FloatingButton } from "../components/FloatingButton";
 import { callCreateContestApi } from "./api/contest/create";
 import { callDeleteContestApi } from "./api/contest/delete";
 import Head from "next/head";
-
+import { FiLogOut, FiPlus } from "react-icons/fi";
 const FullButton = styled(Button)`
   margin: 0;
   min-width: 0px;
@@ -141,9 +141,11 @@ export default withAuthUser({
           </table>
         </div>
       </div>
-      <AddButton onClick={createContest} />
+      <FloatingButton onClick={createContest}>
+        <FiPlus color="white" />
+      </FloatingButton>
       <FloatingButton onClick={logout} index={1}>
-        🚶
+        <FiLogOut color="white" />
       </FloatingButton>
     </>
   );

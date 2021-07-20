@@ -22,6 +22,7 @@ import styled from "styled-components";
 import { callOverrideTaskApi } from "../../../api/task/override";
 import { saveAs } from "file-saver";
 import Head from "next/head";
+import { FiDownload, FiFileText, FiType } from "react-icons/fi";
 
 const RenameButton = styled(Button)`
   margin: auto 0px;
@@ -32,17 +33,17 @@ const RenameButton = styled(Button)`
 `;
 const PDFButton = (props: any) => (
   <FloatingButton {...props} index={2}>
-    {props.disabled ? <BlackIconSpinner /> : "📄"}
+    {props.disabled ? <BlackIconSpinner /> : <FiFileText />}
   </FloatingButton>
 );
 const SaveButton = (props: any) => (
   <FloatingButton {...props} index={1}>
-    {props.disabled ? <BlackIconSpinner /> : "📥"}
+    {props.disabled ? <BlackIconSpinner /> : <FiDownload />}
   </FloatingButton>
 );
 const OverrideButton = (props: any) => (
   <FloatingButton {...props} index={0}>
-    {props.disabled ? <BlackIconSpinner /> : "🎛️"}
+    {props.disabled ? <BlackIconSpinner /> : <FiType />}
   </FloatingButton>
 );
 

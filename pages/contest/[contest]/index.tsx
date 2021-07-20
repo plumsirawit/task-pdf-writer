@@ -12,6 +12,8 @@ import { callDeleteTaskApi } from "../../api/task/delete";
 import { callMoveTaskApi } from "../../api/task/move";
 import { callDuplicateTaskApi } from "../../api/task/duplicate";
 import Head from "next/head";
+import { FiPlus } from "react-icons/fi";
+import { FloatingButton } from "../../../components/FloatingButton";
 
 const FullButton = styled(Button)`
   margin: 0;
@@ -182,7 +184,9 @@ export default withAuthUser({
           </table>
         </div>
       </div>
-      <AddButton onClick={createTask} />
+      <FloatingButton onClick={createTask}>
+        <FiPlus color="white" />
+      </FloatingButton>
     </>
   );
 });

@@ -15,6 +15,7 @@ import { callAddUserToContestApi } from "../../api/contest/adduser";
 import { callRemoveUserFromContestApi } from "../../api/contest/removeuser";
 import Image from "next/image";
 import Head from "next/head";
+import { FiUserMinus, FiUserPlus } from "react-icons/fi";
 
 const Input = styled(DefaultInput)`
   margin-bottom: 5px;
@@ -259,10 +260,10 @@ export default withAuthUser({
         </div>
       </div>
       <FloatingButton index={1} onClick={removeUser}>
-        🚫
+        <FiUserMinus color="white" />
       </FloatingButton>
       <FloatingButton index={0} onClick={addUser}>
-        👥
+        <FiUserPlus color="white" />
       </FloatingButton>
     </>
   );
