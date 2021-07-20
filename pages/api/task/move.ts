@@ -56,14 +56,7 @@ const handler = async (req: AuthApiRequest, res: NextApiResponse) => {
       res.status(403).send({ error: "user have no access to contest" });
       return;
     }
-    if (!srcContestData.tasks.includes(taskId)) {
-      res.status(409).send({ error: "task not found" });
-      return;
-    }
-    if (destContestData.tasks.includes(taskId)) {
-      res.status(409).send({ error: "task found in destination" });
-      return;
-    }
+    // The realtime database tasks are idempotent. No need to reject upon repetition.
     await admin
       .database()
       .ref("tasks/" + taskId + "/allowed-uids")
@@ -72,6 +65,18 @@ const handler = async (req: AuthApiRequest, res: NextApiResponse) => {
           destContestData.users.map((user: string) => [user, "."])
         )
       );
+    await admin
+      .database()
+      .ref("tasks/" + taskId + "/contest")
+      .set(destContestId);
+    if (!srcContestData.tasks.includes(taskId)) {
+      res.status(409).send({ error: "task not found" });
+      return;
+    }
+    if (destContestData.tasks.includes(taskId)) {
+      res.status(409).send({ error: "task found in destination" });
+      return;
+    }
     await admin
       .firestore()
       .collection("contests")
