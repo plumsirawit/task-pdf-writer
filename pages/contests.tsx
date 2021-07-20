@@ -11,6 +11,7 @@ import { callCreateContestApi } from "./api/contest/create";
 import { callDeleteContestApi } from "./api/contest/delete";
 import Head from "next/head";
 import { FiLogOut, FiPlus, FiSettings, FiTrash } from "react-icons/fi";
+import { Spinner } from "../components/Spinner";
 
 interface IContestRowProps {
   contest: string;
@@ -121,9 +122,15 @@ export default withAuthUser({
           <h1 className={styles.title}>Contests</h1>
         </div>
         <div className={styles.panelcontainer}>
-          <table>
-            <tbody>{rows}</tbody>
-          </table>
+          {rows.length > 0 ? (
+            <table>
+              <tbody>{rows}</tbody>
+            </table>
+          ) : (
+            <div className={styles.spinnercontainer}>
+              <Spinner big />
+            </div>
+          )}
         </div>
       </div>
       <FloatingButton theme="dark" onClick={createContest}>

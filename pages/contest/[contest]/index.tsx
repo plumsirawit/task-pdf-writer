@@ -1,7 +1,6 @@
 import { AuthAction, withAuthUser, useAuthUser } from "next-firebase-auth";
 import { FullButton, IconButton } from "../../../components/Button";
 import styles from "../../../styles/Contests.module.css";
-import styled from "styled-components";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useState } from "react";
 import { useContestId } from "../../../utils/useContestId";
@@ -13,6 +12,7 @@ import { callDuplicateTaskApi } from "../../api/task/duplicate";
 import Head from "next/head";
 import { FiCopy, FiShuffle, FiPlus, FiTrash } from "react-icons/fi";
 import { FloatingButton } from "../../../components/FloatingButton";
+import { Spinner } from "../../../components/Spinner";
 
 interface ITaskRowProps {
   task: string;
@@ -168,9 +168,15 @@ export default withAuthUser({
           <h1 className={styles.title}>Tasks</h1>
         </div>
         <div className={styles.panelcontainer}>
-          <table>
-            <tbody>{rows}</tbody>
-          </table>
+          {rows.length > 0 ? (
+            <table>
+              <tbody>{rows}</tbody>
+            </table>
+          ) : (
+            <div className={styles.spinnercontainer}>
+              <Spinner big />
+            </div>
+          )}
         </div>
       </div>
       <FloatingButton theme="dark" onClick={createTask}>
