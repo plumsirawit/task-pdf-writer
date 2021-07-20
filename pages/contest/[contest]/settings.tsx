@@ -183,6 +183,7 @@ const SettingsForm = () => {
                 }
                 layout="fill"
                 alt="contest logo"
+                objectFit="contain"
               />
             </div>
           </div>
