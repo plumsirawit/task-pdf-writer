@@ -8,6 +8,7 @@ import firebase from "firebase/app";
 import "firebase/firestore";
 import { AddButton } from "../components/AddButton";
 import { callCreateContestApi } from "./api/contest/create";
+import { callDeleteContestApi } from "./api/contest/delete";
 
 const FullButton = styled(Button)`
   margin: 0;
@@ -31,6 +32,22 @@ interface IContestRowProps {
 }
 const ContestRow = (props: IContestRowProps) => {
   const router = useRouter();
+  const authUser = useAuthUser();
+  const deleteContest = async () => {
+    if (!props.cid) {
+      return;
+    }
+    const answer = prompt(
+      "Are you sure you want to delete this contest? This action is irreversible. Type 'delete' to continue.",
+      ""
+    );
+    if (answer !== "delete") {
+      return;
+    }
+    await callDeleteContestApi(authUser, {
+      contestId: props.cid,
+    });
+  };
   return (
     <tr>
       <td className={styles.tablects}>
@@ -46,7 +63,7 @@ const ContestRow = (props: IContestRowProps) => {
         </FullButton>
       </td>
       <td className={styles.tablebtn}>
-        <FullButton>DEL</FullButton>
+        <FullButton onClick={deleteContest}>DEL</FullButton>
       </td>
     </tr>
   );

@@ -1,5 +1,5 @@
 import renderMathInElement from "katex/dist/contrib/auto-render";
-import { AuthAction, withAuthUser } from "next-firebase-auth";
+import { AuthAction, withAuthUser, useAuthUser } from "next-firebase-auth";
 import { useRouter } from "next/router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import styles from "../../../../styles/Task.module.css";
@@ -18,6 +18,7 @@ import { FloatingButton } from "../../../../components/FloatingButton";
 import { BlackIconSpinner } from "../../../../components/Spinner";
 import { Button } from "../../../../components/Button";
 import styled from "styled-components";
+import { callOverrideTaskApi } from "../../../api/task/override";
 
 const RenameButton = styled(Button)`
   margin: auto 0px;
@@ -33,12 +34,12 @@ const PDFButton = (props: any) => (
 );
 const SaveButton = (props: any) => (
   <FloatingButton {...props} index={1}>
-    💾
+    {props.disabled ? <BlackIconSpinner /> : "📥"}
   </FloatingButton>
 );
 const OverrideButton = (props: any) => (
   <FloatingButton {...props} index={0}>
-    🎛️
+    {props.disabled ? <BlackIconSpinner /> : "🎛️"}
   </FloatingButton>
 );
 
@@ -46,6 +47,7 @@ export default withAuthUser({
   whenUnauthedAfterInit: AuthAction.REDIRECT_TO_LOGIN,
 })(function Contest() {
   const router = useRouter();
+  const authUser = useAuthUser();
   const contestId = useContestId();
   const taskId = useTaskId();
   const outputRef = useRef<HTMLDivElement>(null);
@@ -95,6 +97,23 @@ export default withAuthUser({
         })
     );
   };
+  const [currentUid, setCurrentUid] = useState<string>("");
+  const subscribeCurrentWriter = () => {
+    if (!contestId || !taskId) {
+      return;
+    }
+    const cb = firebase
+      .database()
+      .ref("tasks/" + taskId + "/current-uid")
+      .on("value", (docs) => {
+        setCurrentUid(docs.val());
+      });
+    return () =>
+      firebase
+        .database()
+        .ref("tasks/" + taskId + "/current-uid")
+        .off("value", cb);
+  };
   const storeMarkdown = useMemo(
     () =>
       debounce((markdownInput) => {
@@ -115,7 +134,13 @@ export default withAuthUser({
   useEffect(() => {
     fetchMarkdown();
     fetchName();
+    subscribeCurrentWriter();
   }, [contestId, taskId]);
+  useEffect(() => {
+    if (currentUid !== authUser.id) {
+      storeMarkdown.cancel();
+    }
+  }, [currentUid]);
   useEffect(() => {
     markdownInput && storeMarkdown(markdownInput);
   }, [markdownInput]);
@@ -137,6 +162,23 @@ export default withAuthUser({
       .set(newName)
       .then(() => setName(newName));
   };
+  const [overrideLoading, setOverrideLoading] = useState<boolean>(false);
+  const override = async () => {
+    if (!contestId || !taskId) {
+      return;
+    }
+    setOverrideLoading(true);
+    await callOverrideTaskApi(authUser, { contestId, taskId });
+    setOverrideLoading(false);
+  };
+  const options = useMemo(
+    () => ({
+      toolbar: false,
+      spellChecker: false,
+      status: false,
+    }),
+    []
+  );
   return (
     <>
       <div className={styles.container}>
@@ -146,18 +188,13 @@ export default withAuthUser({
         </div>
         <div className={styles.panelcontainer}>
           <div className={`${styles["col-6"]} ${styles["edit-pane"]}`}>
-            <SimpleMDE
-              value={markdownInput}
-              onChange={setMarkdownInput}
-              options={useMemo(
-                () => ({
-                  toolbar: false,
-                  spellChecker: false,
-                  status: false,
-                }),
-                []
-              )}
-            />
+            {currentUid === authUser.id && (
+              <SimpleMDE
+                value={markdownInput}
+                onChange={setMarkdownInput}
+                options={options}
+              />
+            )}
           </div>
           <div
             className={`${styles["col-6"]} ${styles["preview-pane"]} ${styles["markdown-body"]} markdown-body`}
@@ -168,7 +205,7 @@ export default withAuthUser({
       <Toaster />
       <PDFButton disabled={pdfLoading} onClick={generatePdf} />
       <SaveButton onClick={saveMarkdown} />
-      <OverrideButton onClick={saveMarkdown} />
+      <OverrideButton disabled={overrideLoading} onClick={override} />
     </>
   );
 });

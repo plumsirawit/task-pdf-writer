@@ -4,12 +4,13 @@ import styles from "../../../styles/Contests.module.css";
 import styled from "styled-components";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import firebase from "firebase/app";
-import "firebase/database";
 import { useContestId } from "../../../utils/useContestId";
 import { callCreateTaskApi } from "../../api/task/create";
 import { AddButton } from "../../../components/AddButton";
 import { callListTasksApi } from "../../api/task/list";
+import { callDeleteTaskApi } from "../../api/task/delete";
+import { callMoveTaskApi } from "../../api/task/move";
+import { callDuplicateTaskApi } from "../../api/task/duplicate";
 
 const FullButton = styled(Button)`
   margin: 0;
@@ -31,10 +32,60 @@ interface ITaskRowProps {
   task: string;
   pid: string;
   cid: string;
+  fetchTasks: () => Promise<void>;
 }
 const TaskRow = (props: ITaskRowProps) => {
   const router = useRouter();
-  console.log(props);
+  const authUser = useAuthUser();
+  const deleteTask = async () => {
+    if (!props.cid) {
+      return;
+    }
+    const answer = prompt(
+      "Are you sure you want to delete this task? This action is irreversible. Type 'delete' to continue.",
+      ""
+    );
+    if (answer !== "delete") {
+      return;
+    }
+    await callDeleteTaskApi(authUser, {
+      contestId: props.cid,
+      taskId: props.pid,
+    });
+    await props.fetchTasks();
+  };
+  const moveTask = async () => {
+    if (!props.cid) {
+      return;
+    }
+    const answer = prompt(
+      "Enter the uid of the contest you want to move this task to.",
+      ""
+    );
+    if (answer === props.cid) {
+      alert("The contest cannot be the same as current one");
+      return;
+    }
+    if (!answer) {
+      return;
+    }
+    await callMoveTaskApi(authUser, {
+      srcContestId: props.cid,
+      destContestId: answer,
+      taskId: props.pid,
+    });
+    await props.fetchTasks();
+  };
+  const duplicateTask = async () => {
+    if (!props.cid) {
+      return;
+    }
+    await callDuplicateTaskApi(authUser, {
+      contestId: props.cid,
+      taskId: props.pid,
+    });
+    await props.fetchTasks();
+  };
   return (
     <tr>
       <td className={styles.tablects}>
@@ -45,13 +96,13 @@ const TaskRow = (props: ITaskRowProps) => {
         </FullButton>
       </td>
       <td className={styles.tablebtn}>
-        <FullButton>MOV</FullButton>
+        <FullButton onClick={moveTask}>MOV</FullButton>
       </td>
       <td className={styles.tablebtn}>
-        <FullButton>DUP</FullButton>
+        <FullButton onClick={duplicateTask}>DUP</FullButton>
       </td>
       <td className={styles.tablebtn}>
-        <FullButton>DEL</FullButton>
+        <FullButton onClick={deleteTask}>DEL</FullButton>
       </td>
     </tr>
   );
@@ -68,14 +119,6 @@ export default withAuthUser({
   const authUser = useAuthUser();
   const [tasks, setTasks] = useState<Task[]>([]);
   const contestId = useContestId();
-  const rows = tasks.map((task) => (
-    <TaskRow
-      task={task.task}
-      cid={contestId ?? ""}
-      pid={task.pid}
-      key={task.pid}
-    />
-  ));
   const fetchTasks = async () => {
     if (!contestId) {
       return;
@@ -93,6 +136,15 @@ export default withAuthUser({
         .sort((a, b) => (a.pid < b.pid ? -1 : 1))
     );
   };
+  const rows = tasks.map((task) => (
+    <TaskRow
+      task={task.task}
+      cid={contestId ?? ""}
+      pid={task.pid}
+      key={task.pid}
+      fetchTasks={fetchTasks}
+    />
+  ));
   useEffect(() => {
     const uid = authUser.id;
     if (!uid || !contestId) {

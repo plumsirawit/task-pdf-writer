@@ -1,6 +1,6 @@
 import initAuth from "../../../initAuth";
 import type { NextApiResponse } from "next";
-import { FirebaseAdminType, getFirebaseAdmin } from "next-firebase-auth";
+import { getFirebaseAdmin } from "next-firebase-auth";
 import * as t from "io-ts";
 import { isLeft } from "fp-ts/Either";
 import { wrapApi } from "../../../utils/apiWrapper";
@@ -29,7 +29,8 @@ const handler = async (req: AuthApiRequest, res: NextApiResponse) => {
       .collection("contests")
       .doc(contestId)
       .get();
-    if (!contestDoc.exists) {
+    const contestData = contestDoc.data();
+    if (!contestData) {
       res.status(404).send({ error: `contest ${contestId} not found` });
       return;
     }
@@ -38,14 +39,18 @@ const handler = async (req: AuthApiRequest, res: NextApiResponse) => {
       res.status(500).send({ error: "uid not found" });
       return;
     }
+    if (!contestData.users.includes(uid)) {
+      res.status(403).send({ error: "user have no access to contest" });
+      return;
+    }
     let taskId = v4();
     await admin
       .database()
       .ref("tasks/" + taskId)
       .set({
-        "allowed-uids": {
-          [uid]: ".",
-        },
+        "allowed-uids": Object.fromEntries(
+          contestData.users.map((user: string) => [user, "."])
+        ),
         contest: contestId,
         "current-uid": req.authUser.id,
         markdown: "",

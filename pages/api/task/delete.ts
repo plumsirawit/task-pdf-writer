@@ -10,6 +10,7 @@ initAuth();
 
 const Body = t.type({
   contestId: t.string,
+  taskId: t.string,
 });
 
 export type Payload = t.TypeOf<typeof Body>;
@@ -21,7 +22,7 @@ const handler = async (req: AuthApiRequest, res: NextApiResponse) => {
       res.status(400).send({ error: "bad request" });
       return;
     }
-    const { contestId } = bodyDecoded.right;
+    const { contestId, taskId } = bodyDecoded.right;
     const admin = getFirebaseAdmin();
     const contestDoc = await admin
       .firestore()
@@ -42,15 +43,23 @@ const handler = async (req: AuthApiRequest, res: NextApiResponse) => {
       res.status(403).send({ error: "user have no access to contest" });
       return;
     }
-    const docs = await new Promise((reso) =>
-      admin
-        .database()
-        .ref("tasks/")
-        .orderByChild("contest")
-        .equalTo(contestId)
-        .once("value", (docs) => reso(docs.val()))
-    );
-    res.status(200).send({ message: "success", tasks: docs });
+    if (!contestData.tasks.includes(taskId)) {
+      res.status(409).send({ error: "task not found" });
+      return;
+    }
+    await admin
+      .database()
+      .ref("tasks/" + taskId)
+      .remove();
+    await admin
+      .firestore()
+      .collection("contests")
+      .doc(contestId)
+      .update({
+        // @ts-ignore
+        tasks: admin.firestore.FieldValue.arrayRemove(taskId),
+      });
+    res.status(200).send({ message: "success" });
   } catch (e) {
     console.log("Error", e);
     res.status(500).send({ error: e.message });
@@ -59,14 +68,7 @@ const handler = async (req: AuthApiRequest, res: NextApiResponse) => {
 
 export default withAuth(handler);
 
-export interface Task {
-  "allowed-uids": Record<string, string>;
-  contest: string;
-  "current-uid": string;
-  markdown: string;
-  name: string;
-}
-export const callListTasksApi = wrapApi<
+export const callDeleteTaskApi = wrapApi<
   Payload,
-  { message?: string; error?: string; tasks?: Record<string, Task> }
->("/api/task/list", "post");
+  { message?: string; error?: string }
+>("/api/task/delete", "delete");
