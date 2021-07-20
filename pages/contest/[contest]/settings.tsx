@@ -31,7 +31,9 @@ const SettingsForm = () => {
   const [language, setLanguage] = useState<string>("");
   const [languageCode, setLanguageCode] = useState<string>("");
   const [contestDate, setContestDate] = useState<string>("");
-  const [logo, setLogo] = useState<string>(""); // base64
+  const [logo, setLogo] = useState<string>(
+    "data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
+  ); // base64
   useEffect(() => {
     if (!contestId) {
       return;
@@ -113,6 +115,9 @@ const SettingsForm = () => {
     fileInput.addEventListener("change", cb);
     return () => fileInput.removeEventListener("change", cb);
   }, [fileInputRef]);
+  useEffect(() => {
+    console.log(logo);
+  }, [logo]);
   return (
     <>
       {contentReady && contestId && (
@@ -169,12 +174,16 @@ const SettingsForm = () => {
           <h3>Logo</h3>
           <div className={styles.row}>
             <span>Current Logo:</span>
-            <Image
-              src={logo}
-              layout="fill"
-              alt="contest logo"
-              className={styles.logo}
-            />
+            <div className={styles.logo}>
+              <Image
+                src={
+                  logo ||
+                  "data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
+                }
+                layout="fill"
+                alt="contest logo"
+              />
+            </div>
           </div>
           <Input type="file" ref={fileInputRef} multiple={false} />
           <Button

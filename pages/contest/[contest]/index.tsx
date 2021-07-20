@@ -60,7 +60,7 @@ const TaskRow = (props: ITaskRowProps) => {
       return;
     }
     const answer = prompt(
-      "Enter the uid of the contest you want to move this task to.",
+      "Enter the id of the contest you want to move this task to.",
       ""
     );
     if (answer === props.cid) {
