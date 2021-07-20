@@ -36,6 +36,7 @@
   color: white;
   background-color: #212529;
   display: inline-block;
+  position: relative;
   text-align: center;
   width: 100%;
 }

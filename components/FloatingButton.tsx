@@ -5,9 +5,9 @@ export const FloatingButton = styled.button`
   width: 64px;
   height: 64px;
   font-size: 50px;
-  display: inline-block;
-  vertical-align: middle;
-  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   text-decoration: none;
   border: none;
   background: none;
@@ -25,9 +25,22 @@ export const FloatingButton = styled.button`
           bottom: 2vmin;
         `}
   right: 2vmin;
+  &:hover,
+  &:active {
+    color: #15ff79;
+    border-color: #15ff79;
+    cursor: pointer;
+  }
   &:disabled {
     cursor: not-allowed;
     opacity: 0.7;
   }
-  color: black;
+  ${(props: { theme?: string }) =>
+    props.theme === "dark"
+      ? css`
+          color: white;
+        `
+      : css`
+          color: black;
+        `}
 `;

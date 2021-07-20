@@ -2,6 +2,9 @@ import Head from "next/head";
 import Image from "next/image";
 import styles from "../styles/Home.module.css";
 import Link from "next/link";
+import { FiGithub } from "react-icons/fi";
+import { IconButton } from "../components/Button";
+import { FloatingButton } from "../components/FloatingButton";
 
 export default function Home() {
   return (
@@ -85,12 +88,15 @@ export default function Home() {
         rel="noopener noreferrer"
         className={styles.ghlogo}
       >
-        <Image
+        <FloatingButton theme="dark">
+          <FiGithub />
+        </FloatingButton>
+        {/* <Image
           src="/GitHub-Mark-Light-64px.png"
           alt="GitHub Logo"
           width={64}
           height={64}
-        />
+        /> */}
       </a>
     </div>
   );

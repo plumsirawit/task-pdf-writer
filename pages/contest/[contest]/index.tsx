@@ -1,35 +1,18 @@
 import { AuthAction, withAuthUser, useAuthUser } from "next-firebase-auth";
-import { Button } from "../../../components/Button";
+import { FullButton, IconButton } from "../../../components/Button";
 import styles from "../../../styles/Contests.module.css";
-import styled from "styled-components";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useState } from "react";
 import { useContestId } from "../../../utils/useContestId";
 import { callCreateTaskApi } from "../../api/task/create";
-import { AddButton } from "../../../components/AddButton";
 import { callListTasksApi } from "../../api/task/list";
 import { callDeleteTaskApi } from "../../api/task/delete";
 import { callMoveTaskApi } from "../../api/task/move";
 import { callDuplicateTaskApi } from "../../api/task/duplicate";
 import Head from "next/head";
-import { FiPlus } from "react-icons/fi";
+import { FiCopy, FiShuffle, FiPlus, FiTrash } from "react-icons/fi";
 import { FloatingButton } from "../../../components/FloatingButton";
-
-const FullButton = styled(Button)`
-  margin: 0;
-  min-width: 0px;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background-color: #212529;
-  color: white;
-  text-decoration: none;
-  border: 1px solid #eaeaea;
-  border-radius: 5px;
-  transition: color 0.15s ease, border-color 0.15s ease;
-`;
+import { Spinner } from "../../../components/Spinner";
 
 interface ITaskRowProps {
   task: string;
@@ -99,13 +82,19 @@ const TaskRow = (props: ITaskRowProps) => {
         </FullButton>
       </td>
       <td className={styles.tablebtn}>
-        <FullButton onClick={moveTask}>MOV</FullButton>
+        <IconButton onClick={moveTask}>
+          <FiShuffle />
+        </IconButton>
       </td>
       <td className={styles.tablebtn}>
-        <FullButton onClick={duplicateTask}>DUP</FullButton>
+        <IconButton onClick={duplicateTask}>
+          <FiCopy />
+        </IconButton>
       </td>
       <td className={styles.tablebtn}>
-        <FullButton onClick={deleteTask}>DEL</FullButton>
+        <IconButton onClick={deleteTask}>
+          <FiTrash />
+        </IconButton>
       </td>
     </tr>
   );
@@ -179,13 +168,19 @@ export default withAuthUser({
           <h1 className={styles.title}>Tasks</h1>
         </div>
         <div className={styles.panelcontainer}>
-          <table>
-            <tbody>{rows}</tbody>
-          </table>
+          {rows.length > 0 ? (
+            <table>
+              <tbody>{rows}</tbody>
+            </table>
+          ) : (
+            <div className={styles.spinnercontainer}>
+              <Spinner big />
+            </div>
+          )}
         </div>
       </div>
-      <FloatingButton onClick={createTask}>
-        <FiPlus color="white" />
+      <FloatingButton theme="dark" onClick={createTask}>
+        <FiPlus />
       </FloatingButton>
     </>
   );

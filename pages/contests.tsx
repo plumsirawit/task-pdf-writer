@@ -1,33 +1,17 @@
 import { AuthAction, withAuthUser, useAuthUser } from "next-firebase-auth";
-import { Button } from "../components/Button";
+import { FullButton, IconButton } from "../components/Button";
 import styles from "../styles/Contests.module.css";
-import styled from "styled-components";
 import { useRouter } from "next/router";
 import { useEffect, useState, useMemo } from "react";
 import firebase from "firebase/app";
 import "firebase/firestore";
 import "firebase/auth";
-import { AddButton } from "../components/AddButton";
 import { FloatingButton } from "../components/FloatingButton";
 import { callCreateContestApi } from "./api/contest/create";
 import { callDeleteContestApi } from "./api/contest/delete";
 import Head from "next/head";
-import { FiLogOut, FiPlus } from "react-icons/fi";
-const FullButton = styled(Button)`
-  margin: 0;
-  min-width: 0px;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background-color: #212529;
-  color: white;
-  text-decoration: none;
-  border: 1px solid #eaeaea;
-  border-radius: 5px;
-  transition: color 0.15s ease, border-color 0.15s ease;
-`;
+import { FiLogOut, FiPlus, FiSettings, FiTrash } from "react-icons/fi";
+import { Spinner } from "../components/Spinner";
 
 interface IContestRowProps {
   contest: string;
@@ -59,14 +43,16 @@ const ContestRow = (props: IContestRowProps) => {
         </FullButton>
       </td>
       <td className={styles.tablebtn}>
-        <FullButton
+        <IconButton
           onClick={() => router.push(`/contest/${props.cid}/settings`)}
         >
-          SET
-        </FullButton>
+          <FiSettings />
+        </IconButton>
       </td>
       <td className={styles.tablebtn}>
-        <FullButton onClick={deleteContest}>DEL</FullButton>
+        <IconButton onClick={deleteContest}>
+          <FiTrash />
+        </IconButton>
       </td>
     </tr>
   );
@@ -136,16 +122,22 @@ export default withAuthUser({
           <h1 className={styles.title}>Contests</h1>
         </div>
         <div className={styles.panelcontainer}>
-          <table>
-            <tbody>{rows}</tbody>
-          </table>
+          {rows.length > 0 ? (
+            <table>
+              <tbody>{rows}</tbody>
+            </table>
+          ) : (
+            <div className={styles.spinnercontainer}>
+              <Spinner big />
+            </div>
+          )}
         </div>
       </div>
-      <FloatingButton onClick={createContest}>
-        <FiPlus color="white" />
+      <FloatingButton theme="dark" onClick={createContest}>
+        <FiPlus />
       </FloatingButton>
-      <FloatingButton onClick={logout} index={1}>
-        <FiLogOut color="white" />
+      <FloatingButton theme="dark" onClick={logout} index={1}>
+        <FiLogOut />
       </FloatingButton>
     </>
   );
