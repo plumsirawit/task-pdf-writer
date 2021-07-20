@@ -40,6 +40,8 @@ RUN python3.8 -m pip install awslambdaric
 
 # COPY docker-entrypoint.sh /root/docker-entrypoint.sh
 # RUN chmod +x /root/docker-entrypoint.sh
+COPY binaries/cpdf/cpdf /usr/bin/
+RUN chmod +x /usr/bin/cpdf
 
 COPY . /usr/src/app
 WORKDIR /usr/src/app
