@@ -113,12 +113,13 @@ export default withAuthUser({
         toast("Saving...", {
           position: "bottom-center",
           icon: "💾",
+          duration: 1000,
         });
         return firebase
           .database()
           .ref("tasks/" + taskId + "/markdown")
           .set(markdownInput);
-      }, 10000),
+      }, 1000),
     [contestId, taskId]
   );
   useEffect(() => {
