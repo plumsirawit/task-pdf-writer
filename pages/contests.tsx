@@ -11,6 +11,7 @@ import { AddButton } from "../components/AddButton";
 import { FloatingButton } from "../components/FloatingButton";
 import { callCreateContestApi } from "./api/contest/create";
 import { callDeleteContestApi } from "./api/contest/delete";
+import Head from "next/head";
 
 const FullButton = styled(Button)`
   margin: 0;
@@ -122,6 +123,14 @@ export default withAuthUser({
   const logout = () => firebase.auth().signOut();
   return (
     <>
+      <Head>
+        <title>task-pdf-writer | Contests</title>
+        <meta
+          name="description"
+          content="Tool for writing competitive programming tasks in PDF"
+        />
+        <link rel="icon" href="/favicon.ico" />
+      </Head>
       <div className={styles.container}>
         <div className={styles.topbar}>
           <h1 className={styles.title}>Contests</h1>

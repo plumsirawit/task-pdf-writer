@@ -21,6 +21,7 @@ import { Button } from "../../../../components/Button";
 import styled from "styled-components";
 import { callOverrideTaskApi } from "../../../api/task/override";
 import { saveAs } from "file-saver";
+import Head from "next/head";
 
 const RenameButton = styled(Button)`
   margin: auto 0px;
@@ -220,6 +221,14 @@ export default withAuthUser({
   );
   return (
     <>
+      <Head>
+        <title>task-pdf-writer | Task</title>
+        <meta
+          name="description"
+          content="Tool for writing competitive programming tasks in PDF"
+        />
+        <link rel="icon" href="/favicon.ico" />
+      </Head>
       <div className={styles.container}>
         <div className={styles.topbar}>
           <h1 className={styles.title}>Edit Task: {name}</h1>

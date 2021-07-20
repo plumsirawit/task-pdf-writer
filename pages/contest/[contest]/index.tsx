@@ -11,6 +11,7 @@ import { callListTasksApi } from "../../api/task/list";
 import { callDeleteTaskApi } from "../../api/task/delete";
 import { callMoveTaskApi } from "../../api/task/move";
 import { callDuplicateTaskApi } from "../../api/task/duplicate";
+import Head from "next/head";
 
 const FullButton = styled(Button)`
   margin: 0;
@@ -163,6 +164,14 @@ export default withAuthUser({
   };
   return (
     <>
+      <Head>
+        <title>task-pdf-writer | Tasks</title>
+        <meta
+          name="description"
+          content="Tool for writing competitive programming tasks in PDF"
+        />
+        <link rel="icon" href="/favicon.ico" />
+      </Head>
       <div className={styles.container}>
         <div className={styles.topbar}>
           <h1 className={styles.title}>Tasks</h1>

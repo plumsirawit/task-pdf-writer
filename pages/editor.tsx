@@ -10,6 +10,7 @@ import styles from "../styles/Editor.module.css";
 import dynamic from "next/dynamic";
 import marked from "../utils/initMarked";
 import renderMathInElement from "katex/dist/contrib/auto-render";
+import Head from "next/head";
 
 export default function Editor() {
   const outputRef = useRef<HTMLDivElement>(null);
@@ -82,6 +83,14 @@ export default function Editor() {
   Modal.setAppElement("#__next");
   return (
     <>
+      <Head>
+        <title>task-pdf-writer | Editor</title>
+        <meta
+          name="description"
+          content="Tool for writing competitive programming tasks in PDF"
+        />
+        <link rel="icon" href="/favicon.ico" />
+      </Head>
       <Modal isOpen={modalIsOpen} contentLabel="Example Modal">
         <div className={styles.modal}>
           <div className={styles.modalrow}>

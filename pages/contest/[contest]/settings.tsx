@@ -14,6 +14,7 @@ import { FloatingButton } from "../../../components/FloatingButton";
 import { callAddUserToContestApi } from "../../api/contest/adduser";
 import { callRemoveUserFromContestApi } from "../../api/contest/removeuser";
 import Image from "next/image";
+import Head from "next/head";
 
 const Input = styled(DefaultInput)`
   margin-bottom: 5px;
@@ -232,6 +233,14 @@ export default withAuthUser({
   };
   return (
     <>
+      <Head>
+        <title>task-pdf-writer | Settings</title>
+        <meta
+          name="description"
+          content="Tool for writing competitive programming tasks in PDF"
+        />
+        <link rel="icon" href="/favicon.ico" />
+      </Head>
       <div className={styles.container}>
         <div className={styles.topbar}>
           <h1 className={styles.title}>Contest Settings</h1>
