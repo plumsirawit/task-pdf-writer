@@ -15,7 +15,9 @@ const initAuth = () => {
         clientEmail:
           "firebase-adminsdk-am4ez@task-pdf-writer.iam.gserviceaccount.com",
         // The private key must not be accesssible on the client side.
-        privateKey: process.env.FIREBASE_PRIVATE_KEY ?? "",
+        privateKey: process.env.FIREBASE_PRIVATE_KEY
+          ? JSON.parse(process.env.FIREBASE_PRIVATE_KEY)
+          : "",
       },
       databaseURL: firebaseConfig.databaseURL,
     },
