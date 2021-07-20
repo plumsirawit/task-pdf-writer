@@ -12,6 +12,7 @@ import { useContestId } from "../../../../utils/useContestId";
 import { useTaskId } from "../../../../utils/useTaskId";
 import firebase from "firebase/app";
 import "firebase/database";
+import "firebase/firestore";
 import debounce from "lodash.debounce";
 import toast, { Toaster } from "react-hot-toast";
 import { FloatingButton } from "../../../../components/FloatingButton";
@@ -19,6 +20,7 @@ import { BlackIconSpinner } from "../../../../components/Spinner";
 import { Button } from "../../../../components/Button";
 import styled from "styled-components";
 import { callOverrideTaskApi } from "../../../api/task/override";
+import { saveAs } from "file-saver";
 
 const RenameButton = styled(Button)`
   margin: auto 0px;
@@ -143,7 +145,47 @@ export default withAuthUser({
   }, [markdownInput, storeMarkdown]);
   const [pdfLoading, setPdfLoading] = useState<boolean>(false);
   const generatePdf = async () => {
+    if (!contestId || !taskId) {
+      return;
+    }
     setPdfLoading(true);
+    const contestDoc = await firebase
+      .firestore()
+      .collection("contests")
+      .doc(contestId)
+      .get();
+    const contestData = contestDoc.data();
+    if (!contestData) {
+      alert("contest not found (probably a bug)");
+      setPdfLoading(false);
+      return;
+    }
+    const innerResp = await fetch(
+      "https://973i5k6wjg.execute-api.ap-southeast-1.amazonaws.com/dev/genpdf",
+      {
+        body: JSON.stringify({
+          content: markdownInput,
+          contest_full_title: contestData.fulltitle,
+          contest_title: contestData.title,
+          contest: contestData.shortname,
+          task_name: name,
+          country: contestData.country,
+          language: contestData.language,
+          language_code: contestData.langcode,
+          contest_date: contestData.date,
+          image_base64: contestData.logo,
+        }),
+        method: "post",
+      }
+    );
+    const pdfResult = (await innerResp.json()).message;
+    setPdfLoading(false);
+    if (pdfResult) {
+      const buffer = Buffer.from(pdfResult, "base64");
+      saveAs(new Blob([buffer], { type: "application/pdf" }), "document.pdf");
+    } else {
+      alert("genpdf error");
+    }
   };
   const saveMarkdown = () => {
     saveAs(
