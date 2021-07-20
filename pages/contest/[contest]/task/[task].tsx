@@ -17,18 +17,20 @@ import debounce from "lodash.debounce";
 import toast, { Toaster } from "react-hot-toast";
 import { FloatingButton } from "../../../../components/FloatingButton";
 import { BlackIconSpinner } from "../../../../components/Spinner";
-import { Button } from "../../../../components/Button";
+import { IconButton } from "../../../../components/Button";
 import styled from "styled-components";
 import { callOverrideTaskApi } from "../../../api/task/override";
 import { saveAs } from "file-saver";
 import Head from "next/head";
-import { FiDownload, FiFileText, FiType } from "react-icons/fi";
+import { FiDownload, FiEdit3, FiFileText, FiType } from "react-icons/fi";
 
-const RenameButton = styled(Button)`
+const RenameButton = styled(IconButton)`
+  width: 64px;
+  height: 64px;
   margin: auto 0px;
   position: absolute;
   right: 2vmin;
-  top: calc(0.67 * 32px + 18.5px);
+  top: 50%;
   transform: translate(0%, -50%);
 `;
 const PDFButton = (props: any) => (
@@ -233,7 +235,9 @@ export default withAuthUser({
       <div className={styles.container}>
         <div className={styles.topbar}>
           <h1 className={styles.title}>Edit Task: {name}</h1>
-          <RenameButton onClick={promptRenameTask}>Rename</RenameButton>
+          <RenameButton onClick={promptRenameTask}>
+            <FiEdit3 />
+          </RenameButton>
         </div>
         <div className={styles.panelcontainer}>
           <div className={`${styles["col-6"]} ${styles["edit-pane"]}`}>
