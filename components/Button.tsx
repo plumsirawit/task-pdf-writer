@@ -15,6 +15,7 @@ export const Button = styled.button`
   transition: color 0.35s ease, border-color 0.35s ease,
     background-color 0.5s ease;
   background-color: #383f46;
+  z-index: 1;
   // #212529;
   position: relative;
 

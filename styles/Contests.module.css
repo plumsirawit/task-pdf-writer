@@ -55,3 +55,20 @@
   align-items: center;
   justify-content: center;
 }
+
+.footer {
+  width: 100%;
+  height: calc(2vmin + 64px);
+  position: fixed;
+  bottom: 0;
+  z-index: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #212529;
+  color: white;
+}
+
+.footer h3 {
+  margin-right: 20px;
+}

@@ -147,12 +147,17 @@ export default withAuthUser({
         title="Add new contest"
         theme="dark"
         onClick={createContest}
+        index={1}
       >
         <FiPlus />
       </FloatingButton>
-      <FloatingButton title="Logout" theme="dark" onClick={logout} index={1}>
+      <FloatingButton title="Logout" theme="dark" onClick={logout} index={2}>
         <FiLogOut />
       </FloatingButton>
+      <footer className={styles.footer}>
+        <h3>User id:</h3>
+        <code>{authUser.id}</code>
+      </footer>
     </>
   );
 });
