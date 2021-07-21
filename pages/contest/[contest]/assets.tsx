@@ -62,14 +62,14 @@ const AssetRow = (props: IAssetRowProps) => {
         <p>{props.aid}</p>
       </td>
       <td className={styles.tablebtn}>
-        <IconButton onClick={() => router.push(assetSrc)}>
+        <IconButton title="View asset" onClick={() => router.push(assetSrc)}>
           {assetSrc && props.mimeType.includes("image") && (
             <Image src={assetSrc} layout="fill" />
           )}
         </IconButton>
       </td>
       <td className={styles.tablebtn}>
-        <IconButton onClick={deleteAsset}>
+        <IconButton title="Delete" onClick={deleteAsset}>
           <FiTrash />
         </IconButton>
       </td>
@@ -109,7 +109,7 @@ export default withAuthUser({
       });
     }
   };
-  const [assets, setAssets] = useState<Asset[]>([]);
+  const [assets, setAssets] = useState<Asset[] | null>(null);
   useEffect(() => {
     if (!contestId) {
       return;
@@ -130,14 +130,16 @@ export default withAuthUser({
         setAssets(currentAssets);
       });
   }, [contestId]);
-  const rows = assets.map((asset) => (
-    <AssetRow
-      cid={contestId ?? ""}
-      aid={asset.id}
-      key={asset.id}
-      mimeType={asset.contentType}
-    />
-  ));
+  const rows =
+    assets &&
+    assets.map((asset) => (
+      <AssetRow
+        cid={contestId ?? ""}
+        aid={asset.id}
+        key={asset.id}
+        mimeType={asset.contentType}
+      />
+    ));
   return (
     <>
       <Head>
@@ -153,7 +155,7 @@ export default withAuthUser({
           <h1 className={styles.title}>Assets</h1>
         </div>
         <div className={styles.panelcontainer}>
-          {true ? (
+          {assets !== null ? (
             <table>
               <tbody>{rows}</tbody>
             </table>
@@ -164,7 +166,7 @@ export default withAuthUser({
           )}
         </div>
       </div>
-      <FloatingButton onClick={uploadAsset} theme="dark">
+      <FloatingButton title="Upload asset" onClick={uploadAsset} theme="dark">
         <input
           type="file"
           style={{ display: "none" }}

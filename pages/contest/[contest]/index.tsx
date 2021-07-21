@@ -82,17 +82,17 @@ const TaskRow = (props: ITaskRowProps) => {
         </FullButton>
       </td>
       <td className={styles.tablebtn}>
-        <IconButton onClick={moveTask}>
+        <IconButton title="Move to other contest" onClick={moveTask}>
           <FiShuffle />
         </IconButton>
       </td>
       <td className={styles.tablebtn}>
-        <IconButton onClick={duplicateTask}>
+        <IconButton title="Duplicate task" onClick={duplicateTask}>
           <FiCopy />
         </IconButton>
       </td>
       <td className={styles.tablebtn}>
-        <IconButton onClick={deleteTask}>
+        <IconButton title="Delete task" onClick={deleteTask}>
           <FiTrash />
         </IconButton>
       </td>
@@ -109,7 +109,7 @@ export default withAuthUser({
   whenUnauthedAfterInit: AuthAction.REDIRECT_TO_LOGIN,
 })(function Tasks() {
   const authUser = useAuthUser();
-  const [tasks, setTasks] = useState<Task[]>([]);
+  const [tasks, setTasks] = useState<Task[] | null>(null);
   const contestId = useContestId();
   const fetchTasks = useCallback(async () => {
     if (!contestId) {
@@ -128,15 +128,17 @@ export default withAuthUser({
         .sort((a, b) => (a.pid < b.pid ? -1 : 1))
     );
   }, [contestId, authUser]);
-  const rows = tasks.map((task) => (
-    <TaskRow
-      task={task.task}
-      cid={contestId ?? ""}
-      pid={task.pid}
-      key={task.pid}
-      fetchTasks={fetchTasks}
-    />
-  ));
+  const rows =
+    tasks &&
+    tasks.map((task) => (
+      <TaskRow
+        task={task.task}
+        cid={contestId ?? ""}
+        pid={task.pid}
+        key={task.pid}
+        fetchTasks={fetchTasks}
+      />
+    ));
   useEffect(() => {
     const uid = authUser.id;
     if (!uid || !contestId) {
@@ -168,7 +170,7 @@ export default withAuthUser({
           <h1 className={styles.title}>Tasks</h1>
         </div>
         <div className={styles.panelcontainer}>
-          {rows.length > 0 ? (
+          {tasks !== null ? (
             <table>
               <tbody>{rows}</tbody>
             </table>
@@ -179,7 +181,7 @@ export default withAuthUser({
           )}
         </div>
       </div>
-      <FloatingButton theme="dark" onClick={createTask}>
+      <FloatingButton title="Add new task" theme="dark" onClick={createTask}>
         <FiPlus />
       </FloatingButton>
     </>

@@ -44,18 +44,22 @@ const ContestRow = (props: IContestRowProps) => {
       </td>
       <td className={styles.tablebtn}>
         <IconButton
+          title="Settings"
           onClick={() => router.push(`/contest/${props.cid}/settings`)}
         >
           <FiSettings />
         </IconButton>
       </td>
       <td className={styles.tablebtn}>
-        <IconButton onClick={() => router.push(`/contest/${props.cid}/assets`)}>
+        <IconButton
+          title="Upload Assets"
+          onClick={() => router.push(`/contest/${props.cid}/assets`)}
+        >
           <FiImage />
         </IconButton>
       </td>
       <td className={styles.tablebtn}>
-        <IconButton onClick={deleteContest}>
+        <IconButton title="Delete" onClick={deleteContest}>
           <FiTrash />
         </IconButton>
       </td>
@@ -72,9 +76,10 @@ export default withAuthUser({
   whenUnauthedAfterInit: AuthAction.REDIRECT_TO_LOGIN,
 })(function Contests() {
   const authUser = useAuthUser();
-  const [contests, setContests] = useState<Contest[]>([]);
+  const [contests, setContests] = useState<Contest[] | null>(null);
   const rows = useMemo(
     () =>
+      contests &&
       contests.map((contest) => (
         <ContestRow
           contest={contest.contest}
@@ -127,7 +132,7 @@ export default withAuthUser({
           <h1 className={styles.title}>Contests</h1>
         </div>
         <div className={styles.panelcontainer}>
-          {rows.length > 0 ? (
+          {contests !== null ? (
             <table>
               <tbody>{rows}</tbody>
             </table>
@@ -138,12 +143,21 @@ export default withAuthUser({
           )}
         </div>
       </div>
-      <FloatingButton theme="dark" onClick={createContest}>
+      <FloatingButton
+        title="Add new contest"
+        theme="dark"
+        onClick={createContest}
+        index={1}
+      >
         <FiPlus />
       </FloatingButton>
-      <FloatingButton theme="dark" onClick={logout} index={1}>
+      <FloatingButton title="Logout" theme="dark" onClick={logout} index={2}>
         <FiLogOut />
       </FloatingButton>
+      <footer className={styles.footer}>
+        <h3>User id:</h3>
+        <code>{authUser.id}</code>
+      </footer>
     </>
   );
 });

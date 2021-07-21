@@ -14,6 +14,7 @@ export const FloatingButton = styled.button`
   transition: color 0.35s ease, border-color 0.35s ease;
   position: fixed;
   cursor: pointer;
+  z-index: 1;
   ${(props: { index?: number }) =>
     props.index
       ? css`
