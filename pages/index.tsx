@@ -48,10 +48,10 @@ export default function Home() {
           </Link>
 
           <a
-            href="https://github.com/plumsirawit/task-pdf-writer"
+            href="https://github.com/plumsirawit/task-pdf-writer/wiki/Instructions"
             className={styles.card}
           >
-            <h2>Documentation &rarr;</h2>
+            <h2>Instructions &rarr;</h2>
             <p>Find in-depth information about task-pdf-writer features.</p>
           </a>
         </div>
