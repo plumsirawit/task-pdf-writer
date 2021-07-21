@@ -279,10 +279,15 @@ export default withAuthUser({
           <SettingsForm />
         </div>
       </div>
-      <FloatingButton theme="dark" index={1} onClick={removeUser}>
+      <FloatingButton
+        title="Remove user"
+        theme="dark"
+        index={1}
+        onClick={removeUser}
+      >
         <FiUserMinus />
       </FloatingButton>
-      <FloatingButton theme="dark" index={0} onClick={addUser}>
+      <FloatingButton title="Add user" theme="dark" index={0} onClick={addUser}>
         <FiUserPlus />
       </FloatingButton>
       <Toaster />

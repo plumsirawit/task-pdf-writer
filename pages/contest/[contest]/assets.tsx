@@ -62,14 +62,14 @@ const AssetRow = (props: IAssetRowProps) => {
         <p>{props.aid}</p>
       </td>
       <td className={styles.tablebtn}>
-        <IconButton onClick={() => router.push(assetSrc)}>
+        <IconButton title="View asset" onClick={() => router.push(assetSrc)}>
           {assetSrc && props.mimeType.includes("image") && (
             <Image src={assetSrc} layout="fill" />
           )}
         </IconButton>
       </td>
       <td className={styles.tablebtn}>
-        <IconButton onClick={deleteAsset}>
+        <IconButton title="Delete" onClick={deleteAsset}>
           <FiTrash />
         </IconButton>
       </td>
@@ -166,7 +166,7 @@ export default withAuthUser({
           )}
         </div>
       </div>
-      <FloatingButton onClick={uploadAsset} theme="dark">
+      <FloatingButton title="Upload asset" onClick={uploadAsset} theme="dark">
         <input
           type="file"
           style={{ display: "none" }}

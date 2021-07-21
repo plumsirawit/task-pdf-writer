@@ -44,18 +44,22 @@ const ContestRow = (props: IContestRowProps) => {
       </td>
       <td className={styles.tablebtn}>
         <IconButton
+          title="Settings"
           onClick={() => router.push(`/contest/${props.cid}/settings`)}
         >
           <FiSettings />
         </IconButton>
       </td>
       <td className={styles.tablebtn}>
-        <IconButton onClick={() => router.push(`/contest/${props.cid}/assets`)}>
+        <IconButton
+          title="Upload Assets"
+          onClick={() => router.push(`/contest/${props.cid}/assets`)}
+        >
           <FiImage />
         </IconButton>
       </td>
       <td className={styles.tablebtn}>
-        <IconButton onClick={deleteContest}>
+        <IconButton title="Delete" onClick={deleteContest}>
           <FiTrash />
         </IconButton>
       </td>
@@ -139,10 +143,14 @@ export default withAuthUser({
           )}
         </div>
       </div>
-      <FloatingButton theme="dark" onClick={createContest}>
+      <FloatingButton
+        title="Add new contest"
+        theme="dark"
+        onClick={createContest}
+      >
         <FiPlus />
       </FloatingButton>
-      <FloatingButton theme="dark" onClick={logout} index={1}>
+      <FloatingButton title="Logout" theme="dark" onClick={logout} index={1}>
         <FiLogOut />
       </FloatingButton>
     </>

@@ -82,17 +82,17 @@ const TaskRow = (props: ITaskRowProps) => {
         </FullButton>
       </td>
       <td className={styles.tablebtn}>
-        <IconButton onClick={moveTask}>
+        <IconButton title="Move to other contest" onClick={moveTask}>
           <FiShuffle />
         </IconButton>
       </td>
       <td className={styles.tablebtn}>
-        <IconButton onClick={duplicateTask}>
+        <IconButton title="Duplicate task" onClick={duplicateTask}>
           <FiCopy />
         </IconButton>
       </td>
       <td className={styles.tablebtn}>
-        <IconButton onClick={deleteTask}>
+        <IconButton title="Delete task" onClick={deleteTask}>
           <FiTrash />
         </IconButton>
       </td>
@@ -181,7 +181,7 @@ export default withAuthUser({
           )}
         </div>
       </div>
-      <FloatingButton theme="dark" onClick={createTask}>
+      <FloatingButton title="Add new task" theme="dark" onClick={createTask}>
         <FiPlus />
       </FloatingButton>
     </>

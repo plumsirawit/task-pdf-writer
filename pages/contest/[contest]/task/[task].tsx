@@ -242,13 +242,27 @@ export default withAuthUser({
         </div>
       </div>
       <Toaster />
-      <FloatingButton disabled={pdfLoading} onClick={generatePdf} index={2}>
+      <FloatingButton
+        title="Generate PDF"
+        disabled={pdfLoading}
+        onClick={generatePdf}
+        index={2}
+      >
         {pdfLoading ? <BlackIconSpinner /> : <FiFileText />}
       </FloatingButton>
-      <FloatingButton onClick={saveMarkdown} index={1}>
+      <FloatingButton
+        title="Download markdown"
+        onClick={saveMarkdown}
+        index={1}
+      >
         <FiDownload />
       </FloatingButton>
-      <FloatingButton disabled={overrideLoading} onClick={override} index={0}>
+      <FloatingButton
+        title="Override control"
+        disabled={overrideLoading}
+        onClick={override}
+        index={0}
+      >
         {overrideLoading ? <BlackIconSpinner /> : <FiType />}
       </FloatingButton>
     </>
