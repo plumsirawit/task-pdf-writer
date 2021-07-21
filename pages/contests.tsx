@@ -10,7 +10,7 @@ import { FloatingButton } from "../components/FloatingButton";
 import { callCreateContestApi } from "./api/contest/create";
 import { callDeleteContestApi } from "./api/contest/delete";
 import Head from "next/head";
-import { FiLogOut, FiPlus, FiSettings, FiTrash } from "react-icons/fi";
+import { FiImage, FiLogOut, FiPlus, FiSettings, FiTrash } from "react-icons/fi";
 import { Spinner } from "../components/Spinner";
 
 interface IContestRowProps {
@@ -47,6 +47,11 @@ const ContestRow = (props: IContestRowProps) => {
           onClick={() => router.push(`/contest/${props.cid}/settings`)}
         >
           <FiSettings />
+        </IconButton>
+      </td>
+      <td className={styles.tablebtn}>
+        <IconButton onClick={() => router.push(`/contest/${props.cid}/assets`)}>
+          <FiImage />
         </IconButton>
       </td>
       <td className={styles.tablebtn}>
