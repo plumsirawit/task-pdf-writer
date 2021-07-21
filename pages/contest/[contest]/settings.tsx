@@ -35,6 +35,7 @@ const SettingsForm = () => {
   const [logo, setLogo] = useState<string>(
     "data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
   ); // base64
+  const [users, setUsers] = useState<string[]>([]);
   useEffect(() => {
     if (!contestId) {
       return;
@@ -117,8 +118,17 @@ const SettingsForm = () => {
     return () => fileInput.removeEventListener("change", cb);
   }, [fileInputRef]);
   useEffect(() => {
-    console.log(logo);
-  }, [logo]);
+    if (!contestId) {
+      return;
+    }
+    return firebase
+      .firestore()
+      .collection("contests")
+      .doc(contestId)
+      .onSnapshot((doc) => {
+        setUsers(doc?.data()?.users);
+      });
+  }, [contestId]);
   return (
     <>
       {contentReady && contestId && (
@@ -188,6 +198,10 @@ const SettingsForm = () => {
             </div>
           </div>
           <Input type="file" ref={fileInputRef} multiple={false} />
+          <h3>Users List</h3>
+          {users.map((user) => (
+            <p key={user}>{user}</p>
+          ))}
           <Button
             onClick={submitForm}
             style={{ marginBottom: 40 }}
