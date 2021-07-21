@@ -16,6 +16,7 @@ import { callRemoveUserFromContestApi } from "../../api/contest/removeuser";
 import Image from "next/image";
 import Head from "next/head";
 import { FiUserMinus, FiUserPlus } from "react-icons/fi";
+import toast, { Toaster } from "react-hot-toast";
 
 const Input = styled(DefaultInput)`
   margin-bottom: 5px;
@@ -233,7 +234,9 @@ export default withAuthUser({
       otherUserId: answer,
     });
     if (resp?.message === "success") {
-      alert("Success!");
+      toast("Success!", {
+        position: "bottom-center",
+      });
     } else {
       alert(resp?.error);
     }
@@ -251,7 +254,9 @@ export default withAuthUser({
       otherUserId: answer,
     });
     if (resp?.message === "success") {
-      alert("Success!");
+      toast("Success!", {
+        position: "bottom-center",
+      });
     } else {
       alert(resp?.error);
     }
@@ -280,6 +285,7 @@ export default withAuthUser({
       <FloatingButton theme="dark" index={0} onClick={addUser}>
         <FiUserPlus />
       </FloatingButton>
+      <Toaster />
     </>
   );
 });
