@@ -48,7 +48,7 @@ const handler = async (req: AuthApiRequest, res: NextApiResponse) => {
         .ref("tasks/")
         .orderByChild("contest")
         .equalTo(contestId)
-        .once("value", (docs) => reso(docs.val()))
+        .once("value", (docs) => reso(docs.val() ?? {}))
     );
     res.status(200).send({ message: "success", tasks: docs });
   } catch (e) {
