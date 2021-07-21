@@ -6,6 +6,7 @@ import { isLeft } from "fp-ts/Either";
 import { wrapApi } from "../../../utils/apiWrapper";
 import { AuthApiRequest, withAuth } from "../../../utils/withAuth";
 import { Task } from "../task/list";
+import { deleteCollection } from "../../../utils/deleteCollection";
 
 initAuth();
 
@@ -62,6 +63,11 @@ const handler = async (req: AuthApiRequest, res: NextApiResponse) => {
       )
     );
     */
+    await deleteCollection(
+      admin.firestore(),
+      `contests/${contestId}/assets`,
+      50
+    );
     await admin.firestore().collection("contests").doc(contestId).delete();
     res.status(200).send({ message: "success" });
   } catch (e) {
