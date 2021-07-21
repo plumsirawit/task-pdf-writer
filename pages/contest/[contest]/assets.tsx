@@ -109,7 +109,7 @@ export default withAuthUser({
       });
     }
   };
-  const [assets, setAssets] = useState<Asset[]>([]);
+  const [assets, setAssets] = useState<Asset[] | null>(null);
   useEffect(() => {
     if (!contestId) {
       return;
@@ -130,14 +130,16 @@ export default withAuthUser({
         setAssets(currentAssets);
       });
   }, [contestId]);
-  const rows = assets.map((asset) => (
-    <AssetRow
-      cid={contestId ?? ""}
-      aid={asset.id}
-      key={asset.id}
-      mimeType={asset.contentType}
-    />
-  ));
+  const rows =
+    assets &&
+    assets.map((asset) => (
+      <AssetRow
+        cid={contestId ?? ""}
+        aid={asset.id}
+        key={asset.id}
+        mimeType={asset.contentType}
+      />
+    ));
   return (
     <>
       <Head>
@@ -153,7 +155,7 @@ export default withAuthUser({
           <h1 className={styles.title}>Assets</h1>
         </div>
         <div className={styles.panelcontainer}>
-          {true ? (
+          {assets !== null ? (
             <table>
               <tbody>{rows}</tbody>
             </table>

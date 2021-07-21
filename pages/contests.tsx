@@ -72,9 +72,10 @@ export default withAuthUser({
   whenUnauthedAfterInit: AuthAction.REDIRECT_TO_LOGIN,
 })(function Contests() {
   const authUser = useAuthUser();
-  const [contests, setContests] = useState<Contest[]>([]);
+  const [contests, setContests] = useState<Contest[] | null>(null);
   const rows = useMemo(
     () =>
+      contests &&
       contests.map((contest) => (
         <ContestRow
           contest={contest.contest}
@@ -127,7 +128,7 @@ export default withAuthUser({
           <h1 className={styles.title}>Contests</h1>
         </div>
         <div className={styles.panelcontainer}>
-          {rows.length > 0 ? (
+          {contests !== null ? (
             <table>
               <tbody>{rows}</tbody>
             </table>
