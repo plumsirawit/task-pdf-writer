@@ -33,21 +33,6 @@ const RenameButton = styled(IconButton)`
   top: 50%;
   transform: translate(0%, -50%);
 `;
-const PDFButton = (props: any) => (
-  <FloatingButton {...props} index={2}>
-    {props.disabled ? <BlackIconSpinner /> : <FiFileText />}
-  </FloatingButton>
-);
-const SaveButton = (props: any) => (
-  <FloatingButton {...props} index={1}>
-    {props.disabled ? <BlackIconSpinner /> : <FiDownload />}
-  </FloatingButton>
-);
-const OverrideButton = (props: any) => (
-  <FloatingButton {...props} index={0}>
-    {props.disabled ? <BlackIconSpinner /> : <FiType />}
-  </FloatingButton>
-);
 
 export default withAuthUser({
   whenUnauthedAfterInit: AuthAction.REDIRECT_TO_LOGIN,
@@ -257,9 +242,15 @@ export default withAuthUser({
         </div>
       </div>
       <Toaster />
-      <PDFButton disabled={pdfLoading} onClick={generatePdf} />
-      <SaveButton onClick={saveMarkdown} />
-      <OverrideButton disabled={overrideLoading} onClick={override} />
+      <FloatingButton disabled={pdfLoading} onClick={generatePdf} index={2}>
+        {pdfLoading ? <BlackIconSpinner /> : <FiFileText />}
+      </FloatingButton>
+      <FloatingButton onClick={saveMarkdown} index={1}>
+        <FiDownload />
+      </FloatingButton>
+      <FloatingButton disabled={overrideLoading} onClick={override} index={0}>
+        {overrideLoading ? <BlackIconSpinner /> : <FiType />}
+      </FloatingButton>
     </>
   );
 });
