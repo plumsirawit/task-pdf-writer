@@ -76,6 +76,8 @@ def add_page_numbers_to_pdf(pdf_file_path, task_name):
     os.system(cmd)
 
 def genpdf(event, context):
+    if os.path.exists('/tmp/static'):
+        shutil.rmtree('/tmp/static')
     shutil.copytree('/usr/src/app/static', '/tmp/static')
     body = json.loads(event['body'])
     rendered_html = render_pdf_template(body)

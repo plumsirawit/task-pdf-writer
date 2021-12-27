@@ -65,7 +65,7 @@ functions:
     # layers:
     #   - { Ref: WkhtmltoxLayerLambdaLayer }
     #   - { Ref: XvfbLayerLambdaLayer }
-    timeout: 60
+    timeout: 30
     events:
       - http:
           path: /genpdf

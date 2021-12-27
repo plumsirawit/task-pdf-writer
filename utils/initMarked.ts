@@ -1,7 +1,8 @@
-import marked from "marked";
+import { marked } from "marked";
 
-const renderer: marked.Renderer = new marked.Renderer();
-const original_table_renderer = new marked.Renderer().table;
+const parser: marked.Parser = new marked.Parser();
+const renderer: marked.Renderer = parser.renderer;
+const original_table_renderer = renderer.table.bind({ parser });
 let IMAGES_URL: string;
 
 // enable resize option for images
