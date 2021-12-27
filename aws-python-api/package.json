@@ -6,14 +6,18 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "serverless offline",
-    "deploy": "serverless deploy -v"
+    "deploy": "serverless deploy -v",
+    "tr": "cp node_modules/katex/dist/katex.css static/css/katex.css && browserify -r katex -r marked -r katex/dist/contrib/auto-render -o static/js/bundle.js"
   },
   "author": "plumsirawit",
   "license": "MIT",
   "dependencies": {
+    "katex": "0.15.1",
+    "marked": "4.0.8",
     "serverless": "^2.51.2"
   },
   "devDependencies": {
+    "browserify": "^17.0.0",
     "serverless-offline": "^7.0.0",
     "serverless-python-requirements": "^5.1.1"
   }

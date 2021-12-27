@@ -7,17 +7,21 @@
     <title>{{ task_name | capfirst }} - {{contest}} - {{settings.CONTEST_TITLE}}</title>
     <link rel="shortcut icon" href="{{ static_path }}/img/favicon.ico"/>
 
-    <link rel="stylesheet" href="{{ static_path }}/libs/markdown/katex.css">
+    <link rel="stylesheet" href="{{ static_path }}/libs/katex/katex.min.css" />
     <link rel="stylesheet" href="{{ static_path }}/css/markdown.css">
     <link rel="stylesheet" href="{{ static_path }}/css/styles.css">
     <link rel="stylesheet" href="{{ static_path }}/css/pdf.css">
 
     <script type="text/javascript" src="{{ static_path }}/libs/jquery/jquery-3.1.1.min.js"></script>
-    <script type="text/javascript" src="{{ static_path }}/libs/markdown/marked.js"></script>
+    <script type="text/javascript" src="{{ static_path }}/js/bundle.js">
+    </script>
+    <script type="text/javascript">
+      var marked = require('marked')
+      var katex = require('katex')
+      var renderMathInElement = require('katex/dist/contrib/auto-render')
+    </script>
     <script type="text/javascript" src="{{ static_path }}/js/init-marked.js"></script>
-    <script type="text/javascript" src="{{ static_path }}/libs/markdown/katex.js"></script>
-    <script type="text/javascript" src="{{ static_path }}/libs/markdown/auto-render.min.js"></script>
-
+    <script type="text/javascript" src="{{ static_path }}/js/polyfill.js"></script>
 </head>
 
 
@@ -54,10 +58,24 @@
 <script>
 
     $(document).ready(function() {
-        text = $('#markdown').text();
-        $('#preview').html(marked(text));
-        renderMathInElement(document.getElementById('preview'));
-        window.setTimeout(function(){window.status="imdone";},8000);
+      try{
+        var text = $('#markdown').text();
+        $('#preview').html(marked.parse(text.replace(/\\/g, "\\\\")));
+        renderMathInElement(document.getElementById('preview'), {
+          delimiters: [
+            { left: "$$", right: "$$", display: true },
+            { left: "\\[", right: "\\]", display: true },
+            { left: "$", right: "$", display: false },
+            { left: "\\(", right: "\\)", display: false },
+          ],
+          throwOnError: false,
+          macros: {'\\frac': '{#1 \\above{0.05em} #2}'}
+        });
+        window.setTimeout(function(){window.status="imdone";},4000);
+      }catch(e){
+        $('#preview').html(e.toString())
+        window.setTimeout(function(){window.status="imdone";},4000);
+      }
     });
     
     IMAGES_URL = '{{ images_path }}';
