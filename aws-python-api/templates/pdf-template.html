@@ -13,10 +13,11 @@
     <link rel="stylesheet" href="{{ static_path }}/css/pdf.css">
 
     <script type="text/javascript" src="{{ static_path }}/libs/jquery/jquery-3.1.1.min.js"></script>
-    <script type="text/javascript" src="{{ static_path }}/libs/markdown/marked.min.js"></script>
-		<script type="text/javascript" src="{{ static_path }}/libs/markdown/katex.js"></script>
-    <script type="text/javascript" src="{{ static_path }}/js/init-marked-compat.js"></script>
-    <!-- <script type="text/javascript" src="{{ static_path }}/libs/markdown/auto-render.min.js"></script> -->
+    <script type="text/javascript" src="{{ static_path }}/libs/markdown/marked.js"></script>
+    <script type="text/javascript" src="{{ static_path }}/js/init-marked.js"></script>
+    <script type="text/javascript" src="{{ static_path }}/libs/markdown/katex.js"></script>
+    <script type="text/javascript" src="{{ static_path }}/libs/markdown/auto-render.min.js"></script>
+
 </head>
 
 
@@ -54,9 +55,9 @@
 
     $(document).ready(function() {
         text = $('#markdown').text();
-        $("#preview").html(marked.parse(text.replace(/\\/g, "\\\\")));
-        //renderMathInElement(document.getElementById('preview'));
-        window.setTimeout(function(){window.status="imdone";},4000);
+        $('#preview').html(marked(text));
+        renderMathInElement(document.getElementById('preview'));
+        window.setTimeout(function(){window.status="imdone";},8000);
     });
     
     IMAGES_URL = '{{ images_path }}';
