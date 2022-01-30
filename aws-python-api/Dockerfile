@@ -5,13 +5,17 @@ RUN apt-get -yq update && \
   apt-get -yq install apt-transport-https
 
 RUN apt-get -yq install software-properties-common
-RUN add-apt-repository -y ppa:george-edison55/cmake-3.x
-RUN add-apt-repository ppa:deadsnakes/ppa
+RUN apt-get -yq install wget
+WORKDIR /
+RUN wget https://www.python.org/ftp/python/3.8.12/Python-3.8.12.tgz
+RUN tar zxvf Python-3.8.12.tgz
+
+# RUN add-apt-repository -y ppa:george-edison55/cmake-3.x
+# RUN add-apt-repository -y ppa:deadsnakes/ppa
 RUN apt-get -yq update
+RUN apt-get -yq install build-essential
 
 RUN echo ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true | debconf-set-selections
-RUN apt-get -yq install python3.8 python3.8-distutils libfontconfig wkhtmltopdf xvfb \
-  libpq-dev ttf-mscorefonts-installer fonts-takao-pgothic
 # RUN pip3 install -U pip
 
 RUN apt-get -yq install gcc libprotobuf-dev protobuf-compiler autoconf wget curl libtool libtool-bin
@@ -24,10 +28,23 @@ RUN wget https://github.com/Kitware/CMake/releases/download/v3.20.5/cmake-3.20.5
 
 ENV PATH="/usr/bin/cmake/bin:${PATH}"
 
+WORKDIR /Python-3.8.12
+RUN apt-get -yq install libncurses-dev libgdbm-dev libz-dev tk-dev libsqlite3-dev libreadline-dev liblzma-dev libffi-dev libssl-dev
+RUN ./configure --prefix=/python3.8
+RUN make -j
+RUN make install
+ENV PATH="/python3.8/bin:${PATH}"
+
+RUN apt-get -yq install libfontconfig wkhtmltopdf xvfb libpq-dev ttf-mscorefonts-installer fonts-takao-pgothic
 # COPY binaries/cpdf/cpdf /usr/bin/
 # RUN chmod +x /usr/bin/cpdf
 
-COPY static/fonts/SourceSansPro/ttf/* /usr/share/fonts/
+# COPY static/fonts/SourceSansPro/ttf/* /usr/share/fonts/
+
+COPY static/fonts/Inconsolata/* /usr/share/fonts
+COPY static/fonts/Sarabun/* /usr/share/fonts
+COPY static/fonts/CourierNew/* /usr/share/fonts
+COPY static/fonts/IRANSans/* /usr/share/fonts
 COPY static/fonts/Thai/* /usr/share/fonts/
 COPY static/fonts/Taiwan/* /usr/share/fonts/
 
@@ -52,5 +69,6 @@ COPY settings.py /usr/src/app/settings.py
 WORKDIR /usr/src/app
 
 # ENTRYPOINT ["/root/docker-entrypoint.sh"]
-ENTRYPOINT [ "python3.8", "-m", "awslambdaric" ]
+RUN chmod +x /python3.8/bin/python3.8
+ENTRYPOINT [ "/python3.8/bin/python3.8", "-m", "awslambdaric" ]
 CMD ["handler.hello"]

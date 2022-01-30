@@ -238,7 +238,7 @@ code, pre {
 /* Default text fonts */
 
 .rendered_content {
-    font-family: CustomTextFont, Arial, serif;
+    font-family: 'Sarabun', CustomTextFont, Arial, serif;
 }
 
 .rendered_content[dir="rtl"] {

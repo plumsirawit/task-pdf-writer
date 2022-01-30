@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "serverless offline",
     "deploy": "serverless deploy -v",
-    "tr": "cp node_modules/katex/dist/katex.css static/css/katex.css && browserify -r katex -r marked -r katex/dist/contrib/auto-render -o static/js/bundle.js"
+    "tr": "cp node_modules/katex/dist/katex.css static/libs/katex/katex.css && cp node_modules/katex/dist/katex.min.css static/libs/katex/katex.min.css && cp -a node_modules/katex/dist/fonts static/libs/katex/fonts && browserify -r katex -r marked -r katex/dist/contrib/auto-render -o static/js/bundle.js"
   },
   "author": "plumsirawit",
   "license": "MIT",
