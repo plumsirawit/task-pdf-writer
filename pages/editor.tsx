@@ -9,7 +9,8 @@ const SimpleMDE = dynamic(() => import("react-simplemde-editor"), {
 import styles from "../styles/Editor.module.css";
 import dynamic from "next/dynamic";
 import marked from "../utils/initMarked";
-import renderMathInElement from "katex/dist/contrib/auto-render";
+// @ts-ignore
+import renderMathInElement from "katex/contrib/auto-render";
 import Head from "next/head";
 
 export default function Editor() {
@@ -32,9 +33,8 @@ export default function Editor() {
     });
   }, [markdownInput]);
   const [pdfLoading, setPdfLoading] = useState<boolean>(false);
-  const [contestFullTitle, setContestFullTitle] = useState<string>(
-    "CONTEST_FULL_TITLE"
-  );
+  const [contestFullTitle, setContestFullTitle] =
+    useState<string>("CONTEST_FULL_TITLE");
   const [contestTitle, setContestTitle] = useState<string>("CONTEST_TITLE");
   const [contest, setContest] = useState<string>("CONTEST");
   const [taskName, setTaskName] = useState<string>("TASK_NAME");

@@ -1,4 +1,5 @@
-import renderMathInElement from "katex/dist/contrib/auto-render";
+// @ts-ignore
+import renderMathInElement from "katex/contrib/auto-render";
 import { AuthAction, withAuthUser, useAuthUser } from "next-firebase-auth";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
