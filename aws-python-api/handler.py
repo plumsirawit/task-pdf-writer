@@ -72,7 +72,7 @@ def convert_html_to_pdf(html, pdf_file_path):
 def add_page_numbers_to_pdf(pdf_file_path, task_name):
     color = '-color "0.4 0.4 0.4" '
     cmd = ('cpdf -add-text "{0} (%Page of %EndPage)   " -font "Arial" ' + color + \
-          '-font-size 10 -bottomright .62in {1} -o {1}').format(task_name.capitalize(), pdf_file_path)
+          '-font-size 10 -bottomright .62in {1} -o {1}').format(task_name, pdf_file_path)
     os.system(cmd)
 
 def genpdf(event, context):
