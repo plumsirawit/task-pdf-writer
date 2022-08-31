@@ -129,6 +129,17 @@ export default withAuthUser({
   useEffect(() => {
     if (currentUid !== authUser.id) {
       storeMarkdown.cancel();
+      const cb = firebase
+        .database()
+        .ref("tasks/" + taskId + "/markdown")
+        .on("value", (docs) => {
+          setMarkdownInput(docs.val());
+        });
+      return () =>
+        firebase
+          .database()
+          .ref("tasks/" + taskId + "/markdown")
+          .off("value", cb);
     }
   }, [currentUid, authUser, storeMarkdown]);
   useEffect(() => {
