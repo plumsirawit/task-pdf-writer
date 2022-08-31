@@ -168,7 +168,17 @@ export default withAuthUser({
         }),
         method: "post",
       }
-    );
+    ).catch((reason) => {
+      setPdfLoading(false);
+      alert("Fetch failed with reason " + reason.message);
+      alert(
+        "Note: the lambda may experience a cold boot, in this case please try again for a few times. Otherwise there are some unexpected errors."
+      );
+      return null;
+    });
+    if (!innerResp) {
+      return;
+    }
     const pdfResult = (await innerResp.json()).message;
     setPdfLoading(false);
     if (pdfResult) {
