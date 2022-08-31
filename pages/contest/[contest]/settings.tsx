@@ -153,7 +153,7 @@ const SettingsForm = () => {
             type="text"
             value={contest}
             onChange={(e) => setContest(e.target.value)}
-            placeholder="Day 1"
+            placeholder="Day 1 Tasks"
           />
           <h3>Country Code</h3>
           <Input
