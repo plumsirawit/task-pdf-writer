@@ -7,12 +7,7 @@ from botocore.config import Config
 from botocore.exceptions import ClientError
 
 admin_config = Config(
-    region_name = 'ap-southeast-1',
-    signature_version = 'v4',
-    retries = {
-        'max_attempts': 10,
-        'mode': 'standard'
-    }
+    region_name = 'ap-southeast-1'
 )
 
 s3 = boto3.client('s3',
@@ -24,12 +19,15 @@ cred = credentials.Certificate("cred.json")
 firebase_admin.initialize_app(cred)
 db = firestore.client()
 
+# Why don't we lift everything here to front-end
+# (yes, now it's TODO)
 def fetch_s3_object(event, context):
-    body = json.loads(event['body'])
-    user_token = body['user_token']
-    contest = body['contest']
-    task = body['task']
-    s3now = body['s3now']
+    print('DBG fetch_s3_object', json.dumps(event, indent=2))
+    user_token = event['headers']['tpw-user-token']
+    contest = event['headers']['tpw-contest']
+    task = event['headers']['tpw-task']
+    s3now = event['headers']['tpw-s3now']
+    secretsuffix = event['headers']['tpw-secretsuffix']
     try:
         decoded_token = auth.verify_id_token(user_token, check_revoked=True)
         uid = decoded_token['uid']
@@ -42,7 +40,7 @@ def fetch_s3_object(event, context):
             raise ValueError("Unauthorized in this contest")
         if task not in data['tasks']:
             raise ValueError("Task is not in this contest")
-        object_name = f'protected/{contest}-{task}-{s3now}.pdf'
+        object_name = f'protected/{contest}-{task}-{s3now}-{secretsuffix}.pdf'
         file_url = s3.generate_presigned_url('get_object', Params={'Bucket': 'task-pdf-writer-v1', 'Key': object_name}, ExpiresIn=3600)
         response = {
             "statusCode": 200,
@@ -130,4 +128,5 @@ def fetch_s3_object(event, context):
 
 def process_s3_object(event, context):
     # Process the object, from md to pdf
-    print(json.dumps(event), json.dumps(context))
+    print(json.dumps(event))
+    # object_name = event['Records'][0]['s3']['object']['key']
