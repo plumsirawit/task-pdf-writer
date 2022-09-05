@@ -130,4 +130,4 @@ def fetch_s3_object(event, context):
 
 def process_s3_object(event, context):
     # Process the object, from md to pdf
-    pass
+    print(json.dumps(event), json.dumps(context))

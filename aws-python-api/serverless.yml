@@ -80,6 +80,20 @@ functions:
       - http:
           path: /getobject
           method: get
+  processobject:
+    image:
+      name: appimage
+      command:
+        - handler_s3.process_s3_object
+    timeout: 100
+    events:
+      - s3:
+          bucket: task-pdf-writer-v1
+          event: s3:ObjectCreated:*
+          rules:
+            - prefix: protected/
+            - suffix: .md
+          existing: true
 
 plugins:
   - serverless-offline
