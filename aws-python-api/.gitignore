@@ -22,3 +22,4 @@ var/
 node_modules/
 
 cred.json
+secret.py
