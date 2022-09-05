@@ -1,3 +1,4 @@
 Django<2.0
 pdfkit==0.6.1
 xvfbwrapper==0.2.9
+firebase-admin==5.3.0

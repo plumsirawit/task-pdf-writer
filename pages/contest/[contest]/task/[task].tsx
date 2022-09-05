@@ -24,6 +24,9 @@ import { callOverrideTaskApi } from "../../../api/task/override";
 import { saveAs } from "file-saver";
 import Head from "next/head";
 import { FiDownload, FiEdit3, FiFileText, FiType } from "react-icons/fi";
+import { PutObjectCommand, HeadObjectCommand } from "@aws-sdk/client-s3";
+import s3Client from "../../../../utils/s3Client";
+import { useFetcher } from "../../../../utils/useFetcher";
 
 const RenameButton = styled(IconButton)`
   width: 64px;
@@ -141,11 +144,12 @@ export default withAuthUser({
           .ref("tasks/" + taskId + "/markdown")
           .off("value", cb);
     }
-  }, [currentUid, authUser, storeMarkdown]);
+  }, [currentUid, authUser, taskId, storeMarkdown]);
   useEffect(() => {
     markdownInput && storeMarkdown(markdownInput);
   }, [markdownInput, storeMarkdown]);
   const [pdfLoading, setPdfLoading] = useState<boolean>(false);
+  const [s3Now, setS3Now] = useState<number>(0);
   const generatePdf = async () => {
     if (!contestId || !taskId) {
       return;
@@ -162,6 +166,26 @@ export default withAuthUser({
       setPdfLoading(false);
       return;
     }
+    const currentS3Now = Date.now();
+    firebase
+      .database()
+      .ref("tasks/" + taskId + "/s3now")
+      .set(currentS3Now);
+    const s3Key = `protected/${contestId}-${taskId}-${currentS3Now}.md`;
+    const s3UploadCommand = new PutObjectCommand({
+      Bucket: "task-pdf-writer-v1",
+      Key: s3Key,
+      Body: markdownInput,
+    });
+    try {
+      const data = await s3Client.send(s3UploadCommand);
+      console.log("Success", data);
+    } catch (err) {
+      console.log("Error", err);
+      setPdfLoading(false);
+    }
+    /*
+    OLD (before 2022-09-05)
     const innerResp = await fetch(
       "https://973i5k6wjg.execute-api.ap-southeast-1.amazonaws.com/dev/genpdf",
       {
@@ -198,7 +222,28 @@ export default withAuthUser({
     } else {
       alert("genpdf error");
     }
+    */
   };
+  useEffect(() => {
+    const cb = firebase
+      .database()
+      .ref("tasks/" + taskId + "/s3now")
+      .on("value", (docs) => {
+        setS3Now(docs.val());
+      });
+    return () =>
+      firebase
+        .database()
+        .ref("tasks/" + taskId + "/s3now")
+        .off("value", cb);
+  }, [taskId]);
+  useFetcher(`protected/${contestId}-${taskId}-${s3Now}.pdf`, () => {
+    console.log("done");
+    if (pdfLoading) {
+      // @TODO: call the handler to download
+      setPdfLoading(false);
+    }
+  });
   const saveMarkdown = () => {
     saveAs(
       new Blob([markdownInput], { type: "text/plain;charset=utf-8" }),

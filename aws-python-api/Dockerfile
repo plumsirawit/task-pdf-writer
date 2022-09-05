@@ -68,6 +68,8 @@ COPY handler.py /usr/src/app/handler.py
 COPY settings.py /usr/src/app/settings.py
 WORKDIR /usr/src/app
 
+COPY cred.json /usr/src/app/cred.json
+
 # ENTRYPOINT ["/root/docker-entrypoint.sh"]
 RUN chmod +x /python3.8/bin/python3.8
 ENTRYPOINT [ "/python3.8/bin/python3.8", "-m", "awslambdaric" ]
