@@ -240,8 +240,49 @@ export default withAuthUser({
   useFetcher(`protected/${contestId}-${taskId}-${s3Now}.pdf`, () => {
     console.log("done");
     if (pdfLoading) {
-      // @TODO: call the handler to download
-      setPdfLoading(false);
+      fetch(
+        "https://973i5k6wjg.execute-api.ap-southeast-1.amazonaws.com/dev/getobject",
+        {
+          body: JSON.stringify({
+            user_token: authUser.getIdToken(),
+            contest: contestId,
+            task: taskId,
+            s3now: s3Now,
+          }),
+          method: "get",
+        }
+      )
+        .then((innerResp) => {
+          if (!innerResp) {
+            throw "Response not found";
+          }
+          return innerResp.json();
+        })
+        .then((respJson) => {
+          const pdfUrl = respJson.message;
+          return fetch(pdfUrl);
+        })
+        .then((pdfResponse) => {
+          if (!pdfResponse) {
+            throw "PDF response not found";
+          }
+          return pdfResponse.blob();
+        })
+        .then((pdfBlob) => {
+          setPdfLoading(false);
+          if (pdfBlob) {
+            saveAs(
+              new Blob([pdfBlob], { type: "application/pdf" }),
+              "document.pdf"
+            );
+          } else {
+            alert("genpdf error");
+          }
+        })
+        .catch((reason) => {
+          setPdfLoading(false);
+          alert("Fetch failed with reason " + reason.message);
+        });
     }
   });
   const saveMarkdown = () => {
