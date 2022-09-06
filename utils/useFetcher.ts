@@ -22,7 +22,7 @@ export const useFetcher = (s3Output: string, callWhenDone: () => void) => {
           currentObjectExists.current = true;
           callWhenDone();
         } catch (err) {
-          console.log("Error -- Not retrieved", err);
+          console.log("Error -- Not retrieved");
         }
       };
       const TIMING_HEURISTICS = [
