@@ -209,14 +209,15 @@ def migrate_logo(event, context):
         for contest in contests:
             contest_id = contest.id
             data = contest.to_dict()
-            contest_logo_base64 = data['logo']
-            object_name = f'private/{contest_id}-logo'
-            upload_datauri(contest_logo_base64, object_name)
-    except Exception:
+            if 'logo' in data and ';' in data['logo']:
+                contest_logo_base64 = data['logo']
+                object_name = f'private/{contest_id}-logo'
+                upload_datauri(contest_logo_base64, object_name)
+    except Exception as e:
         return {
             "statusCode": 500,
             "body": json.dumps({
-                "message": "Something is wrong",
+                "message": "Something is wrong " + str(e),
                 "input": event
             }),
             'headers': {
