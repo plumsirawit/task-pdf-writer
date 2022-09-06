@@ -1,3 +1,4 @@
+import os
 from uuid import uuid4
 import firebase_admin
 from firebase_admin import credentials, auth, firestore
@@ -7,6 +8,8 @@ import boto3
 from botocore.config import Config
 from botocore.exceptions import ClientError
 from urllib.request import urlopen
+import base64
+from util import process_pdf
 
 admin_config = Config(
     region_name='ap-southeast-1'
@@ -134,8 +137,42 @@ def fetch_s3_object(event, context):
 
 def process_s3_object(event, context):
     # Process the object, from md to pdf
-    print(json.dumps(event))
-    # object_name = event['Records'][0]['s3']['object']['key']
+    try:
+        object_name = event['Records'][0]['s3']['object']['key']
+        head_response = s3.head_object(
+            Bucket='task-pdf-writer-v1', Key=object_name)
+        metadata = head_response['Metadata']
+        body = {
+            'content': 'Content not found!',
+            'contest_full_title': metadata.get('tpw-contest-full-title', ''),
+            'contest_title': metadata.get('tpw-contest-title', ''),
+            'contest': metadata.get('tpw-contest', ''),
+            'task_name': metadata.get('tpw-task-name', ''),
+            'country': metadata.get('tpw-country', ''),
+            'language': metadata.get('tpw-language', ''),
+            'language_code': metadata.get('tpw-language-code', ''),
+            'contest_date': metadata.get('tpw-contest-date', ''),
+            'image_base64': ''
+        }
+        content_filename = '/tmp/{}.md'.format(str(uuid4()))
+        s3.download_file('task-pdf-writer-v1', object_name, content_filename)
+        with open(content_filename) as f:
+            body['content'] = f.read()
+        contest_id = body['contest']
+        s3.download_file('task-pdf-writer-v1',
+                         f'private/{contest_id}-logo', content_filename)
+        content_type = s3.head_object(
+            Bucket='task-pdf-writer-v1', Key=f'private/{contest_id}-logo')['Metadata']['Content-Type']
+        with open(content_filename, 'rb') as f:
+            base64_data = base64.b64encode(f.read())
+            body['image_base64'] = f'data:{content_type};base64,' + base64_data
+        # now the body is complete
+        print('[DEBUG body]', body)
+        output_file_path = process_pdf(body)
+        s3.upload_file(output_file_path, 'task-pdf-writer-v1',
+                       object_name.replace('.md', '.pdf'))
+    except Exception:
+        return
 
 
 def upload_datauri(datauri, key):
@@ -147,6 +184,7 @@ def upload_datauri(datauri, key):
             f.write(data)
     s3.upload_file(filename, 'task-pdf-writer-v1',
                    key, {'ContentType': content_type})
+    os.remove(filename)
 
 
 def migrate_logo(event, context):

@@ -94,6 +94,16 @@ functions:
             - prefix: protected/
             - suffix: .md
           existing: true
+  migratelogo:
+    image:
+      name: appimage
+      command:
+        - handler_s3.migrate_logo
+    timeout: 30
+    events:
+      - http:
+          path: /migratelogo
+          method: post
 
 plugins:
   - serverless-offline
