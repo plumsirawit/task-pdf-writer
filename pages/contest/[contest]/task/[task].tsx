@@ -183,6 +183,17 @@ export default withAuthUser({
       Bucket: "task-pdf-writer-v1",
       Key: s3Key,
       Body: markdownInput,
+      Metadata: {
+        "tpw-contest-full-title": contestData.fulltitle,
+        "tpw-contest-title": contestData.title,
+        "tpw-contest": contestData.shortname,
+        "tpw-task-name": name,
+        "tpw-country": contestData.country,
+        "tpw-language": contestData.language,
+        "tpw-language-code": contestData.langcode,
+        "tpw-contest-date": contestData.date,
+        // "tpw-contest-logo": contestData.logo, // this is not good because metadata is very limited
+      },
     });
     try {
       const data = await s3Client.send(s3UploadCommand);

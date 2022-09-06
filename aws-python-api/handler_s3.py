@@ -130,3 +130,8 @@ def process_s3_object(event, context):
     # Process the object, from md to pdf
     print(json.dumps(event))
     # object_name = event['Records'][0]['s3']['object']['key']
+
+def migrate_logo(event, context):
+    # Single time migration.
+    # However, it could be run as a cronjob
+    pass
