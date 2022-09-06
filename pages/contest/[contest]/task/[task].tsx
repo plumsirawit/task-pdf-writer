@@ -269,7 +269,7 @@ export default withAuthUser({
         .off("value", cb);
   }, [taskId]);
   useFetcher(
-    `protected/${contestId}-${taskId}-${s3Now}-${secretSuffix}.md`,
+    `protected/${contestId}-${taskId}-${s3Now}-${secretSuffix}.pdf`,
     () => {
       console.log("done");
       if (pdfLoading) {
@@ -298,21 +298,9 @@ export default withAuthUser({
           })
           .then((respJson) => {
             const pdfUrl = respJson.message;
-            return fetch(pdfUrl);
-          })
-          .then((pdfResponse) => {
-            if (!pdfResponse) {
-              throw "PDF response not found";
-            }
-            return pdfResponse.blob();
-          })
-          .then((pdfBlob) => {
             setPdfLoading(false);
-            if (pdfBlob) {
-              saveAs(
-                new Blob([pdfBlob], { type: "application/pdf" }),
-                "document.pdf"
-              );
+            if (pdfUrl) {
+              saveAs(pdfUrl, "document.pdf");
             } else {
               alert("genpdf error");
             }

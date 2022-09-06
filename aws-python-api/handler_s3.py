@@ -29,12 +29,25 @@ db = firestore.client()
 
 
 def fetch_s3_object(event, context):
-    print('DBG fetch_s3_object', json.dumps(event, indent=2))
-    user_token = event['headers']['tpw-user-token']
-    contest = event['headers']['tpw-contest']
-    task = event['headers']['tpw-task']
-    s3now = event['headers']['tpw-s3now']
-    secretsuffix = event['headers']['tpw-secretsuffix']
+    try:
+        user_token = event['headers']['tpw-user-token']
+        contest = event['headers']['tpw-contest']
+        task = event['headers']['tpw-task']
+        s3now = event['headers']['tpw-s3now']
+        secretsuffix = event['headers']['tpw-secretsuffix']
+    except Exception:
+        return {
+            "statusCode": 400,
+            "body": json.dumps({
+                "message": "Headers not found",
+                "input": event
+            }),
+            'headers': {
+                'Access-Control-Allow-Headers': 'Content-Type,tpw-user-token,tpw-contest,tpw-task,tpw-s3now,tpw-secretsuffix',
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Methods': 'GET'
+            }
+        }
     try:
         decoded_token = auth.verify_id_token(user_token, check_revoked=True)
         uid = decoded_token['uid']
@@ -57,7 +70,7 @@ def fetch_s3_object(event, context):
                 "input": event
             }),
             'headers': {
-                'Access-Control-Allow-Headers': 'Content-Type',
+                'Access-Control-Allow-Headers': 'Content-Type,tpw-user-token,tpw-contest,tpw-task,tpw-s3now,tpw-secretsuffix',
                 'Access-Control-Allow-Origin': '*',
                 'Access-Control-Allow-Methods': 'GET'
             }
@@ -72,7 +85,7 @@ def fetch_s3_object(event, context):
                 "input": event
             }),
             'headers': {
-                'Access-Control-Allow-Headers': 'Content-Type',
+                'Access-Control-Allow-Headers': 'Content-Type,tpw-user-token,tpw-contest,tpw-task,tpw-s3now,tpw-secretsuffix',
                 'Access-Control-Allow-Origin': '*',
                 'Access-Control-Allow-Methods': 'GET'
             }
@@ -86,7 +99,7 @@ def fetch_s3_object(event, context):
                 "input": event
             }),
             'headers': {
-                'Access-Control-Allow-Headers': 'Content-Type',
+                'Access-Control-Allow-Headers': 'Content-Type,tpw-user-token,tpw-contest,tpw-task,tpw-s3now,tpw-secretsuffix',
                 'Access-Control-Allow-Origin': '*',
                 'Access-Control-Allow-Methods': 'GET'
             }
@@ -100,7 +113,7 @@ def fetch_s3_object(event, context):
                 "input": event
             }),
             'headers': {
-                'Access-Control-Allow-Headers': 'Content-Type',
+                'Access-Control-Allow-Headers': 'Content-Type,tpw-user-token,tpw-contest,tpw-task,tpw-s3now,tpw-secretsuffix',
                 'Access-Control-Allow-Origin': '*',
                 'Access-Control-Allow-Methods': 'GET'
             }
@@ -114,7 +127,7 @@ def fetch_s3_object(event, context):
                 "input": event
             }),
             'headers': {
-                'Access-Control-Allow-Headers': 'Content-Type',
+                'Access-Control-Allow-Headers': 'Content-Type,tpw-user-token,tpw-contest,tpw-task,tpw-s3now,tpw-secretsuffix',
                 'Access-Control-Allow-Origin': '*',
                 'Access-Control-Allow-Methods': 'GET'
             }
@@ -128,7 +141,7 @@ def fetch_s3_object(event, context):
                 "input": event
             }),
             'headers': {
-                'Access-Control-Allow-Headers': 'Content-Type',
+                'Access-Control-Allow-Headers': 'Content-Type,tpw-user-token,tpw-contest,tpw-task,tpw-s3now,tpw-secretsuffix',
                 'Access-Control-Allow-Origin': '*',
                 'Access-Control-Allow-Methods': 'GET'
             }
@@ -160,13 +173,14 @@ def process_s3_object(event, context):
             body['content'] = f.read()
         contest_id = body['contest']
         try:
-            s3.head_object(Bucket='task-pdf-writer-v1', Key=f'private/{contest_id}-logo')
+            s3.head_object(Bucket='task-pdf-writer-v1',
+                           Key=f'private/{contest_id}-logo')
             logo_exists = True
         except ClientError:
             logo_exists = False
         if logo_exists:
             s3.download_file('task-pdf-writer-v1',
-                            f'private/{contest_id}-logo', content_filename)
+                             f'private/{contest_id}-logo', content_filename)
             content_type = s3.head_object(
                 Bucket='task-pdf-writer-v1', Key=f'private/{contest_id}-logo')['Metadata']['Content-Type']
             with open(content_filename, 'rb') as f:

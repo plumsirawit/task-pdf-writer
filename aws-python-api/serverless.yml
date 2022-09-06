@@ -80,6 +80,16 @@ functions:
       - http:
           path: /getobject
           method: get
+          cors:
+            origins: '*'
+            headers:
+              - Content-Type
+              - tpw-user-token
+              - tpw-contest
+              - tpw-task
+              - tpw-s3now
+              - tpw-secretsuffix
+            allowCredentials: false
   processobject:
     image:
       name: appimage
