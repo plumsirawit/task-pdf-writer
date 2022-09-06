@@ -5,8 +5,14 @@ import Link from "next/link";
 import { FiGithub } from "react-icons/fi";
 import { IconButton } from "../components/Button";
 import { FloatingButton } from "../components/FloatingButton";
+import { useEffect } from "react";
 
 export default function Home() {
+  useEffect(() => {
+    alert(
+      "UNDER MAINTENANCE! Contest creation is disabled, and logo uploads are not guaranteed to be safe. Please use with caution. Planned next stable ver: 9 Sep 2022."
+    );
+  }, []);
   return (
     <div className={styles.container}>
       <Head>
