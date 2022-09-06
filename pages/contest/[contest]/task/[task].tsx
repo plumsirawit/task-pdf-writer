@@ -27,6 +27,7 @@ import { FiDownload, FiEdit3, FiFileText, FiType } from "react-icons/fi";
 import { PutObjectCommand, HeadObjectCommand } from "@aws-sdk/client-s3";
 import s3Client from "../../../../utils/s3Client";
 import { useFetcher } from "../../../../utils/useFetcher";
+import cryptoRandomString from "crypto-random-string";
 
 const RenameButton = styled(IconButton)`
   width: 64px;
@@ -150,6 +151,7 @@ export default withAuthUser({
   }, [markdownInput, storeMarkdown]);
   const [pdfLoading, setPdfLoading] = useState<boolean>(false);
   const [s3Now, setS3Now] = useState<number>(0);
+  const [secretSuffix, setSecretSuffix] = useState<string>("");
   const generatePdf = async () => {
     if (!contestId || !taskId) {
       return;
@@ -167,11 +169,16 @@ export default withAuthUser({
       return;
     }
     const currentS3Now = Date.now();
+    const currentSecretSuffix = cryptoRandomString({ length: 24 });
     firebase
       .database()
       .ref("tasks/" + taskId + "/s3now")
       .set(currentS3Now);
-    const s3Key = `protected/${contestId}-${taskId}-${currentS3Now}.md`;
+    firebase
+      .database()
+      .ref("tasks/" + taskId + "/secretsuffix")
+      .set(currentSecretSuffix);
+    const s3Key = `protected/${contestId}-${taskId}-${currentS3Now}-${currentSecretSuffix}.md`;
     const s3UploadCommand = new PutObjectCommand({
       Bucket: "task-pdf-writer-v1",
       Key: s3Key,
@@ -237,54 +244,75 @@ export default withAuthUser({
         .ref("tasks/" + taskId + "/s3now")
         .off("value", cb);
   }, [taskId]);
-  useFetcher(`protected/${contestId}-${taskId}-${s3Now}.pdf`, () => {
-    console.log("done");
-    if (pdfLoading) {
-      fetch(
-        "https://973i5k6wjg.execute-api.ap-southeast-1.amazonaws.com/dev/getobject",
-        {
-          body: JSON.stringify({
-            user_token: authUser.getIdToken(),
-            contest: contestId,
-            task: taskId,
-            s3now: s3Now,
-          }),
-          method: "get",
-        }
-      )
-        .then((innerResp) => {
-          if (!innerResp) {
-            throw "Response not found";
-          }
-          return innerResp.json();
-        })
-        .then((respJson) => {
-          const pdfUrl = respJson.message;
-          return fetch(pdfUrl);
-        })
-        .then((pdfResponse) => {
-          if (!pdfResponse) {
-            throw "PDF response not found";
-          }
-          return pdfResponse.blob();
-        })
-        .then((pdfBlob) => {
-          setPdfLoading(false);
-          if (pdfBlob) {
-            saveAs(
-              new Blob([pdfBlob], { type: "application/pdf" }),
-              "document.pdf"
-            );
-          } else {
-            alert("genpdf error");
-          }
-        })
-        .catch((reason) => {
-          setPdfLoading(false);
-          alert("Fetch failed with reason " + reason.message);
-        });
+  useEffect(() => {
+    const cb = firebase
+      .database()
+      .ref("tasks/" + taskId + "/secretsuffix")
+      .on("value", (docs) => {
+        setSecretSuffix(docs.val());
+      });
+    return () =>
+      firebase
+        .database()
+        .ref("tasks/" + taskId + "/secretsuffix")
+        .off("value", cb);
+  }, [taskId]);
+  useFetcher(
+    `protected/${contestId}-${taskId}-${s3Now}-${secretSuffix}.md`,
+    () => {
+      console.log("done");
+      if (pdfLoading) {
+        authUser
+          .getIdToken()
+          .then((uidToken) =>
+            fetch(
+              "https://973i5k6wjg.execute-api.ap-southeast-1.amazonaws.com/dev/getobject",
+              {
+                headers: {
+                  "tpw-user-token": uidToken ?? "",
+                  "tpw-contest": contestId ?? "",
+                  "tpw-task": taskId ?? "",
+                  "tpw-s3now": `${s3Now}`,
+                  "tpw-secretsuffix": secretSuffix,
+                },
+                method: "get",
+              }
+            )
+          )
+          .then((innerResp) => {
+            if (!innerResp) {
+              throw "Response not found";
+            }
+            return innerResp.json();
+          })
+          .then((respJson) => {
+            const pdfUrl = respJson.message;
+            return fetch(pdfUrl);
+          })
+          .then((pdfResponse) => {
+            if (!pdfResponse) {
+              throw "PDF response not found";
+            }
+            return pdfResponse.blob();
+          })
+          .then((pdfBlob) => {
+            setPdfLoading(false);
+            if (pdfBlob) {
+              saveAs(
+                new Blob([pdfBlob], { type: "application/pdf" }),
+                "document.pdf"
+              );
+            } else {
+              alert("genpdf error");
+            }
+          })
+          .catch((reason) => {
+            setPdfLoading(false);
+            alert("Fetch failed with reason " + reason.message);
+          });
+      }
     }
-  });
+  );
   const saveMarkdown = () => {
     saveAs(
       new Blob([markdownInput], { type: "text/plain;charset=utf-8" }),
