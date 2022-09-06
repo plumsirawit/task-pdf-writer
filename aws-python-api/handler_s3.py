@@ -63,8 +63,7 @@ def fetch_s3_object(event, context):
             raise ValueError("Task is not in this contest")
         object_name = f'protected/{contest}-{task}-{s3now}-{secretsuffix}.pdf'
         try:
-            s3.head_object(Bucket='task-pdf-writer-v1',
-                           Key=object_name)
+            s3.download_file('task-pdf-writer-v1', object_name, '/tmp/buf.pdf')
         except ClientError:
             raise FileNotFoundError('PDF doesn\'t exist')
         file_url = s3.generate_presigned_url('get_object', Params={

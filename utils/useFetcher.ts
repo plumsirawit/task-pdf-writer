@@ -66,10 +66,11 @@ export const useFetcher = (s3Output: string, fetchContext: FetchContext) => {
               received: false,
             };
           }
-          await new Promise((res) => setTimeout(res, 5000)); // dirty hack to avoid no key error
+          // await new Promise((res) => setTimeout(res, 5000)); // dirty hack to avoid no key error
           const pdfUrl = data.message;
           fetchContext.setPdfLoading(false);
-          saveAs(pdfUrl, "document.pdf");
+          // @ts-ignore (dirty fix)
+          window.open(pdfUrl, "_blank").focus();
           return {
             isError: false,
             received: true,
