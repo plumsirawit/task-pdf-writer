@@ -73,6 +73,20 @@ const handler = async (req: AuthApiRequest, res: NextApiResponse) => {
           logo,
         })
       );
+    if (logo) {
+      const copyResponse = await fetch(
+        "https://973i5k6wjg.execute-api.ap-southeast-1.amazonaws.com/dev/copylogo",
+        {
+          method: "POST",
+          headers: {
+            "tpw-contest": contestId,
+          },
+        }
+      );
+      if (copyResponse.status !== 200) {
+        throw "Copy failed!";
+      }
+    }
     res.status(200).send({ message: "success" });
   } catch (e) {
     console.log("Error", e);

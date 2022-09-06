@@ -210,6 +210,72 @@ def upload_datauri(datauri, key):
     os.remove(filename)
 
 
+def copy_logo(event, context):
+    # Copy logo from firestore to S3
+    try:
+        contest = event['headers']['tpw-contest']
+    except Exception:
+        return {
+            "statusCode": 400,
+            "body": json.dumps({
+                "message": "Contest headers not found",
+                "input": event
+            }),
+            'headers': {
+                'Access-Control-Allow-Headers': 'Content-Type,tpw-contest',
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Methods': 'POST'
+            }
+        }
+    try:
+        doc = db.collection(u'contests').document(contest).get()
+        if not doc.exists:
+            raise ValueError('Document not found')
+        data = doc.to_dict()
+        if 'logo' in data and ';' in data['logo']:
+            contest_logo_base64 = data['logo']
+            object_name = f'private/{contest}-logo'
+            upload_datauri(contest_logo_base64, object_name)
+            return {
+                "statusCode": 200,
+                "body": json.dumps({
+                    "message": "Logo copy done!",
+                    "input": event
+                }),
+                'headers': {
+                    'Access-Control-Allow-Headers': 'Content-Type,tpw-contest',
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Methods': 'POST'
+                }
+            }
+        else:
+            return {
+                "statusCode": 200,
+                "body": json.dumps({
+                    "message": "Logo not found",
+                    "input": event
+                }),
+                'headers': {
+                    'Access-Control-Allow-Headers': 'Content-Type,tpw-contest',
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Methods': 'POST'
+                }
+            }
+    except Exception:
+        return {
+            "statusCode": 500,
+            "body": json.dumps({
+                "message": "Something is wrong",
+                "input": event
+            }),
+            'headers': {
+                'Access-Control-Allow-Headers': 'Content-Type,tpw-contest',
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Methods': 'POST'
+            }
+        }
+
+
 def migrate_logo(event, context):
     # Single time migration.
     # However, it could be run as a cronjob

@@ -114,6 +114,22 @@ functions:
       - http:
           path: /migratelogo
           method: post
+  copylogo:
+    image:
+      name: appimage
+      command:
+        - handler_s3.copy_logo
+    timeout: 30
+    events:
+      - http:
+          path: /copylogo
+          method: post
+          cors:
+            origins: '*'
+            headers:
+              - Content-Type
+              - tpw-contest
+            allowCredentials: false
 
 plugins:
   - serverless-offline
