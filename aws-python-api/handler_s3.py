@@ -159,19 +159,26 @@ def process_s3_object(event, context):
         with open(content_filename) as f:
             body['content'] = f.read()
         contest_id = body['contest']
-        s3.download_file('task-pdf-writer-v1',
-                         f'private/{contest_id}-logo', content_filename)
-        content_type = s3.head_object(
-            Bucket='task-pdf-writer-v1', Key=f'private/{contest_id}-logo')['Metadata']['Content-Type']
-        with open(content_filename, 'rb') as f:
-            base64_data = base64.b64encode(f.read())
-            body['image_base64'] = f'data:{content_type};base64,' + base64_data
+        try:
+            s3.head_object(Bucket='task-pdf-writer-v1', Key=f'private/{contest_id}-logo')
+            logo_exists = True
+        except ClientError:
+            logo_exists = False
+        if logo_exists:
+            s3.download_file('task-pdf-writer-v1',
+                            f'private/{contest_id}-logo', content_filename)
+            content_type = s3.head_object(
+                Bucket='task-pdf-writer-v1', Key=f'private/{contest_id}-logo')['Metadata']['Content-Type']
+            with open(content_filename, 'rb') as f:
+                base64_data = base64.b64encode(f.read())
+                body['image_base64'] = f'data:{content_type};base64,' + base64_data
         # now the body is complete
         print('[DEBUG body]', body)
         output_file_path = process_pdf(body)
         s3.upload_file(output_file_path, 'task-pdf-writer-v1',
                        object_name.replace('.md', '.pdf'))
-    except Exception:
+    except Exception as e:
+        print('[DEBUG] ERROR', e)
         return
 
 
