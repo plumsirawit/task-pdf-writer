@@ -1,8 +1,4 @@
-# WARNING: UNDER MAINTENANCE
-
-Currently, this project is going under heavy maintenance. The logo are copied from Firebase Firestore to AWS S3. Use at your own risk. (which is very risky) I'll try to fix this as soon as possible (planned next stable release: no later than 9 Sep 2022). Note that I'll try my best to protect data loss. However, uploaded logo (during this period) may be invalid in PDFs. I'd say please wait for it to be stable and then reupload the logo when everything is ready.
-
-Furthermore, during the maintenance, no contest creation will be allowed. This is done to prevent data anomalies during migrations. I apologize for any inconvenience, but I hope this will be fixed very soon.
+**v.1.2.1 stable update** (Yes I surely hope it is stable)
 
 ![](https://raw.githubusercontent.com/plumsirawit/task-pdf-writer/main/public/task-pdf-writer-banner.svg)
 

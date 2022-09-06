@@ -8,8 +8,6 @@ initAuth();
 
 const handler = async (req: AuthApiRequest, res: NextApiResponse) => {
   try {
-    res.status(403).send({ message: "forbidden" });
-    return;
     const admin = getFirebaseAdmin();
     const contestDoc = await admin
       .firestore()

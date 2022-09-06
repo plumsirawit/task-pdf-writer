@@ -70,6 +70,66 @@ functions:
       - http:
           path: /genpdf
           method: post
+  getobject:
+    image:
+      name: appimage
+      command:
+        - handler_s3.fetch_s3_object
+    timeout: 10
+    events:
+      - http:
+          path: /getobject
+          method: get
+          cors:
+            origins: '*'
+            headers:
+              - Content-Type
+              - tpw-user-token
+              - tpw-contest
+              - tpw-task
+              - tpw-s3now
+              - tpw-secretsuffix
+            allowCredentials: false
+  processobject:
+    image:
+      name: appimage
+      command:
+        - handler_s3.process_s3_object
+    timeout: 100
+    events:
+      - s3:
+          bucket: task-pdf-writer-v1
+          event: s3:ObjectCreated:*
+          rules:
+            - prefix: protected/
+            - suffix: .md
+          existing: true
+  migratelogo:
+    image:
+      name: appimage
+      command:
+        - handler_s3.migrate_logo
+    timeout: 30
+    events:
+      - http:
+          path: /migratelogo
+          method: post
+  copylogo:
+    image:
+      name: appimage
+      command:
+        - handler_s3.copy_logo
+    timeout: 30
+    events:
+      - http:
+          path: /copylogo
+          method: post
+          cors:
+            origins: '*'
+            headers:
+              - Content-Type
+              - tpw-contest
+            allowCredentials: false
 
 plugins:
   - serverless-offline

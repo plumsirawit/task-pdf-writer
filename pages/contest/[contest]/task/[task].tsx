@@ -24,6 +24,10 @@ import { callOverrideTaskApi } from "../../../api/task/override";
 import { saveAs } from "file-saver";
 import Head from "next/head";
 import { FiDownload, FiEdit3, FiFileText, FiType } from "react-icons/fi";
+import { PutObjectCommand, HeadObjectCommand } from "@aws-sdk/client-s3";
+import s3Client from "../../../../utils/s3Client";
+import { useFetcher } from "../../../../utils/useFetcher";
+import cryptoRandomString from "crypto-random-string";
 
 const RenameButton = styled(IconButton)`
   width: 64px;
@@ -141,11 +145,13 @@ export default withAuthUser({
           .ref("tasks/" + taskId + "/markdown")
           .off("value", cb);
     }
-  }, [currentUid, authUser, storeMarkdown]);
+  }, [currentUid, authUser, taskId, storeMarkdown]);
   useEffect(() => {
     markdownInput && storeMarkdown(markdownInput);
   }, [markdownInput, storeMarkdown]);
   const [pdfLoading, setPdfLoading] = useState<boolean>(false);
+  const [s3Now, setS3Now] = useState<number>(0);
+  const [secretSuffix, setSecretSuffix] = useState<string>("");
   const generatePdf = async () => {
     if (!contestId || !taskId) {
       return;
@@ -162,6 +168,42 @@ export default withAuthUser({
       setPdfLoading(false);
       return;
     }
+    const currentS3Now = Date.now();
+    const currentSecretSuffix = cryptoRandomString({ length: 24 });
+    firebase
+      .database()
+      .ref("tasks/" + taskId + "/s3now")
+      .set(currentS3Now);
+    firebase
+      .database()
+      .ref("tasks/" + taskId + "/secretsuffix")
+      .set(currentSecretSuffix);
+    const s3Key = `protected/${contestId}-${taskId}-${currentS3Now}-${currentSecretSuffix}.md`;
+    const s3UploadCommand = new PutObjectCommand({
+      Bucket: "task-pdf-writer-v1",
+      Key: s3Key,
+      Body: markdownInput,
+      Metadata: {
+        "tpw-contest-full-title": contestData.fulltitle,
+        "tpw-contest-title": contestData.title,
+        "tpw-contest": contestData.shortname,
+        "tpw-contest-id": contestId,
+        "tpw-task-name": name,
+        "tpw-country": contestData.country,
+        "tpw-language": contestData.language,
+        "tpw-language-code": contestData.langcode,
+        "tpw-contest-date": contestData.date,
+      },
+    });
+    try {
+      const data = await s3Client.send(s3UploadCommand);
+      console.log("Success", data);
+    } catch (err) {
+      console.log("Error", err);
+      setPdfLoading(false);
+    }
+    /*
+    OLD (before 2022-09-05)
     const innerResp = await fetch(
       "https://973i5k6wjg.execute-api.ap-southeast-1.amazonaws.com/dev/genpdf",
       {
@@ -198,7 +240,43 @@ export default withAuthUser({
     } else {
       alert("genpdf error");
     }
+    */
   };
+  useEffect(() => {
+    const cb = firebase
+      .database()
+      .ref("tasks/" + taskId + "/s3now")
+      .on("value", (docs) => {
+        setS3Now(docs.val());
+      });
+    return () =>
+      firebase
+        .database()
+        .ref("tasks/" + taskId + "/s3now")
+        .off("value", cb);
+  }, [taskId]);
+  useEffect(() => {
+    const cb = firebase
+      .database()
+      .ref("tasks/" + taskId + "/secretsuffix")
+      .on("value", (docs) => {
+        setSecretSuffix(docs.val());
+      });
+    return () =>
+      firebase
+        .database()
+        .ref("tasks/" + taskId + "/secretsuffix")
+        .off("value", cb);
+  }, [taskId]);
+  useFetcher(`protected/${contestId}-${taskId}-${s3Now}-${secretSuffix}.pdf`, {
+    pdfLoading,
+    setPdfLoading,
+    contestId,
+    taskId,
+    s3Now,
+    secretSuffix,
+    authUser,
+  });
   const saveMarkdown = () => {
     saveAs(
       new Blob([markdownInput], { type: "text/plain;charset=utf-8" }),

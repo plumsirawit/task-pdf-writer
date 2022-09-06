@@ -65,8 +65,13 @@ COPY binaries /usr/src/app/binaries
 COPY static /usr/src/app/static
 COPY templates /usr/src/app/templates
 COPY handler.py /usr/src/app/handler.py
+COPY handler_s3.py /usr/src/app/handler_s3.py
 COPY settings.py /usr/src/app/settings.py
+COPY util.py /usr/src/app/util.py
 WORKDIR /usr/src/app
+
+COPY cred.json /usr/src/app/cred.json
+COPY secret.py /usr/src/app/secret.py
 
 # ENTRYPOINT ["/root/docker-entrypoint.sh"]
 RUN chmod +x /python3.8/bin/python3.8

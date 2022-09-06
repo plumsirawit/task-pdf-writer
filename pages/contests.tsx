@@ -114,8 +114,7 @@ export default withAuthUser({
       });
   }, [authUser]);
   const createContest = async () => {
-    alert("Maintenance: Contest creation is disabled!");
-    // await callCreateContestApi(authUser, {});
+    await callCreateContestApi(authUser, {});
   };
   const logout = () => firebase.auth().signOut();
   return (
