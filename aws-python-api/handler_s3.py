@@ -1,19 +1,21 @@
+from uuid import uuid4
 import firebase_admin
 from firebase_admin import credentials, auth, firestore
-from secret import IAM_ADMIN_ACCESS, IAM_ADMIN_SECRET
+from secret import IAM_ADMIN_ACCESS, IAM_ADMIN_SECRET, PLUM_PERSONAL_IDENTIFICATION
 import json
 import boto3
 from botocore.config import Config
 from botocore.exceptions import ClientError
+from urllib.request import urlopen
 
 admin_config = Config(
-    region_name = 'ap-southeast-1'
+    region_name='ap-southeast-1'
 )
 
 s3 = boto3.client('s3',
-    aws_access_key_id=IAM_ADMIN_ACCESS,
-    aws_secret_access_key=IAM_ADMIN_SECRET,
-    config=admin_config)
+                  aws_access_key_id=IAM_ADMIN_ACCESS,
+                  aws_secret_access_key=IAM_ADMIN_SECRET,
+                  config=admin_config)
 
 cred = credentials.Certificate("cred.json")
 firebase_admin.initialize_app(cred)
@@ -21,6 +23,8 @@ db = firestore.client()
 
 # Why don't we lift everything here to front-end
 # (yes, now it's TODO)
+
+
 def fetch_s3_object(event, context):
     print('DBG fetch_s3_object', json.dumps(event, indent=2))
     user_token = event['headers']['tpw-user-token']
@@ -41,7 +45,8 @@ def fetch_s3_object(event, context):
         if task not in data['tasks']:
             raise ValueError("Task is not in this contest")
         object_name = f'protected/{contest}-{task}-{s3now}-{secretsuffix}.pdf'
-        file_url = s3.generate_presigned_url('get_object', Params={'Bucket': 'task-pdf-writer-v1', 'Key': object_name}, ExpiresIn=3600)
+        file_url = s3.generate_presigned_url('get_object', Params={
+                                             'Bucket': 'task-pdf-writer-v1', 'Key': object_name}, ExpiresIn=3600)
         response = {
             "statusCode": 200,
             "body": json.dumps({
@@ -126,12 +131,71 @@ def fetch_s3_object(event, context):
             }
         }
 
+
 def process_s3_object(event, context):
     # Process the object, from md to pdf
     print(json.dumps(event))
     # object_name = event['Records'][0]['s3']['object']['key']
 
+
+def upload_datauri(datauri, key):
+    content_type = datauri.split(';')[0]
+    filename = '/tmp/{}.dat'.format(str(uuid4()))
+    with urlopen(datauri) as response:
+        data = response.read()
+        with open(filename, "wb") as f:
+            f.write(data)
+    s3.upload_file(filename, 'task-pdf-writer-v1',
+                   key, {'ContentType': content_type})
+
+
 def migrate_logo(event, context):
     # Single time migration.
     # However, it could be run as a cronjob
-    pass
+    pin = event['headers']['tpw-pin']
+    if pin != PLUM_PERSONAL_IDENTIFICATION:
+        return {
+            "statusCode": 403,
+            "body": json.dumps({
+                "message": "This function is for Plum only!",
+                "input": event
+            }),
+            'headers': {
+                'Access-Control-Allow-Headers': 'Content-Type',
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Methods': 'POST'
+            }
+        }
+    try:
+        contests = db.collection(u'contests').stream()
+        for contest in contests:
+            contest_id = contest.id
+            data = contest.to_dict()
+            contest_logo_base64 = data['logo']
+            object_name = f'private/{contest_id}-logo'
+            upload_datauri(contest_logo_base64, object_name)
+    except Exception:
+        return {
+            "statusCode": 500,
+            "body": json.dumps({
+                "message": "Something is wrong",
+                "input": event
+            }),
+            'headers': {
+                'Access-Control-Allow-Headers': 'Content-Type',
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Methods': 'POST'
+            }
+        }
+    return {
+        "statusCode": 200,
+        "body": json.dumps({
+            "message": "Migration done!",
+            "input": event
+        }),
+        'headers': {
+            'Access-Control-Allow-Headers': 'Content-Type',
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'POST'
+        }
+    }
