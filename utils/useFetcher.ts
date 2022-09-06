@@ -1,7 +1,5 @@
-import { HeadObjectCommand } from "@aws-sdk/client-s3";
 import { AuthUser } from "next-firebase-auth";
 import { useEffect, useRef } from "react";
-import s3Client from "./s3Client";
 
 export interface FetchContext {
   pdfLoading: boolean;
@@ -41,48 +39,55 @@ const fetchPdf = async ({
 };
 
 export const useFetcher = (s3Output: string, fetchContext: FetchContext) => {
-  const globalS3Output = useRef<string>("");
-  const currentObjectExists = useRef<boolean>(false);
+  const pendingPromise = useRef<Promise<void> | undefined>(undefined);
   useEffect(() => {
-    if (s3Output !== globalS3Output.current && fetchContext.pdfLoading) {
-      globalS3Output.current = s3Output;
-      currentObjectExists.current = false;
+    const currentInterval = setInterval(() => {
+      if (pendingPromise.current) {
+        return; // something is pending
+      }
+      if (!fetchContext.pdfLoading) {
+        return;
+      }
       const pollS3 = async () => {
-        if (
-          s3Output !== globalS3Output.current ||
-          currentObjectExists.current ||
-          !fetchContext.pdfLoading
-        ) {
-          return;
-        }
         try {
           const resp = await fetchPdf(fetchContext);
           if (!resp || resp.status !== 200) {
             fetchContext.setPdfLoading(false);
             console.log("Something is wrong", resp);
-            return;
+            return {
+              isError: true,
+              received: false,
+            };
           }
           const data = await resp.json();
           if (!data || !data.message || data.message === "PDF doesn't exist") {
-            return;
+            return {
+              isError: false,
+              received: false,
+            };
           }
           await new Promise((res) => setTimeout(res, 5000)); // dirty hack to avoid no key error
           const pdfUrl = data.message;
           fetchContext.setPdfLoading(false);
           saveAs(pdfUrl, "document.pdf");
-          currentObjectExists.current = true;
+          return {
+            isError: false,
+            received: true,
+          };
         } catch (err) {
           console.log("Error -- Not retrieved");
+          return {
+            isError: false,
+            received: false,
+          };
         }
       };
-      // this is too dirty, need urgent fix.
-      const TIMING_HEURISTICS = [
-        5, 10, 13, 15, 18, 20, 21, 22, 23, 24, 25, 26, 27, 30, 33, 36, 40, 45,
-        50, 55, 60, 65, 70, 75, 80, 85, 90, 100,
-      ];
-      TIMING_HEURISTICS.map((t) =>
-        new Promise<void>((res) => setTimeout(res, t * 1000)).then(pollS3)
-      );
-    }
+      pendingPromise.current = pollS3().then(() => {
+        pendingPromise.current = undefined;
+      });
+    }, 5000);
+    return () => {
+      clearInterval(currentInterval);
+    };
   }, [s3Output, fetchContext]);
 };
