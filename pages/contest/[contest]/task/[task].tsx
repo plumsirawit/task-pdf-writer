@@ -268,50 +268,15 @@ export default withAuthUser({
         .ref("tasks/" + taskId + "/secretsuffix")
         .off("value", cb);
   }, [taskId]);
-  useFetcher(
-    `protected/${contestId}-${taskId}-${s3Now}-${secretSuffix}.pdf`,
-    () => {
-      console.log("done");
-      if (pdfLoading) {
-        authUser
-          .getIdToken()
-          .then((uidToken) =>
-            fetch(
-              "https://973i5k6wjg.execute-api.ap-southeast-1.amazonaws.com/dev/getobject",
-              {
-                headers: {
-                  "tpw-user-token": uidToken ?? "",
-                  "tpw-contest": contestId ?? "",
-                  "tpw-task": taskId ?? "",
-                  "tpw-s3now": `${s3Now}`,
-                  "tpw-secretsuffix": secretSuffix,
-                },
-                method: "get",
-              }
-            )
-          )
-          .then((innerResp) => {
-            if (!innerResp) {
-              throw "Response not found";
-            }
-            return innerResp.json();
-          })
-          .then((respJson) => {
-            const pdfUrl = respJson.message;
-            setPdfLoading(false);
-            if (pdfUrl) {
-              saveAs(pdfUrl, "document.pdf");
-            } else {
-              alert("genpdf error");
-            }
-          })
-          .catch((reason) => {
-            setPdfLoading(false);
-            alert("Fetch failed with reason " + reason.message);
-          });
-      }
-    }
-  );
+  useFetcher(`protected/${contestId}-${taskId}-${s3Now}-${secretSuffix}.pdf`, {
+    pdfLoading,
+    setPdfLoading,
+    contestId,
+    taskId,
+    s3Now,
+    secretSuffix,
+    authUser,
+  });
   const saveMarkdown = () => {
     saveAs(
       new Blob([markdownInput], { type: "text/plain;charset=utf-8" }),

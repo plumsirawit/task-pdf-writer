@@ -25,7 +25,8 @@ firebase_admin.initialize_app(cred)
 db = firestore.client()
 
 # Why don't we lift everything here to front-end
-# (yes, now it's TODO)
+# No, TODO: lift everything from front-end to back-end
+# Polling should be handled with care (for security reasons)
 
 
 def fetch_s3_object(event, context):
@@ -61,6 +62,11 @@ def fetch_s3_object(event, context):
         if task not in data['tasks']:
             raise ValueError("Task is not in this contest")
         object_name = f'protected/{contest}-{task}-{s3now}-{secretsuffix}.pdf'
+        try:
+            s3.head_object(Bucket='task-pdf-writer-v1',
+                           Key=object_name)
+        except ClientError:
+            raise FileNotFoundError('PDF doesn\'t exist')
         file_url = s3.generate_presigned_url('get_object', Params={
                                              'Bucket': 'task-pdf-writer-v1', 'Key': object_name}, ExpiresIn=3600)
         response = {
@@ -124,6 +130,20 @@ def fetch_s3_object(event, context):
             "statusCode": 500,
             "body": json.dumps({
                 "message": "Boto3 error",
+                "input": event
+            }),
+            'headers': {
+                'Access-Control-Allow-Headers': 'Content-Type,tpw-user-token,tpw-contest,tpw-task,tpw-s3now,tpw-secretsuffix',
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Methods': 'GET'
+            }
+        }
+    except FileNotFoundError:
+        # PDF doesn't exist
+        return {
+            "statusCode": 200,
+            "body": json.dumps({
+                "message": "PDF doesn't exist",
                 "input": event
             }),
             'headers': {
