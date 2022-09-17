@@ -60,17 +60,17 @@
     $(document).ready(function() {
       try{
         var text = $('#markdown').text();
-        $('#preview').html(marked.parse(text.replace(/\\/g, "\\\\")));
-        renderMathInElement(document.getElementById('preview'), {
-          delimiters: [
-            { left: "$$", right: "$$", display: true },
-            { left: "\\[", right: "\\]", display: true },
-            { left: "$", right: "$", display: false },
-            { left: "\\(", right: "\\)", display: false },
-          ],
-          throwOnError: false,
-          macros: {'\\frac': '{#1 \\above{0.05em} #2}'}
-        });
+        $('#preview').html(marked.parse(text));
+        // renderMathInElement(document.getElementById('preview'), {
+        //   delimiters: [
+        //     { left: "$$", right: "$$", display: true },
+        //     { left: "\\[", right: "\\]", display: true },
+        //     { left: "$", right: "$", display: false },
+        //     { left: "\\(", right: "\\)", display: false },
+        //   ],
+        //   throwOnError: false,
+        //   macros: {'\\frac': '{#1 \\above{0.05em} #2}'}
+        // });
         window.setTimeout(function(){window.status="imdone";},4000);
       }catch(e){
         $('#preview').html(e.toString())

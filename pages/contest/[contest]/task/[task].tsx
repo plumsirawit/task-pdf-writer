@@ -53,16 +53,16 @@ export default withAuthUser({
     if (!outputDiv) {
       return;
     }
-    outputDiv.innerHTML = marked.parse(markdownInput.replaceAll(/\\/g, "\\\\"));
-    renderMathInElement(outputDiv, {
-      delimiters: [
-        { left: "$$", right: "$$", display: true },
-        { left: "\\[", right: "\\]", display: true },
-        { left: "$", right: "$", display: false },
-        { left: "\\(", right: "\\)", display: false },
-      ],
-      throwOnError: false,
-    });
+    outputDiv.innerHTML = marked.parse(markdownInput);
+    // renderMathInElement(outputDiv, {
+    //   delimiters: [
+    //     { left: "$$", right: "$$", display: true },
+    //     { left: "\\[", right: "\\]", display: true },
+    //     { left: "$", right: "$", display: false },
+    //     { left: "\\(", right: "\\)", display: false },
+    //   ],
+    //   throwOnError: false,
+    // });
   }, [markdownInput]);
   const fetchMarkdown = useCallback(() => {
     if (!contestId || !taskId) {

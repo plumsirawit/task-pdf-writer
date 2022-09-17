@@ -42,6 +42,41 @@ renderer.table = function(header, body) {
     return html;
 }
 
+var original_em = renderer.em;
+renderer.em = function (text) {
+  if (text.includes("$")) return "_" + text + "_";
+  else return original_em(text);
+};
+
+const blockRegex = /\$\$([\s\S]+?)\$\$/g;
+const inlineRegex = /\$([^\$]*)\$/g;
+const replacer = (text) => {
+  text = text.replace(blockRegex, (match, expression) => {
+    return katex.renderToString(expression, {
+      displayMode: true,
+      throwOnError: false,
+    });
+  });
+  text = text.replace(inlineRegex, (match, expression) => {
+    console.log("expr", expression);
+    return katex.renderToString(expression, {
+      displayMode: false,
+      throwOnError: false,
+    });
+  });
+  return text;
+};
+
+const replaceTypes = ["listitem", "tablecell", "paragraph"];
+replaceTypes.forEach((type) => {
+  const original = renderer[type];
+  renderer[type] = (...args) => {
+    args[0] = replacer(args[0]);
+    return original(...args);
+  };
+});
+
+
 // global options
 marked.setOptions({
     renderer: renderer,
