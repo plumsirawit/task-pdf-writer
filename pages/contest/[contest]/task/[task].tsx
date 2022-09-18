@@ -53,7 +53,7 @@ export default withAuthUser({
     if (!outputDiv) {
       return;
     }
-    outputDiv.innerHTML = marked.parse(markdownInput);
+    outputDiv.innerHTML = marked.parse(markdownInput.replaceAll(/\\/g, "\\\\"));
     renderMathInElement(outputDiv, {
       delimiters: [
         { left: "$$", right: "$$", display: true },
