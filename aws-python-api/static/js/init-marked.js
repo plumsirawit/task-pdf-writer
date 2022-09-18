@@ -42,6 +42,12 @@ renderer.table = function(header, body) {
     return html;
 }
 
+var original_em = renderer.em;
+renderer.em = function (text) {
+  if (text.includes("$")) return "_" + text + "_";
+  else return original_em(text);
+};
+
 // global options
 marked.setOptions({
     renderer: renderer,

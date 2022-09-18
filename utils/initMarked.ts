@@ -1,4 +1,5 @@
 import { marked } from "marked";
+import katex from "katex";
 
 const parser: marked.Parser = new marked.Parser();
 const renderer: marked.Renderer = parser.renderer;
@@ -49,6 +50,12 @@ renderer.table = function (header, body) {
   html =
     "<div " + tags + ">" + original_table_renderer(header, body) + "</div>";
   return html;
+};
+
+const original_em = renderer.em.bind({ parser });
+renderer.em = function (text: string) {
+  if (text.includes("$")) return "_" + text + "_";
+  else return original_em(text);
 };
 
 // global options
