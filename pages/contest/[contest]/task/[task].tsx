@@ -184,15 +184,8 @@ export default withAuthUser({
       Key: s3Key,
       Body: markdownInput,
       Metadata: {
-        "tpw-contest-full-title": contestData.fulltitle,
-        "tpw-contest-title": contestData.title,
-        "tpw-contest": contestData.shortname,
         "tpw-contest-id": contestId,
         "tpw-task-name": name,
-        "tpw-country": contestData.country,
-        "tpw-language": contestData.language,
-        "tpw-language-code": contestData.langcode,
-        "tpw-contest-date": contestData.date,
       },
     });
     try {
@@ -285,11 +278,17 @@ export default withAuthUser({
   };
   const promptRenameTask = () => {
     const newName = prompt("Enter new task name", name) ?? name;
-    firebase
-      .database()
-      .ref("tasks/" + taskId + "/name")
-      .set(newName)
-      .then(() => setName(newName));
+    if (/^[a-z0-9]*$/.test(newName) && newName.length <= 30) {
+      firebase
+        .database()
+        .ref("tasks/" + taskId + "/name")
+        .set(newName)
+        .then(() => setName(newName));
+    } else {
+      alert(
+        "Task name must contain only lowercase English characters or numbers and must be no more than 30 characters long."
+      );
+    }
   };
   const [overrideLoading, setOverrideLoading] = useState<boolean>(false);
   const override = async () => {

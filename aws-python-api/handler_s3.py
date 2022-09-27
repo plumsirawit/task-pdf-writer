@@ -24,11 +24,6 @@ cred = credentials.Certificate("cred.json")
 firebase_admin.initialize_app(cred)
 db = firestore.client()
 
-# Why don't we lift everything here to front-end
-# No, TODO: lift everything from front-end to back-end
-# Polling should be handled with care (for security reasons)
-
-
 def fetch_s3_object(event, context):
     try:
         user_token = event['headers']['tpw-user-token']
@@ -174,23 +169,28 @@ def process_s3_object(event, context):
         head_response = s3.head_object(
             Bucket='task-pdf-writer-v1', Key=object_name)
         metadata = head_response['Metadata']
+        contest_id = metadata.get('tpw-contest-id', '')
+        task_name = metadata.get('tpw-task-name', '')
+        doc = db.collection(u'contests').document(contest_id).get()
+        if not doc.exists:
+            raise ValueError('Document not found')
+        doc_data = doc.to_dict()
         body = {
             'content': 'Content not found!',
-            'contest_full_title': metadata.get('tpw-contest-full-title', ''),
-            'contest_title': metadata.get('tpw-contest-title', ''),
-            'contest': metadata.get('tpw-contest', ''),
-            'task_name': metadata.get('tpw-task-name', ''),
-            'country': metadata.get('tpw-country', ''),
-            'language': metadata.get('tpw-language', ''),
-            'language_code': metadata.get('tpw-language-code', ''),
-            'contest_date': metadata.get('tpw-contest-date', ''),
+            'contest_full_title': doc_data.get('fulltitle', ''),
+            'contest_title': doc_data.get('title', ''),
+            'contest': doc_data.get('shortname', ''),
+            'task_name': task_name,
+            'country': doc_data.get('country', ''),
+            'language': doc_data.get('language', ''),
+            'language_code': doc_data.get('langcode', ''),
+            'contest_date': doc_data.get('date', ''),
             'image_base64': ''
         }
         content_filename = '/tmp/{}.md'.format(str(uuid4()))
         s3.download_file('task-pdf-writer-v1', object_name, content_filename)
         with open(content_filename) as f:
             body['content'] = f.read()
-        contest_id = metadata.get('tpw-contest-id', '')
         try:
             s3.head_object(Bucket='task-pdf-writer-v1',
                            Key=f'private/{contest_id}-logo')
