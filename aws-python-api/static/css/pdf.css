@@ -25,8 +25,8 @@ div.pdf {
 }
 
 .header {
-    font-family: IRANSans, Helvetica, Arial, sans-serif;
-    font-size: 14px;
+    font-family: "Sarabun", IRANSans, Helvetica, Arial, sans-serif;
+    font-size: 16px;
     letter-spacing: -.04em;
     font-weight: 400;
 }
@@ -34,7 +34,8 @@ div.pdf {
 .header .title {
     display: inline-block;
     float: left;
-    line-height: 1.25em;
+    padding-top: 5px;
+    line-height: 1.4em;
 }
 
 .header .title div:first-child {
