@@ -153,7 +153,9 @@ export default function Editor() {
             <button onClick={generatePdf} className={styles.button} disabled={pdfLoading}>
               {pdfLoading ? (
                 <div className={styles.spinnerwrapper}>
-                  <MoonLoader size="15" color="white" css="display: block" />
+                  <div style={{ display: "flex" }}>
+                    <MoonLoader size={15} color="white"/>
+                  </div>
                 </div>
               ) : (
                 <>Generate</>
