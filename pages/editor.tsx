@@ -33,15 +33,14 @@ export default function Editor() {
     });
   }, [markdownInput]);
   const [pdfLoading, setPdfLoading] = useState<boolean>(false);
-  const [contestFullTitle, setContestFullTitle] =
-    useState<string>("CONTEST_FULL_TITLE");
-  const [contestTitle, setContestTitle] = useState<string>("CONTEST_TITLE");
-  const [contest, setContest] = useState<string>("CONTEST");
-  const [taskName, setTaskName] = useState<string>("TASK_NAME");
-  const [country, setCountry] = useState<string>("COUNTRY");
-  const [language, setLanguage] = useState<string>("LANGUAGE");
-  const [languageCode, setLanguageCode] = useState<string>("LANGCODE");
-  const [contestDate, setContestDate] = useState<string>("CONTEST_DATE");
+  const [contestFullTitle, setContestFullTitle] = useState<string>("");
+  const [contestTitle, setContestTitle] = useState<string>("");
+  const [contest, setContest] = useState<string>("");
+  const [taskName, setTaskName] = useState<string>("");
+  const [country, setCountry] = useState<string>("");
+  const [language, setLanguage] = useState<string>("");
+  const [languageCode, setLanguageCode] = useState<string>("");
+  const [contestDate, setContestDate] = useState<string>("");
   const fileInputRef = useRef<HTMLInputElement>(null);
   const generatePdf = async () => {
     setPdfLoading(true);
@@ -74,10 +73,7 @@ export default function Editor() {
     saveAs(new Blob([buffer], { type: "application/pdf" }), "document.pdf");
   };
   const saveMarkdown = () => {
-    saveAs(
-      new Blob([markdownInput], { type: "text/plain;charset=utf-8" }),
-      "document.md"
-    );
+    saveAs(new Blob([markdownInput], { type: "text/plain;charset=utf-8" }), "document.md");
   };
   const [modalIsOpen, setModalIsOpen] = useState<boolean>(false);
   Modal.setAppElement("#__next");
@@ -85,88 +81,90 @@ export default function Editor() {
     <>
       <Head>
         <title>task-pdf-writer | Editor</title>
-        <meta
-          name="description"
-          content="Tool for writing competitive programming tasks in PDF"
-        />
+        <meta name="description" content="Tool for writing competitive programming tasks in PDF" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <Modal isOpen={modalIsOpen} contentLabel="Example Modal">
         <div className={styles.modal}>
           <div className={styles.modalrow}>
-            <h2>Parameter Setings</h2>
-            <button onClick={() => setModalIsOpen(false)}>Close</button>
+            <h2>Parameter Settings</h2>
+            <button onClick={() => setModalIsOpen(false)} style={{ padding: "1rem" }}>
+              Close
+            </button>
           </div>
-          <input
-            type="text"
-            value={contestFullTitle}
-            onChange={(e) => setContestFullTitle(e.target.value)}
-            placeholder="Contest Full Title"
-          />
-          <input
-            type="text"
-            value={contestTitle}
-            onChange={(e) => setContestTitle(e.target.value)}
-            placeholder="Contest Title"
-          />
-          <input
-            type="text"
-            value={contest}
-            onChange={(e) => setContest(e.target.value)}
-            placeholder="Contest"
-          />
-          <input
-            type="text"
-            value={taskName}
-            onChange={(e) => setTaskName(e.target.value)}
-            placeholder="Task Name"
-          />
-          <input
-            type="text"
-            value={country}
-            onChange={(e) => setCountry(e.target.value)}
-            placeholder="Country Code"
-          />
-          <input
-            type="text"
-            value={language}
-            onChange={(e) => setLanguage(e.target.value)}
-            placeholder="Language"
-          />
-          <input
-            type="text"
-            value={languageCode}
-            onChange={(e) => setLanguageCode(e.target.value)}
-            placeholder="Language Code"
-          />
-          <input
-            type="text"
-            value={contestDate}
-            onChange={(e) => setContestDate(e.target.value)}
-            placeholder="Contest Date"
-          />
-          <input type="file" ref={fileInputRef} multiple={false} />
-          <button
-            onClick={generatePdf}
-            className={styles.button}
-            disabled={pdfLoading}
-          >
-            {pdfLoading ? (
-              <div className={styles.spinnerwrapper}>
-                <MoonLoader size="15" color="white" css="display: block" />
-              </div>
-            ) : (
-              <>Generate</>
-            )}
-          </button>
+          <form style={{ maxWidth: "300px" }}>
+            <label>Contest full title</label>
+            <input
+              type="text"
+              value={contestFullTitle}
+              onChange={(e) => setContestFullTitle(e.target.value)}
+              placeholder="Contest Full Title"
+            />
+            <label>Contest title</label>
+            <input
+              type="text"
+              value={contestTitle}
+              onChange={(e) => setContestTitle(e.target.value)}
+              placeholder="Contest Title"
+            />
+            <label>Contest</label>
+            <input
+              type="text"
+              value={contest}
+              onChange={(e) => setContest(e.target.value)}
+              placeholder="Contest"
+            />
+            <label>Task name</label>
+            <input
+              type="text"
+              value={taskName}
+              onChange={(e) => setTaskName(e.target.value)}
+              placeholder="Task Name"
+            />
+            <label>Country code</label>
+            <input
+              type="text"
+              value={country}
+              onChange={(e) => setCountry(e.target.value)}
+              placeholder="Country Code"
+            />
+            <label>Language</label>
+            <input
+              type="text"
+              value={language}
+              onChange={(e) => setLanguage(e.target.value)}
+              placeholder="Language"
+            />
+            <label>Language code</label>
+            <input
+              type="text"
+              value={languageCode}
+              onChange={(e) => setLanguageCode(e.target.value)}
+              placeholder="Language Code"
+            />
+            <label>Contest date</label>
+            <input
+              type="text"
+              value={contestDate}
+              onChange={(e) => setContestDate(e.target.value)}
+              placeholder="Contest Date"
+            />
+            <input type="file" ref={fileInputRef} multiple={false} />
+            <button onClick={generatePdf} className={styles.button} disabled={pdfLoading}>
+              {pdfLoading ? (
+                <div className={styles.spinnerwrapper}>
+                  <MoonLoader size="15" color="white" css="display: block" />
+                </div>
+              ) : (
+                <>Generate</>
+              )}
+            </button>
+          </form>
         </div>
       </Modal>
       <div className={styles.container}>
         <div className={styles.topbar}>
-          <button
-            onClick={() => setModalIsOpen(true)}
-            className={styles.button}
-          >
+          <button onClick={() => setModalIsOpen(true)} className={styles.button}>
             Generate PDF
           </button>
           <button onClick={saveMarkdown} className={styles.button}>
