@@ -1,4 +1,10 @@
-**v.1.2.1 stable update** (Yes I surely hope it is stable)
+**IMPORTANT: SECURITY BOUNTY**
+
+According to the scan from [GitRoll](https://gitroll.io/result/repo/TWYT9Bb9YC0hyD57q1Xa), there might be severe vulnerabilities in this repository. After a bit of manually checking the access permission on S3, I confirm that the report is somehow misleading, i.e., the AWS IAM is being controlled properly and the exposed secret key is only for the client to upload files on S3 directly. This can be improved easily by revoking that direct access to S3 and offload the work to another Lambda instead (which would give a stupid overhead but well... maybe a bit safer since no direct contact is made to AWS S3?). I'll make this into a GitHub issue, and deal with it if I have time.
+
+However, there might be other hidden vulnerabilities! Even if I'm very sure that there is none of them, no one could guarantee that directly. Therefore, I'm going to put a **SECURITY BOUNTY** of $200 for anyone who found a severe security flaw (such as: eavesdroppers can read/write problem statements or images). Minor security flaw reports are appreciated, but the bounty will be lower, accordingly.
+
+Please submit the vulnerability / security flaw reports by opening a GitHub Issue. If I'm not notified in 24 hours, send me an email directly.
 
 ![](https://raw.githubusercontent.com/plumsirawit/task-pdf-writer/main/public/task-pdf-writer-banner.svg)
 
