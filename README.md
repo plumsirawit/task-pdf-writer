@@ -1,3 +1,11 @@
+# EXTREMELY IMPORTANT: SECURITY FLAW is found!
+
+A severe security flaw is found, a report about this incident will be published soon. Currently, the secret Firebase and AWS admin credentials are revoked. The platform will be halted until further notice. I sincerely, and extremely, apologize to my carelessness about this. And I also greatly thank Teeramaet Bongkodmalee for reporting the flaw. He is truly a hero in this situation.
+
+After publishing the report and fixing the flaw, the security bounty will remain active for other security flaws (apart from the client secret key case and the credentials leak case).
+
+**Therefore, the service will be closed until further notice.**
+
 **IMPORTANT: SECURITY BOUNTY**
 
 According to the scan from [GitRoll](https://gitroll.io/result/repo/TWYT9Bb9YC0hyD57q1Xa), there might be severe vulnerabilities in this repository. After a bit of manually checking the access permission on S3, I confirm that the report is somehow misleading, i.e., the AWS IAM is being controlled properly and the exposed secret key is only for the client to upload files on S3 directly. This can be improved easily by revoking that direct access to S3 and offload the work to another Lambda instead (which would give a stupid overhead but well... maybe a bit safer since no direct contact is made to AWS S3?). I'll make this into a GitHub issue, and deal with it if I have time.
