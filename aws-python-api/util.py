@@ -6,25 +6,29 @@ import shutil
 
 import pdfkit
 from xvfbwrapper import Xvfb
+from html_sanitizer import Sanitizer
 
+def sanitize(st):
+    sanitizer = Sanitizer()
+    return sanitizer.sanitize(st)
 
 def render_pdf_template(body):
     render_context = {
-        'content': body['content'],
-        'contest_full_title': body['contest_full_title'],
-        'contest_title': body['contest_title'],
-        'contest': body['contest'],
-        'task_name': body['task_name'],
-        'country': body['country'],
-        'language': body['language'],
-        'language_code': body['language_code'],
+        'content': sanitize(body['content']),
+        'contest_full_title': sanitize(body['contest_full_title']),
+        'contest_title': sanitize(body['contest_title']),
+        'contest': sanitize(body['contest']),
+        'task_name': sanitize(body['task_name']),
+        'country': sanitize(body['country']),
+        'language': sanitize(body['language']),
+        'language_code': sanitize(body['language_code']),
         'direction': 'ltr',
         'pdf_output': True,
         'static_path': 'static',
         'images_path': '',
         'text_font_base64': False,
-        'contest_date': body['contest_date'],
-        'image_base64': body['image_base64']
+        'contest_date': sanitize(body['contest_date']),
+        'image_base64': sanitize(body['image_base64'])
     }
     return render_to_string('pdf-template.html', context=render_context)
 
