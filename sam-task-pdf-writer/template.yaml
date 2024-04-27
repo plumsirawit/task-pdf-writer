@@ -1,7 +1,7 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: >
-  sam-task-pdf-writer
+  python3.12
 
   Sample SAM Template for sam-task-pdf-writer
 
@@ -9,7 +9,6 @@ Description: >
 Globals:
   Function:
     Timeout: 3
-    MemorySize: 128
 
     Tracing: Active
     # You can add LoggingConfig parameters such as the Logformat, Log Group, and SystemLogLevel or ApplicationLogLevel. Learn more here https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-resource-function.html#sam-function-loggingconfig.
@@ -21,9 +20,7 @@ Resources:
   HelloWorldFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
-      CodeUri: hello_world/
-      Handler: app.lambda_handler
-      Runtime: python3.9
+      PackageType: Image
       Architectures:
       - x86_64
       Events:
@@ -32,6 +29,10 @@ Resources:
           Properties:
             Path: /hello
             Method: get
+    Metadata:
+      Dockerfile: Dockerfile
+      DockerContext: ./hello_world
+      DockerTag: python3.12-v1
 
   ApplicationResourceGroup:
     Type: AWS::ResourceGroups::Group
