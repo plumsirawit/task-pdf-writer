@@ -17,6 +17,9 @@ capabilities = "CAPABILITY_IAM"
 confirm_changeset = true
 resolve_s3 = true
 resolve_image_repos = true
+s3_prefix = "sam-task-pdf-writer"
+region = "ap-southeast-1"
+profile = "sam-pwua"
 
 [default.package.parameters]
 resolve_s3 = true

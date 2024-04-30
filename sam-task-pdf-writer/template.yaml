@@ -17,6 +17,24 @@ Globals:
   Api:
     TracingEnabled: true
 Resources:
+  GetobjectGatewayApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      Cors:
+        AllowMethods: "'POST'"
+        AllowCredentials: false
+        AllowHeaders: "'Content-Type, tpw-user-token, tpw-contest, tpw-task, tpw-s3now, tpw-secretsuffix'"
+        AllowOrigin: "'*'"
+  CopylogoGatewayApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      Cors:
+        AllowMethods: "'POST'"
+        AllowCredentials: false
+        AllowHeaders: "'Content-Type, tpw-contest'"
+        AllowOrigin: "'*'"
   HelloWorldFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
@@ -33,6 +51,142 @@ Resources:
       Dockerfile: Dockerfile
       DockerContext: ./hello_world
       DockerTag: python3.12-v1
+  Hello2Function:
+    Type: AWS::Serverless::Function
+    Properties:
+      PackageType: Image
+      ImageConfig:
+        Command: ["handler.hello"]
+      Architectures:
+        - x86_64
+      Events:
+        Hello2:
+          Type: Api
+          Properties:
+            Path: /hello2
+            Method: get
+    Metadata:
+      Dockerfile: Dockerfile
+      DockerContext: ./aws-python-api
+  Render2Function:
+    Type: AWS::Serverless::Function
+    Properties:
+      PackageType: Image
+      ImageConfig:
+        Command: ["handler.render"]
+      Architectures:
+        - x86_64
+      Events:
+        Render2:
+          Type: Api
+          Properties:
+            Path: /render
+            Method: post
+    Metadata:
+      Dockerfile: Dockerfile
+      DockerContext: ./aws-python-api
+  Genpdf2Function:
+    Type: AWS::Serverless::Function
+    Properties:
+      PackageType: Image
+      ImageConfig:
+        Command: ["handler.genpdf"]
+      Architectures:
+        - x86_64
+      Timeout: 30
+      Events:
+        Genpdf2:
+          Type: Api
+          Properties:
+            Path: /genpdf
+            Method: post
+    Metadata:
+      Dockerfile: Dockerfile
+      DockerContext: ./aws-python-api
+  GetobjectFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      PackageType: Image
+      ImageConfig:
+        Command: ["handler_s3.fetch_s3_object"]
+      Architectures:
+        - x86_64
+      Timeout: 10
+      Events:
+        Getobject:
+          Type: Api
+          Properties:
+            Path: /getobject
+            Method: get
+            RestApiId: 
+              Ref: GetobjectGatewayApi
+    Metadata:
+      Dockerfile: Dockerfile
+      DockerContext: ./aws-python-api
+  ProcessobjectFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      PackageType: Image
+      ImageConfig:
+        Command: ["handler_s3.process_s3_object"]
+      Architectures:
+        - x86_64
+      Timeout: 100
+      Events:
+        Processobject:
+          Type: S3
+          Properties:
+            Bucket:
+              Ref: task-pdf-writer-v1
+            Events: s3:ObjectCreated:*
+            Filter:
+              S3Key:
+                Rules:
+                - Name: prefix
+                  Value: protected/
+                - Name: suffix
+                  Value: .md
+    Metadata:
+      Dockerfile: Dockerfile
+      DockerContext: ./aws-python-api
+  MigratelogoFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      PackageType: Image
+      ImageConfig:
+        Command: ["handler_s3.migrate_logo"]
+      Architectures:
+        - x86_64
+      Timeout: 30
+      Events:
+        Getobject:
+          Type: Api
+          Properties:
+            Path: /migratelogo
+            Method: post
+    Metadata:
+      Dockerfile: Dockerfile
+      DockerContext: ./aws-python-api
+  CopylogoFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      PackageType: Image
+      ImageConfig:
+        Command: ["handler_s3.copy_logo"]
+      Architectures:
+        - x86_64
+      Timeout: 30
+      Events:
+        Getobject:
+          Type: Api
+          Properties:
+            Path: /copylogo
+            Method: post
+            RestApiId: 
+              Ref: CopylogoGatewayApi
+    Metadata:
+      Dockerfile: Dockerfile
+      DockerContext: ./aws-python-api
 
   ApplicationResourceGroup:
     Type: AWS::ResourceGroups::Group
@@ -47,16 +201,49 @@ Resources:
       ResourceGroupName:
         Ref: ApplicationResourceGroup
       AutoConfigurationEnabled: 'true'
-Outputs:
+# Outputs:
   # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
   # Find out more about other implicit resources you can reference within SAM
   # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
-  HelloWorldApi:
-    Description: API Gateway endpoint URL for Prod stage for Hello World function
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello/"
-  HelloWorldFunction:
-    Description: Hello World Lambda Function ARN
-    Value: !GetAtt HelloWorldFunction.Arn
-  HelloWorldFunctionIamRole:
-    Description: Implicit IAM Role created for Hello World function
-    Value: !GetAtt HelloWorldFunctionRole.Arn
+  # HelloWorldApi:
+  #   Description: API Gateway endpoint URL for Prod stage for Hello World function
+  #   Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello/"
+  # HelloWorldFunction:
+  #   Description: Hello World Lambda Function ARN
+  #   Value: !GetAtt HelloWorldFunction.Arn
+  # HelloWorldFunctionIamRole:
+  #   Description: Implicit IAM Role created for Hello World function
+  #   Value: !GetAtt HelloWorldFunctionRole.Arn
+  # Hello2Api:
+  #   Description: API Gateway endpoint URL for Prod stage for Hello 2 function
+  #   Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello2/"
+  # Hello2Function:
+  #   Description: Hello 2 Lambda Function ARN
+  #   Value: !GetAtt Hello2Function.Arn
+  # Hello2FunctionIamRole:
+  #   Description: Implicit IAM Role created for Hello 2 function
+  #   Value: !GetAtt Hello2FunctionRole.Arn
+  # Render2Api:
+  #   Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/render/"
+  # Render2Function:
+  #   Value: !GetAtt Render2Function.Arn
+  # Render2FunctionIamRole:
+  #   Value: !GetAtt Render2FunctionRole.Arn
+  # Genpdf2Api:
+  #   Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/genpdf/"
+  # Genpdf2Function:
+  #   Value: !GetAtt Genpdf2Function.Arn
+  # Genpdf2FunctionIamRole:
+  #   Value: !GetAtt Genpdf2FunctionRole.Arn
+  # GetobjectApi:
+  #   Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/render/"
+  # GetobjectFunction:
+  #   Value: !GetAtt GetobjectFunction.Arn
+  # GetobjectFunctionIamRole:
+  #   Value: !GetAtt GetobjectFunctionRole.Arn
+  # Render2Api:
+  #   Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/render/"
+  # Render2Function:
+  #   Value: !GetAtt Render2Function.Arn
+  # Render2FunctionIamRole:
+  #   Value: !GetAtt Render2FunctionRole.Arn
