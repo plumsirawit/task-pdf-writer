@@ -1,4 +1,5 @@
-FROM ubuntu:xenial-20170710
+# FROM ubuntu:xenial-20170710
+FROM ubuntu:24.04
 
 RUN rm -rf /var/lib/apt/lists/*
 RUN apt-get -yq update && \
@@ -29,7 +30,7 @@ RUN wget https://github.com/Kitware/CMake/releases/download/v3.20.5/cmake-3.20.5
 ENV PATH="/usr/bin/cmake/bin:${PATH}"
 
 WORKDIR /Python-3.8.12
-RUN apt-get -yq install libncurses-dev libgdbm-dev libz-dev tk-dev libsqlite3-dev libreadline-dev liblzma-dev libffi-dev libssl-dev
+RUN apt-get -yq install libncurses-dev libgdbm-dev libz-dev libsqlite3-dev libreadline-dev liblzma-dev libffi-dev libssl-dev tk-dev
 RUN ./configure --prefix=/python3.8
 RUN make -j
 RUN make install

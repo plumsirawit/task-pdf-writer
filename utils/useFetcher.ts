@@ -23,7 +23,7 @@ const fetchPdf = async ({
   }
   const uidToken = await authUser.getIdToken();
   const innerResp = await fetch(
-    "https://973i5k6wjg.execute-api.ap-southeast-1.amazonaws.com/dev/getobject",
+    "https://wd5sfsdcug.execute-api.ap-southeast-1.amazonaws.com/Prod/getobject/",
     {
       headers: {
         "tpw-user-token": uidToken ?? "",

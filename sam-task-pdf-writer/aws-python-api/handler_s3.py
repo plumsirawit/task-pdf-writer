@@ -11,6 +11,8 @@ from urllib.request import urlopen
 import base64
 from util import process_pdf
 
+S3_BUCKET = 'sam-task-pdf-writer-tpws3bucket'
+
 admin_config = Config(
     region_name='ap-southeast-1'
 )
@@ -23,6 +25,7 @@ s3 = boto3.client('s3',
 cred = credentials.Certificate("cred.json")
 firebase_admin.initialize_app(cred)
 db = firestore.client()
+
 
 def fetch_s3_object(event, context):
     try:
@@ -58,11 +61,11 @@ def fetch_s3_object(event, context):
             raise ValueError("Task is not in this contest")
         object_name = f'protected/{contest}-{task}-{s3now}-{secretsuffix}.pdf'
         try:
-            s3.download_file('task-pdf-writer-v1', object_name, '/tmp/buf.pdf')
+            s3.download_file(S3_BUCKET, object_name, '/tmp/buf.pdf')
         except ClientError:
             raise FileNotFoundError('PDF doesn\'t exist')
         file_url = s3.generate_presigned_url('get_object', Params={
-                                             'Bucket': 'task-pdf-writer-v1', 'Key': object_name}, ExpiresIn=3600)
+                                             'Bucket': S3_BUCKET, 'Key': object_name}, ExpiresIn=3600)
         response = {
             "statusCode": 200,
             "body": json.dumps({
@@ -167,7 +170,7 @@ def process_s3_object(event, context):
     try:
         object_name = event['Records'][0]['s3']['object']['key']
         head_response = s3.head_object(
-            Bucket='task-pdf-writer-v1', Key=object_name)
+            Bucket=S3_BUCKET, Key=object_name)
         metadata = head_response['Metadata']
         contest_id = metadata.get('tpw-contest-id', '')
         task_name = metadata.get('tpw-task-name', '')
@@ -188,20 +191,20 @@ def process_s3_object(event, context):
             'image_base64': ''
         }
         content_filename = '/tmp/{}.md'.format(str(uuid4()))
-        s3.download_file('task-pdf-writer-v1', object_name, content_filename)
+        s3.download_file(S3_BUCKET, object_name, content_filename)
         with open(content_filename) as f:
             body['content'] = f.read()
         try:
-            s3.head_object(Bucket='task-pdf-writer-v1',
+            s3.head_object(Bucket=S3_BUCKET,
                            Key=f'private/{contest_id}-logo')
             logo_exists = True
         except ClientError:
             logo_exists = False
         if logo_exists:
-            s3.download_file('task-pdf-writer-v1',
+            s3.download_file(S3_BUCKET,
                              f'private/{contest_id}-logo', content_filename)
             head_response = s3.head_object(
-                Bucket='task-pdf-writer-v1', Key=f'private/{contest_id}-logo')
+                Bucket=S3_BUCKET, Key=f'private/{contest_id}-logo')
             # print('[DEBUG metadata]', head_response)
             content_type = head_response['ContentType']
             with open(content_filename, 'rb') as f:
@@ -210,8 +213,9 @@ def process_s3_object(event, context):
         # now the body is complete
         print('[DEBUG body]', body)
         output_file_path = process_pdf(body)
-        s3.upload_file(output_file_path, 'task-pdf-writer-v1',
+        s3.upload_file(output_file_path, S3_BUCKET,
                        object_name.replace('.md', '.pdf'))
+        print('[INFO] END process_s3_object')
     except Exception as e:
         print('[DEBUG] ERROR', str(e))
         return
@@ -224,7 +228,7 @@ def upload_datauri(datauri, key):
         data = response.read()
         with open(filename, "wb") as f:
             f.write(data)
-    s3.upload_file(filename, 'task-pdf-writer-v1',
+    s3.upload_file(filename, S3_BUCKET,
                    key, {'ContentType': content_type})
     os.remove(filename)
 
