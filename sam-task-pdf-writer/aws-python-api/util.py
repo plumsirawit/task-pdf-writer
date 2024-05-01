@@ -6,11 +6,16 @@ import shutil
 
 import pdfkit
 from xvfbwrapper import Xvfb
-from html_sanitizer import Sanitizer
+
+import markdown
+from mdx_bleach.mdx_bleach.extension import BleachExtension
+
 
 def sanitize(st):
-    sanitizer = Sanitizer()
-    return sanitizer.sanitize(st)
+    bleach = BleachExtension()
+    md = markdown.Markdown(extensions=[bleach])
+    return md.convert(st)
+
 
 def render_pdf_template(body):
     render_context = {

@@ -74,6 +74,8 @@ WORKDIR /usr/src/app
 COPY cred.json /usr/src/app/cred.json
 COPY secret.py /usr/src/app/secret.py
 
+COPY mdx_bleach /usr/src/app/mdx_bleach/
+
 # ENTRYPOINT ["/root/docker-entrypoint.sh"]
 RUN chmod +x /python3.8/bin/python3.8
 ENTRYPOINT [ "/python3.8/bin/python3.8", "-m", "awslambdaric" ]
