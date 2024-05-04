@@ -12,9 +12,13 @@ from mdx_bleach.mdx_bleach.extension import BleachExtension
 
 
 def sanitize(st):
-    bleach = BleachExtension()
-    md = markdown.Markdown(extensions=[bleach])
-    return md.convert(st)
+    '''
+    TODO: sanitize input
+    '''
+    # bleach = BleachExtension()
+    # md = markdown.Markdown(extensions=[bleach])
+    # return md.convert(st)
+    return st
 
 
 def render_pdf_template(body):
