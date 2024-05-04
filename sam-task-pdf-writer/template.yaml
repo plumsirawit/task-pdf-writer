@@ -25,9 +25,6 @@ Resources:
     Type: AWS::Serverless::Api
     Properties:
       StageName: Prod
-      Auth:
-        ApiKeyRequired: false
-      AlwaysDeploy: true
       Cors:
         AllowMethods: "'GET'"
         AllowCredentials: false

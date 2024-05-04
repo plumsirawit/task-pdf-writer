@@ -7,8 +7,8 @@ import shutil
 import pdfkit
 from xvfbwrapper import Xvfb
 
-import markdown
-from mdx_bleach.mdx_bleach.extension import BleachExtension
+# import markdown
+# from mdx_bleach.mdx_bleach.extension import BleachExtension
 
 
 def sanitize(st):
