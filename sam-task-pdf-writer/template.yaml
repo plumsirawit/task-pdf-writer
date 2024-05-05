@@ -154,6 +154,7 @@ Resources:
       Environment:
         Variables:
           DJANGO_SETTINGS_MODULE: settings
+          HOME: /tmp/
       Events:
         Processobj:
           Type: S3
