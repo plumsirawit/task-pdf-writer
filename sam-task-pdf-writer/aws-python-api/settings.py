@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.10/ref/settings/
 """
 
+import django
 import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -22,7 +23,6 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'jq5w*u%s@o&b5gf59qmuby*y1$xrm5cpcw5kbxb86vu@z^1gm9'
 
-import django
 django.setup()
 
 # SECURITY WARNING: don't run with debug turned on in production!
@@ -32,6 +32,7 @@ ALLOWED_HOSTS = ['*']
 
 WKHTMLTOPDF_CMD_OPTIONS = {
     'disable-local-file-access': None,
+    'allow': '/tmp/ /root/',
     'page-size': 'A4',
     'margin-left': '0.75in',
     'margin-right': '0.75in',
@@ -72,8 +73,7 @@ ROOT_URLCONF = 'Translation.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'templates')]
-        ,
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -177,7 +177,7 @@ USE_L10N = True
 USE_TZ = True
 
 TRANSLATION_EDIT_TIME_OUT = 120
-PRINT_SYSTEM_ADDRESS="http://print.ioi2017.org"
+PRINT_SYSTEM_ADDRESS = "http://print.ioi2017.org"
 
 
 STATIC_URL = '/static/'

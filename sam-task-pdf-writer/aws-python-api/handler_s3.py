@@ -13,6 +13,8 @@ from util import process_pdf
 
 S3_BUCKET = 'sam-task-pdf-writer-tpws3bucket'
 
+# OK.
+
 admin_config = Config(
     region_name='ap-southeast-1'
 )
