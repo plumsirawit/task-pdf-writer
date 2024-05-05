@@ -1,10 +1,8 @@
-# EXTREMELY IMPORTANT: SECURITY FLAW is found!
+# UPDATE: SECURITY FLAW is fixed!
 
-A severe security flaw is found, a report about this incident will be published soon. Currently, the secret Firebase and AWS admin credentials are revoked. The platform will be halted until further notice. I sincerely, and extremely, apologize to my carelessness about this. And I also greatly thank Teeramaet Bongkodmalee for reporting the flaw. He is truly a hero in this situation.
+The current fix has been delivered. However, there is no serious review conducted. In effect, the service is back again, but please use it at your own risk since we cannot afford to do a thorough review / pentest for now. For the current fixed version, use https://task-pdf-writer-d2zmuqgwi-plumsirawits-projects.vercel.app/.
 
-After publishing the report and fixing the flaw, the security bounty will remain active for other security flaws (apart from the client secret key case and the credentials leak case).
-
-**Therefore, the service will be closed until further notice.**
+The main version at https://pdf.graders.me/ is currently suspended until the pending PR#53 is merged.
 
 **IMPORTANT: SECURITY BOUNTY**
 
