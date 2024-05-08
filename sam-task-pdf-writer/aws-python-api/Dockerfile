@@ -1,5 +1,5 @@
 # FROM ubuntu:xenial-20170710
-FROM ubuntu:24.04
+FROM arm64v8/ubuntu:24.04
 
 RUN rm -rf /var/lib/apt/lists/*
 RUN apt-get -yq update && \
@@ -59,6 +59,7 @@ RUN python3.8 -m pip install awslambdaric
 # COPY docker-entrypoint.sh /root/docker-entrypoint.sh
 # RUN chmod +x /root/docker-entrypoint.sh
 COPY binaries/cpdf/cpdf /usr/bin/
+# COPY binaries/cpdf/cpdf-arm-v2.7 /usr/bin/cpdf
 RUN chmod +x /usr/bin/cpdf
 
 RUN mkdir /usr/src/app

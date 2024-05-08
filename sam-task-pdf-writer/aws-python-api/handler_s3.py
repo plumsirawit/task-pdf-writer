@@ -10,6 +10,7 @@ from botocore.exceptions import ClientError
 from urllib.request import urlopen
 import base64
 from util import process_pdf
+import time
 
 S3_BUCKET = 'sam-task-pdf-writer-tpws3bucket'
 
@@ -62,9 +63,17 @@ def fetch_s3_object(event, context):
         if task not in data['tasks']:
             raise ValueError("Task is not in this contest")
         object_name = f'protected/{contest}-{task}-{s3now}-{secretsuffix}.pdf'
-        try:
-            s3.download_file(S3_BUCKET, object_name, '/tmp/buf.pdf')
-        except ClientError:
+        flag_valid = False
+        for _ in range(30):
+            # server-side polling
+            try:
+                s3.download_file(S3_BUCKET, object_name, '/tmp/buf.pdf')
+            except ClientError:
+                time.sleep(0.5)
+                continue
+            flag_valid = True
+            break
+        if not flag_valid:
             raise FileNotFoundError('PDF doesn\'t exist')
         file_url = s3.generate_presigned_url('get_object', Params={
                                              'Bucket': S3_BUCKET, 'Key': object_name}, ExpiresIn=3600)

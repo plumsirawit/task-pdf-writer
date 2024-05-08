@@ -87,7 +87,7 @@ export const useFetcher = (s3Output: string, fetchContext: FetchContext) => {
       pendingPromise.current = pollS3().then(() => {
         pendingPromise.current = undefined;
       });
-    }, 5000);
+    }, 20000);
     return () => {
       clearInterval(currentInterval);
     };
