@@ -1,8 +1,6 @@
-# UPDATE: SECURITY FLAW is fixed!
+**UPDATE: v1.3.0beta!**
 
-The current fix has been delivered. However, there is no serious review conducted. In effect, the service is back again, but please use it at your own risk since we cannot afford to do a thorough review / pentest for now. For the current fixed version, use https://task-pdf-writer-d2zmuqgwi-plumsirawits-projects.vercel.app/.
-
-The main version at https://pdf.graders.me/ is currently suspended until the pending PR#53 is merged.
+The main platform is currently suspended due to technical problems. However, please use https://task-pdf-writer-89a7lp3cn-plumsirawits-projects.vercel.app/ for the beta version of v1.3.0. Feedbacks are appreciated!
 
 **IMPORTANT: SECURITY BOUNTY**
 
