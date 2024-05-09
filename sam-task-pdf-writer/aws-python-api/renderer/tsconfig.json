@@ -1,13 +1,14 @@
 {
     "compilerOptions": {
-        "target": "ESNext",
-        "module": "ESNext",
+        "target": "ES2015",
+        "module": "CommonJS",
         "moduleResolution": "Node",
         "outDir": "dist",
         "declaration": true,
-        "allowImportingTsExtensions": true
+        "baseUrl": ".",
+        "typeRoots": ["./node_modules/@types"]
     },
-    "include": ["./**/*.ts"],
+    "include": ["./src/**/*.ts"],
     "exclude": ["node_modules"],
     "ts-node": {
         "compilerOptions": {

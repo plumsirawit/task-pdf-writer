@@ -1,0 +1,38 @@
+{
+    "Records": [
+        {
+            "eventVersion": "2.1",
+            "eventSource": "aws:s3",
+            "awsRegion": "us-east-2",
+            "eventTime": "2019-09-03T19:37:27.192Z",
+            "eventName": "ObjectCreated:Put",
+            "userIdentity": {
+                "principalId": "AWS:AIDAINPONIXQXHT3IKHL2"
+            },
+            "requestParameters": {
+                "sourceIPAddress": "205.255.255.255"
+            },
+            "responseElements": {
+                "x-amz-request-id": "D82B88E5F771F645",
+                "x-amz-id-2": "vlR7PnpV2Ce81l0PRw6jlUpck7Jo5ZsQjryTjKlc5aLWGVHPZLj5NeC6qMa0emYBDXOo6QBU0Wo="
+            },
+            "s3": {
+                "s3SchemaVersion": "1.0",
+                "configurationId": "828aa6fc-f7b5-4305-8584-487c791949c1",
+                "bucket": {
+                    "name": "sam-task-pdf-writer-tpws3bucket",
+                    "ownerIdentity": {
+                        "principalId": "A3I5XTEXAMAI3E"
+                    },
+                    "arn": "arn:aws:s3:::sam-task-pdf-writer-tpws3bucket/protected/2o0K34kBqRT69DHPkOvf-3622b012-d538-4892-8fea-d4b989f2f09c-1715228049324-a3db5511610f24ad5be2a911.md"
+                },
+                "object": {
+                    "key": "protected/2o0K34kBqRT69DHPkOvf-3622b012-d538-4892-8fea-d4b989f2f09c-1715228049324-a3db5511610f24ad5be2a911.md",
+                    "size": 1305107,
+                    "eTag": "f1796f0f7f91bd5ac92ae1902c3d63e7",
+                    "sequencer": "0C0F6F405D6ED209E1"
+                }
+            }
+        }
+    ]
+}

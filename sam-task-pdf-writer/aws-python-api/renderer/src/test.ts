@@ -1,4 +1,4 @@
-import { renderMarkdownToHTML } from "./render.ts";
+import { renderMarkdownToHTML } from "./render";
 import * as fs from "node:fs";
 
 const htmlTemplate = fs.readFileSync("static_min/template.html").toString();
@@ -83,7 +83,6 @@ void deploy_bird(int x, int y)
 *หมายเหตุ* แต่เอาจริง ๆ ผมว่าถ้า $F \\geq p$ มันจะเริ่มไม่แฟร์แล้ว เพราะเราสามารถ generate solution โดยใช้ polynomial แปลก ๆ แล้วอัดของที่ไม่อยู่ใน solution เข้า $F$ ไป แล้วต้องให้ผู้เข้าแข่งขันมานั่งเดาเอาให้มันได้ เว้นแต่ว่ามันจะมีวิธีที่ justified แล้วว่าจะมอบ optimal solution ให้เสมอไม่ว่าจุดต้องห้ามทั้ง $F$ จุด หน้าตาเป็นยังไง
 `;
 
-renderMarkdownToHTML(inputMd).then((st) => {
-    const outHtml = htmlTemplate.replace("{{RENDERED_CONTENT}}", st);
-    fs.writeFileSync("out.html", outHtml);
-});
+const st = renderMarkdownToHTML(inputMd);
+const outHtml = htmlTemplate.replace("{{RENDERED_CONTENT}}", st);
+fs.writeFileSync("out.html", outHtml);

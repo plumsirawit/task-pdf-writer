@@ -8,7 +8,7 @@ function parseLatex(st: string): E.Either<string, Error> {
         SINGLE,
         DOUBLE,
     }
-    st = st.replaceAll("&lt;", "<");
+    st = st.replace(/&lt;/g, "<");
     let state = State.NORMAL;
     let lastIndex = 0;
     let outputList: String[] = [];
@@ -57,12 +57,10 @@ function parseLatex(st: string): E.Either<string, Error> {
     return E.left(outputList.join(""));
 }
 
-export async function renderMarkdownToHTML(
-    markdownInput: string
-): Promise<string> {
+export function renderMarkdownToHTML(markdownInput: string): string {
     const latexDone = parseLatex(markdownInput);
     if (latexDone._tag == "Right") {
         return "[ERROR] " + latexDone.right.message;
     }
-    return marked.parse(latexDone.left);
+    return marked.parse(latexDone.left) as string;
 }

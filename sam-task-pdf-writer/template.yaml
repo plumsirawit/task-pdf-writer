@@ -139,6 +139,36 @@ Resources:
     Metadata:
       Dockerfile: Dockerfile
       DockerContext: ./aws-python-api
+  Preprocessobject2Function:
+    Type: AWS::Serverless::Function
+    Properties:
+      Policies:
+        - AmazonS3FullAccess
+        - AmazonDynamoDBFullAccess
+      PackageType: Image
+      ImageConfig:
+        Command: ["index.handler"]
+      Architectures:
+        - arm64
+      Timeout: 30
+      MemorySize: 1024
+      Events:
+        Processobj:
+          Type: S3
+          Properties:
+            Bucket:
+              Ref: TpwS3Bucket
+            Events: s3:ObjectCreated:*
+            Filter:
+              S3Key:
+                Rules:
+                  - Name: prefix
+                    Value: protected/
+                  - Name: suffix
+                    Value: .md
+    Metadata:
+      Dockerfile: Dockerfile
+      DockerContext: ./aws-python-api/renderer
   Processobject2Function:
     Type: AWS::Serverless::Function
     Properties:
@@ -169,7 +199,7 @@ Resources:
                   - Name: prefix
                     Value: protected/
                   - Name: suffix
-                    Value: .md
+                    Value: .html
     Metadata:
       Dockerfile: Dockerfile
       DockerContext: ./aws-python-api

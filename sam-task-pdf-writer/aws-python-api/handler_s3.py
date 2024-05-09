@@ -11,6 +11,7 @@ from urllib.request import urlopen
 import base64
 from util import process_pdf
 import time
+import io
 
 S3_BUCKET = 'sam-task-pdf-writer-tpws3bucket'
 
@@ -203,8 +204,9 @@ def process_s3_object(event, context):
         }
         content_filename = '/tmp/{}.md'.format(str(uuid4()))
         s3.download_file(S3_BUCKET, object_name, content_filename)
-        with open(content_filename) as f:
-            body['content'] = f.read()
+        content_file = io.open(content_filename, mode='r', encoding='utf-8')
+        content = content_file.read()
+        content_file.close()
         try:
             s3.head_object(Bucket=S3_BUCKET,
                            Key=f'private/{contest_id}-logo')
@@ -222,10 +224,11 @@ def process_s3_object(event, context):
                 base64_data = base64.b64encode(f.read()).decode('utf-8')
                 body['image_base64'] = f'data:{content_type};base64,' + base64_data
         # now the body is complete
+        print('[DEBUG content]', content)
         print('[DEBUG body]', body)
-        output_file_path = process_pdf(body)
+        output_file_path = process_pdf(content, body)
         s3.upload_file(output_file_path, S3_BUCKET,
-                       object_name.replace('.md', '.pdf'))
+                       object_name.replace('.html', '.pdf'))
         print('[INFO] END process_s3_object')
     except Exception as e:
         print('[DEBUG] ERROR', str(e))

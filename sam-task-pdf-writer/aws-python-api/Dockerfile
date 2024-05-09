@@ -68,7 +68,6 @@ COPY static /usr/src/app/static/
 COPY templates /usr/src/app/templates/
 COPY handler.py /usr/src/app/handler.py
 COPY handler_s3.py /usr/src/app/handler_s3.py
-COPY settings.py /usr/src/app/settings.py
 COPY util.py /usr/src/app/util.py
 WORKDIR /usr/src/app
 
