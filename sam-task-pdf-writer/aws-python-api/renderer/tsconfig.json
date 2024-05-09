@@ -1,0 +1,18 @@
+{
+    "compilerOptions": {
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Node",
+        "outDir": "dist",
+        "declaration": true,
+        "allowImportingTsExtensions": true
+    },
+    "include": ["./**/*.ts"],
+    "exclude": ["node_modules"],
+    "ts-node": {
+        "compilerOptions": {
+            "module": "CommonJS"
+        },
+        "experimentalSpecifierResolution": "node"
+    }
+}

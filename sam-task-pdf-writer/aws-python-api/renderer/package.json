@@ -1,0 +1,20 @@
+{
+    "name": "renderer",
+    "version": "1.0.0",
+    "description": "Renders markdown with LaTeX into HTML",
+    "main": "index.js",
+    "scripts": {
+        "test": "ts-node src/test.ts"
+    },
+    "author": "Sirawit Pongnakintr",
+    "license": "ISC",
+    "devDependencies": {
+        "@types/jsdom": "21.1.6",
+        "fp-ts": "2.16.5",
+        "jsdom": "24.0.0",
+        "katex": "0.16.10",
+        "marked": "12.0.2",
+        "ts-node": "10.9.2",
+        "typescript": "5.4.5"
+    }
+}
