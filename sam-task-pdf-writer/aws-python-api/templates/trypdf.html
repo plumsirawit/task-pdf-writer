@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>trypdf.html</title>
+    <link rel="shortcut icon" href="../static/img/favicon.ico" />
+
+    <link rel="stylesheet" href="../static/libs/katex/katex.min.css" />
+    <link rel="stylesheet" href="../static/css/markdown.css" />
+    <link rel="stylesheet" href="../static/css/styles.css" />
+    <link rel="stylesheet" href="../static/css/pdf.css" />
+
+    <script
+      type="text/javascript"
+      src="../static/libs/jquery/jquery-3.1.1.min.js"
+    ></script>
+    <script type="text/javascript" src="../static/js/bundle.js"></script>
+    <script type="text/javascript">
+      var marked = require("marked");
+      var katex = require("katex");
+      var renderMathInElement = require("katex/dist/contrib/auto-render");
+    </script>
+    <script type="text/javascript" src="../static/js/init-marked.js"></script>
+    <script type="text/javascript" src="../static/js/polyfill.js"></script>
+  </head>
+
+  <body>
+    <div class="markdown-body pdf">
+      <div class="header">
+        <div class="logo"></div>
+        <div class="title">
+          <!--
+		<div>IOI 2021 Call for Tasks Submission</div>
+		<div>January 15, 2021</div>
+		<div><br></div>
+		<div>{{contest}} Tasks</div>
+		-->
+          <div>{{contest_full_title}}</div>
+          <div>{{contest_date}}</div>
+          <div>{{contest_place}}</div>
+          <div>{{contest}}</div>
+          <!-- <div>{{contest}} Tasks</div> -->
+        </div>
+        <div class="meta">
+          <div>{{task_name}}</div>
+          <div>{{language}} ({{country}})</div>
+        </div>
+        <div style="clear: both"></div>
+        <hr />
+      </div>
+      <div id="markdown" style="display: none">{{content}}</div>
+      <div
+        id="preview"
+        class="rendered_content"
+        dir="{{direction}}"
+        lang="{{language_code}}"
+      ></div>
+    </div>
+  </body>
+  <script>
+    $(window).on("load", function () {
+      console.log("done1");
+    });
+    $(document).ready(function () {
+      try {
+        var text = $("#markdown").text();
+        $("#preview").html(marked.parse(text.replace(/\\/g, "\\\\")));
+        renderMathInElement(document.getElementById("preview"), {
+          delimiters: [
+            { left: "$$", right: "$$", display: true },
+            { left: "\\[", right: "\\]", display: true },
+            { left: "$", right: "$", display: false },
+            { left: "\\(", right: "\\)", display: false },
+          ],
+          throwOnError: false,
+          macros: { "\\frac": "{#1 \\above{0.05em} #2}" },
+        });
+        window.setTimeout(function () {
+          window.status = "imdone";
+        }, 0);
+      } catch (e) {
+        $("#preview").html(e.toString());
+        window.setTimeout(function () {
+          window.status = "imdone";
+        }, 0);
+      }
+    });
+
+    IMAGES_URL = "{{ images_path }}";
+  </script>
+
+  <style>
+    @media print {
+      body {
+        zoom: 1.2;
+      }
+      .header .logo img {
+        margin-top: 1px;
+      }
+    }
+  </style>
+</html>

@@ -1,0 +1,3 @@
+[submodule "sam-task-pdf-writer/aws-python-api/mdx_bleach"]
+	path = sam-task-pdf-writer/aws-python-api/mdx_bleach
+	url = https://github.com/plumsirawit/mdx_bleach

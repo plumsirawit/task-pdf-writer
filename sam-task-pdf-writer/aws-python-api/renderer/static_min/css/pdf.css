@@ -1,0 +1,113 @@
+
+body {
+    margin: 3em 5em;
+    zoom: .9;
+    text-align: justify;
+    background-color: rgb(82, 86, 89);
+}
+
+h1, h2, h3, h4 {
+    page-break-after: avoid;
+}
+
+pre, table th {
+    background-color: #eee important!;
+}
+
+div.pdf {
+    background-color: white;
+    border: 1px solid #333;
+    box-shadow: 0 0 2px #333;
+    width: 45em;
+    min-height: 67em;
+    margin: 4em auto;
+    padding: 4.5em 5.5em;
+}
+
+.header {
+    font-family: "Sarabun", IRANSans, Helvetica, Arial, sans-serif;
+    font-size: 16px;
+    letter-spacing: -.04em;
+    font-weight: 400;
+}
+
+.header .title {
+    display: inline-block;
+    float: left;
+    padding-top: 5px;
+    line-height: 1.4em;
+}
+
+.header .title div:first-child {
+    font-weight: 500;
+    font-size: 1.1em;
+    letter-spacing: -.03em;
+    margin: 0px 0px 3px;
+}
+
+.header .logo {
+    display: inline-block;
+    float: left;
+    margin-right: 0px;
+    margin-top: -2px;
+}
+
+.header .logo img {
+    height: 70px;
+    margin-top: 0;
+    padding-right: 15px;
+}
+
+.header .meta {
+    display: inline-block;
+    float: right;
+    text-align: right;
+    margin-top: 28px;
+    font-size: 12px;
+}
+
+.header .meta div:first-child {
+    font-family: "Inconsolata", "Courier New", monospace;
+    font-weight: bold;
+    font-size: 18px;
+    letter-spacing: -.03em;
+    line-height: 25px;
+    margin: 0px;
+}
+
+.header hr {
+    margin: 5px 0;
+    border: none;
+    border-top: 1px solid #666;
+    height: 1px;
+}
+
+.pdf.markdown-body {
+    color: black;
+    font-size: 16px;
+}
+
+.pdf.markdown-body code {
+    color: black;
+}
+
+.pdf pre {
+    border: 1px solid #ddd;
+    border-radius: 0px
+}
+
+@media print {
+
+    body {
+        margin: 0;
+        background-color: white;
+    }
+
+    div.pdf {
+        margin: 0;
+        padding: 0;
+        border-width: 0;
+        box-shadow: none;
+        width: 100%;
+    }
+}

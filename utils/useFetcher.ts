@@ -23,7 +23,7 @@ const fetchPdf = async ({
   }
   const uidToken = await authUser.getIdToken();
   const innerResp = await fetch(
-    "https://973i5k6wjg.execute-api.ap-southeast-1.amazonaws.com/dev/getobject",
+    "https://syzri8p2f1.execute-api.ap-southeast-1.amazonaws.com/Prod/getobject/",
     {
       headers: {
         "tpw-user-token": uidToken ?? "",
@@ -87,7 +87,7 @@ export const useFetcher = (s3Output: string, fetchContext: FetchContext) => {
       pendingPromise.current = pollS3().then(() => {
         pendingPromise.current = undefined;
       });
-    }, 5000);
+    }, 20000);
     return () => {
       clearInterval(currentInterval);
     };

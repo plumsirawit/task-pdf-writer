@@ -41,10 +41,10 @@ export default function Home() {
             </a>
           </Link>
 
-          <Link href="/editor">
-            <a className={styles.card}>
+          <Link href="/editor" aria-disabled="true" style={{pointerEvents: 'none'}}>
+            <a className={styles.card} aria-disabled="true" style={{pointerEvents: 'none', backgroundColor: "#282f36"}}>
               <h2>Try &rarr;</h2>
-              <p>Discover the tool without having to register an account!</p>
+              <p><span style={{color: "#fe4599", fontWeight: "bold"}}>TEMPORARY DISABLED</span> due to technical problems.</p>
             </a>
           </Link>
 

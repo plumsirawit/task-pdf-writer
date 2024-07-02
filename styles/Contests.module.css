@@ -59,7 +59,7 @@
 .footer {
   width: 100%;
   height: calc(2vmin + 64px);
-  position: fixed;
+  position: relative;
   bottom: 0;
   z-index: 0;
   display: flex;

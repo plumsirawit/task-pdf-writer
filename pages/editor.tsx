@@ -50,7 +50,7 @@ export default function Editor() {
       imageBase64 = (await toBase64(file)) ?? "";
     }
     const resp = await fetch(
-      "https://973i5k6wjg.execute-api.ap-southeast-1.amazonaws.com/dev/genpdf",
+      "https://hh8z43oxfh.execute-api.ap-southeast-1.amazonaws.com/Prod/genpdf",
       {
         body: JSON.stringify({
           content: markdownInput,
@@ -73,7 +73,10 @@ export default function Editor() {
     saveAs(new Blob([buffer], { type: "application/pdf" }), "document.pdf");
   };
   const saveMarkdown = () => {
-    saveAs(new Blob([markdownInput], { type: "text/plain;charset=utf-8" }), "document.md");
+    saveAs(
+      new Blob([markdownInput], { type: "text/plain;charset=utf-8" }),
+      "document.md"
+    );
   };
   const [modalIsOpen, setModalIsOpen] = useState<boolean>(false);
   Modal.setAppElement("#__next");
@@ -81,14 +84,20 @@ export default function Editor() {
     <>
       <Head>
         <title>task-pdf-writer | Editor</title>
-        <meta name="description" content="Tool for writing competitive programming tasks in PDF" />
+        <meta
+          name="description"
+          content="Tool for writing competitive programming tasks in PDF"
+        />
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <Modal isOpen={modalIsOpen} contentLabel="Example Modal">
         <div className={styles.modal}>
           <div className={styles.modalrow}>
             <h2>Parameter Settings</h2>
-            <button onClick={() => setModalIsOpen(false)} style={{ padding: "1rem" }}>
+            <button
+              onClick={() => setModalIsOpen(false)}
+              style={{ padding: "1rem" }}
+            >
               Close
             </button>
           </div>
@@ -150,11 +159,15 @@ export default function Editor() {
               placeholder="Contest Date"
             />
             <input type="file" ref={fileInputRef} multiple={false} />
-            <button onClick={generatePdf} className={styles.button} disabled={pdfLoading}>
+            <button
+              onClick={generatePdf}
+              className={styles.button}
+              disabled={pdfLoading}
+            >
               {pdfLoading ? (
                 <div className={styles.spinnerwrapper}>
                   <div style={{ display: "flex" }}>
-                    <MoonLoader size={15} color="white"/>
+                    <MoonLoader size={15} color="white" />
                   </div>
                 </div>
               ) : (
@@ -166,7 +179,10 @@ export default function Editor() {
       </Modal>
       <div className={styles.container}>
         <div className={styles.topbar}>
-          <button onClick={() => setModalIsOpen(true)} className={styles.button}>
+          <button
+            onClick={() => setModalIsOpen(true)}
+            className={styles.button}
+          >
             Generate PDF
           </button>
           <button onClick={saveMarkdown} className={styles.button}>

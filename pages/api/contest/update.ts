@@ -75,7 +75,7 @@ const handler = async (req: AuthApiRequest, res: NextApiResponse) => {
       );
     if (logo) {
       const copyResponse = await fetch(
-        "https://973i5k6wjg.execute-api.ap-southeast-1.amazonaws.com/dev/copylogo",
+        "https://fwnlsbhyyg.execute-api.ap-southeast-1.amazonaws.com/Prod/copylogo/",
         {
           method: "POST",
           headers: {

@@ -180,7 +180,7 @@ export default withAuthUser({
       .set(currentSecretSuffix);
     const s3Key = `protected/${contestId}-${taskId}-${currentS3Now}-${currentSecretSuffix}.md`;
     const s3UploadCommand = new PutObjectCommand({
-      Bucket: "task-pdf-writer-v1",
+      Bucket: "sam-task-pdf-writer-tpws3bucket",
       Key: s3Key,
       Body: markdownInput,
       Metadata: {
@@ -198,7 +198,7 @@ export default withAuthUser({
     /*
     OLD (before 2022-09-05)
     const innerResp = await fetch(
-      "https://973i5k6wjg.execute-api.ap-southeast-1.amazonaws.com/dev/genpdf",
+      "https://hh8z43oxfh.execute-api.ap-southeast-1.amazonaws.com/Prod/genpdf",
       {
         body: JSON.stringify({
           content: markdownInput,
