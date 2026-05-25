@@ -38,8 +38,15 @@ marked.use({
             }
             return `<img src="${href}" alt="${text}" style="${style}">`;
         },
-        code(code: string, _infostring: string | undefined, _escaped: boolean) {
-            return `<pre style="page-break-inside:avoid;"><code>${code}</code></pre>`;
+        code(code: string, _infostring: string | undefined, escaped: boolean) {
+            // parseLatex replaces &lt; → < globally before marked runs, so
+            // code block content arrives with raw < and > which wkhtmltopdf
+            // would interpret as HTML tags. Re-escape them unless marked
+            // already did so.
+            const safe = escaped
+                ? code
+                : code.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+            return `<pre style="page-break-inside:avoid;"><code>${safe}</code></pre>`;
         },
         table(header: string, body: string) {
             let tags = 'style="page-break-inside:avoid;"';
