@@ -6,11 +6,13 @@ import "easymde/dist/easymde.min.css";
 import "katex/dist/katex.min.css";
 import type { AppProps } from "next/app";
 
-import initAuth from "../initAuth";
-
-initAuth();
+import { AuthProvider } from "../utils/AuthContext";
 
 function MyApp({ Component, pageProps }: AppProps) {
-  return <Component {...pageProps} />;
+  return (
+    <AuthProvider>
+      <Component {...pageProps} />
+    </AuthProvider>
+  );
 }
 export default MyApp;

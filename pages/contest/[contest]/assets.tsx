@@ -1,9 +1,6 @@
-import { AuthAction, useAuthUser, withAuthUser } from "next-firebase-auth";
 import { useEffect, useRef, useState } from "react";
-import { Button, FullButton, IconButton } from "../../../components/Button";
-import { Input as DefaultInput } from "../../../components/Input";
+import { IconButton } from "../../../components/Button";
 import styles from "../../../styles/Contests.module.css";
-import styled from "styled-components";
 import { useContestId } from "../../../utils/useContestId";
 import { useRouter } from "next/router";
 import { FloatingButton } from "../../../components/FloatingButton";
@@ -12,13 +9,12 @@ import { FiTrash, FiUploadCloud } from "react-icons/fi";
 import { Spinner } from "../../../components/Spinner";
 import Image from "next/image";
 import { toBase64 } from "../../../utils/toBase64";
-import { callCreateAssetApi } from "../../api/asset/create";
+import { callCreateAssetApi, callDeleteAssetApi } from "../../../utils/apiCalls";
 import toast, { Toaster } from "react-hot-toast";
-import firebase from "firebase/app";
-import "firebase/firestore";
-import "firebase/storage";
 import mime from "mime";
-import { callDeleteAssetApi } from "../../api/asset/delete";
+import { withAuthGuard } from "../../../utils/withAuthGuard";
+import { useAuth } from "../../../utils/AuthContext";
+import firebase from "../../../utils/firebase";
 
 interface IAssetRowProps {
   cid: string;
@@ -27,7 +23,7 @@ interface IAssetRowProps {
 }
 const AssetRow = (props: IAssetRowProps) => {
   const router = useRouter();
-  const authUser = useAuthUser();
+  const { user } = useAuth();
   const deleteAsset = async () => {
     if (!props.cid) {
       return;
@@ -39,7 +35,7 @@ const AssetRow = (props: IAssetRowProps) => {
     if (answer !== "delete") {
       return;
     }
-    const resp = await callDeleteAssetApi(authUser, {
+    const resp = await callDeleteAssetApi(user, {
       contestId: props.cid,
       assetId: props.aid,
     });
@@ -64,7 +60,7 @@ const AssetRow = (props: IAssetRowProps) => {
       <td className={styles.tablebtn}>
         <IconButton title="View asset" onClick={() => router.push(assetSrc)}>
           {assetSrc && props.mimeType.includes("image") && (
-            <Image src={assetSrc} layout="fill" />
+            <Image src={assetSrc} fill alt="" />
           )}
         </IconButton>
       </td>
@@ -80,10 +76,8 @@ interface Asset {
   id: string;
   contentType: string;
 }
-export default withAuthUser({
-  whenUnauthedAfterInit: AuthAction.REDIRECT_TO_LOGIN,
-})(function Assets() {
-  const authUser = useAuthUser();
+export default withAuthGuard(function Assets() {
+  const { user } = useAuth();
   const contestId = useContestId();
   const assetUploaderRef = useRef<HTMLInputElement>(null);
   const uploadAsset = () => {
@@ -98,7 +92,7 @@ export default withAuthUser({
     if (!base64Data) {
       return;
     }
-    const resp = await callCreateAssetApi(authUser, {
+    const resp = await callCreateAssetApi(user, {
       contestId,
       base64Content: base64Data,
     });

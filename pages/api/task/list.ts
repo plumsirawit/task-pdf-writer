@@ -1,12 +1,9 @@
-import initAuth from "../../../initAuth";
 import type { NextApiResponse } from "next";
-import { getFirebaseAdmin } from "next-firebase-auth";
 import * as t from "io-ts";
 import { isLeft } from "fp-ts/Either";
 import { wrapApi } from "../../../utils/apiWrapper";
 import { AuthApiRequest, withAuth } from "../../../utils/withAuth";
-
-initAuth();
+import admin from "../../../utils/firebaseAdmin";
 
 const Body = t.type({
   contestId: t.string,
@@ -22,7 +19,6 @@ const handler = async (req: AuthApiRequest, res: NextApiResponse) => {
       return;
     }
     const { contestId } = bodyDecoded.right;
-    const admin = getFirebaseAdmin();
     const contestDoc = await admin
       .firestore()
       .collection("contests")
@@ -42,16 +38,14 @@ const handler = async (req: AuthApiRequest, res: NextApiResponse) => {
       res.status(403).send({ error: "user have no access to contest" });
       return;
     }
-    const docs = await new Promise((reso) =>
-      admin
-        .database()
-        .ref("tasks/")
-        .orderByChild("contest")
-        .equalTo(contestId)
-        .once("value", (docs) => reso(docs.val() ?? {}))
-    );
-    res.status(200).send({ message: "success", tasks: docs });
-  } catch (e) {
+    const snapshot = await admin
+      .database()
+      .ref("tasks/")
+      .orderByChild("contest")
+      .equalTo(contestId)
+      .once("value");
+    res.status(200).send({ message: "success", tasks: snapshot.val() ?? {} });
+  } catch (e: any) {
     console.log("Error", e);
     res.status(500).send({ error: e.message });
   }

@@ -1,9 +1,9 @@
-import { AuthUser } from "next-firebase-auth";
+import firebase from "./firebase";
 
 export function wrapApi<Payload, Response>(path: string, method: string) {
-  return async (authUser: AuthUser, payload: Payload) => {
+  return async (authUser: firebase.User | null, payload: Payload) => {
     try {
-      const token = await authUser.getIdToken();
+      const token = await authUser?.getIdToken();
       const response = await fetch(path, {
         body: JSON.stringify(payload),
         headers: {
@@ -13,7 +13,7 @@ export function wrapApi<Payload, Response>(path: string, method: string) {
         method,
       });
       return (await response.json()) as Response;
-    } catch (e) {
+    } catch (e: any) {
       alert("Network error: " + e.message);
     }
   };

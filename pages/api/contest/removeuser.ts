@@ -1,13 +1,11 @@
-import initAuth from "../../../initAuth";
 import type { NextApiResponse } from "next";
-import { getFirebaseAdmin } from "next-firebase-auth";
+import { FieldValue } from "firebase-admin/firestore";
 import * as t from "io-ts";
 import { isLeft } from "fp-ts/Either";
 import { wrapApi } from "../../../utils/apiWrapper";
 import { AuthApiRequest, withAuth } from "../../../utils/withAuth";
 import { Task } from "../task/list";
-
-initAuth();
+import admin from "../../../utils/firebaseAdmin";
 
 const Body = t.type({
   contestId: t.string,
@@ -24,7 +22,6 @@ const handler = async (req: AuthApiRequest, res: NextApiResponse) => {
       return;
     }
     const { contestId, otherUserId } = bodyDecoded.right;
-    const admin = getFirebaseAdmin();
     const contestDoc = await admin
       .firestore()
       .collection("contests")
@@ -57,14 +54,13 @@ const handler = async (req: AuthApiRequest, res: NextApiResponse) => {
       res.status(404).send({ error: "other user not found" });
       return;
     }
-    const docs = await new Promise<Record<string, Task>>((reso) =>
-      admin
-        .database()
-        .ref("tasks/")
-        .orderByChild("contest")
-        .equalTo(contestId)
-        .once("value", (docs) => reso(docs.val()))
-    );
+    const snapshot = await admin
+      .database()
+      .ref("tasks/")
+      .orderByChild("contest")
+      .equalTo(contestId)
+      .once("value");
+    const docs: Record<string, Task> = snapshot.val() ?? {};
     await Promise.all(
       Object.keys(docs).map((task) =>
         admin
@@ -74,18 +70,16 @@ const handler = async (req: AuthApiRequest, res: NextApiResponse) => {
       )
     );
     if (contestData.users.includes(otherUserId)) {
-      // this allows idempotent calls to the api
       await admin
         .firestore()
         .collection("contests")
         .doc(contestId)
         .update({
-          // @ts-ignore
-          users: admin.firestore.FieldValue.arrayRemove(otherUserId),
+          users: FieldValue.arrayRemove(otherUserId),
         });
     }
     res.status(200).send({ message: "success" });
-  } catch (e) {
+  } catch (e: any) {
     console.log("Error", e);
     res.status(500).send({ error: e.message });
   }

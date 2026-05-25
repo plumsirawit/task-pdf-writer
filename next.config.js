@@ -1,7 +1,10 @@
 export default {
   reactStrictMode: true,
   images: {
-    domains: ["picsum.photos", "firebasestorage.googleapis.com"],
+    remotePatterns: [
+      { hostname: "picsum.photos" },
+      { hostname: "firebasestorage.googleapis.com" },
+    ],
   },
   compiler: {
     styledComponents: true,

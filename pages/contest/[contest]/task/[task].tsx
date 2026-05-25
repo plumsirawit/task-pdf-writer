@@ -1,6 +1,5 @@
 // @ts-ignore
 import renderMathInElement from "katex/contrib/auto-render";
-import { AuthAction, withAuthUser, useAuthUser } from "next-firebase-auth";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import styles from "../../../../styles/Task.module.css";
@@ -11,23 +10,23 @@ const SimpleMDE = dynamic(() => import("react-simplemde-editor"), {
 });
 import { useContestId } from "../../../../utils/useContestId";
 import { useTaskId } from "../../../../utils/useTaskId";
-import firebase from "firebase/app";
-import "firebase/database";
-import "firebase/firestore";
 import debounce from "lodash.debounce";
 import toast, { Toaster } from "react-hot-toast";
 import { FloatingButton } from "../../../../components/FloatingButton";
 import { BlackIconSpinner } from "../../../../components/Spinner";
 import { IconButton } from "../../../../components/Button";
 import styled from "styled-components";
-import { callOverrideTaskApi } from "../../../api/task/override";
+import { callOverrideTaskApi } from "../../../../utils/apiCalls";
 import { saveAs } from "file-saver";
 import Head from "next/head";
 import { FiDownload, FiEdit3, FiFileText, FiType } from "react-icons/fi";
-import { PutObjectCommand, HeadObjectCommand } from "@aws-sdk/client-s3";
+import { PutObjectCommand } from "@aws-sdk/client-s3";
 import s3Client from "../../../../utils/s3Client";
 import { useFetcher } from "../../../../utils/useFetcher";
 import cryptoRandomString from "crypto-random-string";
+import { withAuthGuard } from "../../../../utils/withAuthGuard";
+import { useAuth } from "../../../../utils/AuthContext";
+import firebase from "../../../../utils/firebase";
 
 const RenameButton = styled(IconButton)`
   width: 64px;
@@ -39,11 +38,9 @@ const RenameButton = styled(IconButton)`
   transform: translate(0%, -50%);
 `;
 
-export default withAuthUser({
-  whenUnauthedAfterInit: AuthAction.REDIRECT_TO_LOGIN,
-})(function Contest() {
+export default withAuthGuard(function Contest() {
   const router = useRouter();
-  const authUser = useAuthUser();
+  const { user } = useAuth();
   const contestId = useContestId();
   const taskId = useTaskId();
   const outputRef = useRef<HTMLDivElement>(null);
@@ -131,7 +128,7 @@ export default withAuthUser({
         .off("value", cb);
   }, [contestId, taskId, fetchMarkdown, fetchName]);
   useEffect(() => {
-    if (currentUid !== authUser.id) {
+    if (currentUid !== user?.uid) {
       storeMarkdown.cancel();
       const cb = firebase
         .database()
@@ -145,7 +142,7 @@ export default withAuthUser({
           .ref("tasks/" + taskId + "/markdown")
           .off("value", cb);
     }
-  }, [currentUid, authUser, taskId, storeMarkdown]);
+  }, [currentUid, user, taskId, storeMarkdown]);
   useEffect(() => {
     markdownInput && storeMarkdown(markdownInput);
   }, [markdownInput, storeMarkdown]);
@@ -195,45 +192,6 @@ export default withAuthUser({
       console.log("Error", err);
       setPdfLoading(false);
     }
-    /*
-    OLD (before 2022-09-05)
-    const innerResp = await fetch(
-      "https://hh8z43oxfh.execute-api.ap-southeast-1.amazonaws.com/Prod/genpdf",
-      {
-        body: JSON.stringify({
-          content: markdownInput,
-          contest_full_title: contestData.fulltitle,
-          contest_title: contestData.title,
-          contest: contestData.shortname,
-          task_name: name,
-          country: contestData.country,
-          language: contestData.language,
-          language_code: contestData.langcode,
-          contest_date: contestData.date,
-          image_base64: contestData.logo,
-        }),
-        method: "post",
-      }
-    ).catch((reason) => {
-      setPdfLoading(false);
-      alert("Fetch failed with reason " + reason.message);
-      alert(
-        "Note: the lambda may experience a cold boot, in this case please try again for a few times. Otherwise there are some unexpected errors."
-      );
-      return null;
-    });
-    if (!innerResp) {
-      return;
-    }
-    const pdfResult = (await innerResp.json()).message;
-    setPdfLoading(false);
-    if (pdfResult) {
-      const buffer = Buffer.from(pdfResult, "base64");
-      saveAs(new Blob([buffer], { type: "application/pdf" }), "document.pdf");
-    } else {
-      alert("genpdf error");
-    }
-    */
   };
   useEffect(() => {
     const cb = firebase
@@ -268,7 +226,7 @@ export default withAuthUser({
     taskId,
     s3Now,
     secretSuffix,
-    authUser,
+    authUser: user,
   });
   const saveMarkdown = () => {
     saveAs(
@@ -296,7 +254,7 @@ export default withAuthUser({
       return;
     }
     setOverrideLoading(true);
-    await callOverrideTaskApi(authUser, { contestId, taskId });
+    await callOverrideTaskApi(user, { contestId, taskId });
     setOverrideLoading(false);
   };
   const options = useMemo(
@@ -326,7 +284,7 @@ export default withAuthUser({
         </div>
         <div className={styles.panelcontainer}>
           <div className={`${styles["col-6"]} ${styles["edit-pane"]}`}>
-            {currentUid === authUser.id && (
+            {currentUid === user?.uid && (
               <SimpleMDE
                 value={markdownInput}
                 onChange={setMarkdownInput}

@@ -1,20 +1,17 @@
-import { withAuthUser, useAuthUser, AuthAction } from "next-firebase-auth";
 import Head from "next/head";
 import styles from "../styles/Register.module.css";
 import { useState } from "react";
-import { MoonLoader } from "react-spinners";
-import { callRegisterApi } from "./api/register";
-import firebase from "firebase/app";
-import "firebase/auth";
+import { callRegisterApi } from "../utils/apiCalls";
 import { Input, InputHead } from "../components/Input";
 import { Button } from "../components/Button";
 import { Spinner } from "../components/Spinner";
 import { Card } from "../components/Card";
+import { withGuestGuard } from "../utils/withAuthGuard";
+import { useAuth } from "../utils/AuthContext";
+import firebase from "../utils/firebase";
 
-export default withAuthUser({
-  whenAuthed: AuthAction.REDIRECT_TO_APP,
-})(function Register() {
-  const authUser = useAuthUser();
+export default withGuestGuard(function Register() {
+  const { user } = useAuth();
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [confirmPassword, setConfirmPassword] = useState<string>("");
@@ -28,7 +25,7 @@ export default withAuthUser({
       setIsLoading(false);
       return;
     }
-    const resp = await callRegisterApi(authUser, {
+    const resp = await callRegisterApi(user, {
       email,
       password,
       fullname: fullName,

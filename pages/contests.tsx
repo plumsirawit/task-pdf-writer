@@ -1,17 +1,15 @@
-import { AuthAction, withAuthUser, useAuthUser } from "next-firebase-auth";
 import { FullButton, IconButton } from "../components/Button";
 import styles from "../styles/Contests.module.css";
 import { useRouter } from "next/router";
 import { useEffect, useState, useMemo } from "react";
-import firebase from "firebase/app";
-import "firebase/firestore";
-import "firebase/auth";
 import { FloatingButton } from "../components/FloatingButton";
-import { callCreateContestApi } from "./api/contest/create";
-import { callDeleteContestApi } from "./api/contest/delete";
+import { callCreateContestApi, callDeleteContestApi } from "../utils/apiCalls";
 import Head from "next/head";
 import { FiImage, FiLogOut, FiPlus, FiSettings, FiTrash } from "react-icons/fi";
 import { Spinner } from "../components/Spinner";
+import { withAuthGuard } from "../utils/withAuthGuard";
+import { useAuth } from "../utils/AuthContext";
+import firebase from "../utils/firebase";
 
 interface IContestRowProps {
   contest: string;
@@ -19,7 +17,7 @@ interface IContestRowProps {
 }
 const ContestRow = (props: IContestRowProps) => {
   const router = useRouter();
-  const authUser = useAuthUser();
+  const { user } = useAuth();
   const deleteContest = async () => {
     if (!props.cid) {
       return;
@@ -31,7 +29,7 @@ const ContestRow = (props: IContestRowProps) => {
     if (answer !== "delete") {
       return;
     }
-    await callDeleteContestApi(authUser, {
+    await callDeleteContestApi(user, {
       contestId: props.cid,
     });
   };
@@ -72,10 +70,8 @@ interface Contest {
   cid: string;
 }
 
-export default withAuthUser({
-  whenUnauthedAfterInit: AuthAction.REDIRECT_TO_LOGIN,
-})(function Contests() {
-  const authUser = useAuthUser();
+export default withAuthGuard(function Contests() {
+  const { user } = useAuth();
   const [contests, setContests] = useState<Contest[] | null>(null);
   const rows = useMemo(
     () =>
@@ -90,11 +86,10 @@ export default withAuthUser({
     [contests]
   );
   useEffect(() => {
-    const uid = authUser.id;
+    const uid = user?.uid;
     if (!uid) {
       return;
     }
-    console.log(uid);
     return firebase
       .firestore()
       .collection("contests")
@@ -102,19 +97,17 @@ export default withAuthUser({
       .orderBy(firebase.firestore.FieldPath.documentId())
       .onSnapshot((contests) => {
         const currentContests: Contest[] = [];
-        console.log("Start");
         contests.forEach((contest) => {
           currentContests.push({
             contest: contest.data().title,
             cid: contest.id,
           });
-          console.log("This time", contest.id);
         });
         setContests(currentContests);
       });
-  }, [authUser]);
+  }, [user]);
   const createContest = async () => {
-    await callCreateContestApi(authUser, {});
+    await callCreateContestApi(user, {});
   };
   const logout = () => firebase.auth().signOut();
   return (
@@ -156,7 +149,7 @@ export default withAuthUser({
       </FloatingButton>
       <footer className={styles.footer}>
         <h3>User id:</h3>
-        <code>{authUser.id}</code>
+        <code>{user?.uid}</code>
       </footer>
     </>
   );

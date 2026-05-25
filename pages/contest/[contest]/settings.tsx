@@ -1,22 +1,20 @@
-import { AuthAction, useAuthUser, withAuthUser } from "next-firebase-auth";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "../../../components/Button";
 import { Input as DefaultInput } from "../../../components/Input";
 import styles from "../../../styles/Settings.module.css";
 import styled from "styled-components";
-import firebase from "firebase/app";
-import "firebase/firestore";
-import { callUpdateContestApi } from "../../api/contest/update";
+import { callUpdateContestApi, callAddUserToContestApi, callRemoveUserFromContestApi } from "../../../utils/apiCalls";
 import { toBase64 } from "../../../utils/toBase64";
 import { useContestId } from "../../../utils/useContestId";
 import { useRouter } from "next/router";
 import { FloatingButton } from "../../../components/FloatingButton";
-import { callAddUserToContestApi } from "../../api/contest/adduser";
-import { callRemoveUserFromContestApi } from "../../api/contest/removeuser";
 import Image from "next/image";
 import Head from "next/head";
 import { FiUserMinus, FiUserPlus } from "react-icons/fi";
 import toast, { Toaster } from "react-hot-toast";
+import { withAuthGuard } from "../../../utils/withAuthGuard";
+import { useAuth } from "../../../utils/AuthContext";
+import firebase from "../../../utils/firebase";
 
 const Input = styled(DefaultInput)`
   margin-bottom: 5px;
@@ -69,7 +67,7 @@ const SettingsForm = () => {
       });
   }, [contestId, router]);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const authUser = useAuthUser();
+  const { user } = useAuth();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const submitForm = async () => {
     setIsLoading(true);
@@ -85,7 +83,7 @@ const SettingsForm = () => {
       return;
     }
     const file = fileInput.files?.[0];
-    const response = await callUpdateContestApi(authUser, {
+    const response = await callUpdateContestApi(user, {
       contestFullTitle,
       contestTitle,
       contest,
@@ -192,9 +190,9 @@ const SettingsForm = () => {
                   logo ||
                   "data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
                 }
-                layout="fill"
+                fill
                 alt="contest logo"
-                objectFit="contain"
+                style={{ objectFit: "contain" }}
               />
             </div>
           </div>
@@ -216,10 +214,8 @@ const SettingsForm = () => {
   );
 };
 
-export default withAuthUser({
-  whenUnauthedAfterInit: AuthAction.REDIRECT_TO_LOGIN,
-})(function Contest() {
-  const authUser = useAuthUser();
+export default withAuthGuard(function Contest() {
+  const { user } = useAuth();
   const contestId = useContestId();
   const addUser = async () => {
     if (!contestId) {
@@ -229,7 +225,7 @@ export default withAuthUser({
     if (!answer) {
       return;
     }
-    const resp = await callAddUserToContestApi(authUser, {
+    const resp = await callAddUserToContestApi(user, {
       contestId,
       otherUserId: answer,
     });
@@ -249,7 +245,7 @@ export default withAuthUser({
     if (!answer) {
       return;
     }
-    const resp = await callRemoveUserFromContestApi(authUser, {
+    const resp = await callRemoveUserFromContestApi(user, {
       contestId,
       otherUserId: answer,
     });

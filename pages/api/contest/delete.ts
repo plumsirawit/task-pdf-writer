@@ -1,14 +1,10 @@
-import initAuth from "../../../initAuth";
 import type { NextApiResponse } from "next";
-import { getFirebaseAdmin } from "next-firebase-auth";
 import * as t from "io-ts";
 import { isLeft } from "fp-ts/Either";
 import { wrapApi } from "../../../utils/apiWrapper";
 import { AuthApiRequest, withAuth } from "../../../utils/withAuth";
-import { Task } from "../task/list";
 import { deleteCollection } from "../../../utils/deleteCollection";
-
-initAuth();
+import admin from "../../../utils/firebaseAdmin";
 
 const Body = t.type({
   contestId: t.string,
@@ -24,7 +20,6 @@ const handler = async (req: AuthApiRequest, res: NextApiResponse) => {
       return;
     }
     const { contestId } = bodyDecoded.right;
-    const admin = getFirebaseAdmin();
     const contestDoc = await admin
       .firestore()
       .collection("contests")
@@ -70,7 +65,7 @@ const handler = async (req: AuthApiRequest, res: NextApiResponse) => {
     );
     await admin.firestore().collection("contests").doc(contestId).delete();
     res.status(200).send({ message: "success" });
-  } catch (e) {
+  } catch (e: any) {
     console.log("Error", e);
     res.status(500).send({ error: e.message });
   }
