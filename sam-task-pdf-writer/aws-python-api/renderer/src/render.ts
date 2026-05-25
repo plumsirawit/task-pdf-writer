@@ -86,6 +86,7 @@ function parseLatex(st: string): string {
                     renderToString(st.substring(contentStart, closeIdx), {
                         throwOnError: false,
                         displayMode: true,
+                        output: "html",
                     })
                 );
                 i = closeIdx + 2;
@@ -102,6 +103,7 @@ function parseLatex(st: string): string {
                 outputList.push(
                     renderToString(st.substring(contentStart, closeIdx), {
                         throwOnError: false,
+                        output: "html",
                     })
                 );
                 i = closeIdx + 1;
@@ -119,6 +121,7 @@ function parseLatex(st: string): string {
                     renderToString(st.substring(contentStart, closeIdx), {
                         throwOnError: false,
                         displayMode: true,
+                        output: "html",
                     })
                 );
                 i = closeIdx + 2;
@@ -135,6 +138,7 @@ function parseLatex(st: string): string {
                 outputList.push(
                     renderToString(st.substring(contentStart, closeIdx), {
                         throwOnError: false,
+                        output: "html",
                     })
                 );
                 i = closeIdx + 2;
