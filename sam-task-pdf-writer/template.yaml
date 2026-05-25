@@ -44,7 +44,7 @@ Resources:
     Properties:
       PackageType: Image
       Architectures:
-        - arm64
+        - x86_64
       Events:
         HelloWorld:
           Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
@@ -62,7 +62,7 @@ Resources:
       ImageConfig:
         Command: ["handler.hello"]
       Architectures:
-        - arm64
+        - x86_64
       Environment:
         Variables:
           DJANGO_SETTINGS_MODULE: settings
@@ -82,7 +82,7 @@ Resources:
       ImageConfig:
         Command: ["handler.render"]
       Architectures:
-        - arm64
+        - x86_64
       Environment:
         Variables:
           DJANGO_SETTINGS_MODULE: settings
@@ -102,7 +102,7 @@ Resources:
       ImageConfig:
         Command: ["handler.genpdf"]
       Architectures:
-        - arm64
+        - x86_64
       Timeout: 30
       Environment:
         Variables:
@@ -123,7 +123,7 @@ Resources:
       ImageConfig:
         Command: ["handler_s3.fetch_s3_object"]
       Architectures:
-        - arm64
+        - x86_64
       Timeout: 30
       Environment:
         Variables:
@@ -149,7 +149,7 @@ Resources:
       ImageConfig:
         Command: ["index.handler"]
       Architectures:
-        - arm64
+        - x86_64
       Timeout: 30
       MemorySize: 1024
       Events:
@@ -179,7 +179,7 @@ Resources:
       ImageConfig:
         Command: ["handler_s3.process_s3_object"]
       Architectures:
-        - arm64
+        - x86_64
       Timeout: 60
       MemorySize: 4096
       Environment:
@@ -210,7 +210,7 @@ Resources:
       ImageConfig:
         Command: ["handler_s3.migrate_logo"]
       Architectures:
-        - arm64
+        - x86_64
       Timeout: 30
       Environment:
         Variables:
@@ -231,7 +231,7 @@ Resources:
       ImageConfig:
         Command: ["handler_s3.copy_logo"]
       Architectures:
-        - arm64
+        - x86_64
       Timeout: 30
       Environment:
         Variables:

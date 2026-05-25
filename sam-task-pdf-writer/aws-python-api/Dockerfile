@@ -1,5 +1,6 @@
 # FROM ubuntu:xenial-20170710
-FROM arm64v8/ubuntu:24.04
+FROM ubuntu:24.04
+# FROM arm64v8/ubuntu:24.04
 
 RUN rm -rf /var/lib/apt/lists/*
 RUN apt-get -yq update && \
@@ -49,7 +50,7 @@ COPY static/fonts/IRANSans/* /usr/share/fonts/
 COPY static/fonts/Thai/* /usr/share/fonts/
 COPY static/fonts/Taiwan/* /usr/share/fonts/
 
-RUN curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
+RUN curl https://bootstrap.pypa.io/pip/3.8/get-pip.py -o get-pip.py
 RUN python3.8 get-pip.py
 
 COPY requirements.txt /root/requirements.txt
