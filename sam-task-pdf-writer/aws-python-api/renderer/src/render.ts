@@ -54,70 +54,91 @@ marked.use({
     },
 });
 
+// Handles $, $$, \[, \( math delimiters — same set as the frontend's
+// renderMathInElement. Uses indexOf for closing delimiters; unmatched
+// openers are emitted as literal text so a stray $ never breaks the page.
 function parseLatex(st: string): string {
-    enum State {
-        NORMAL,
-        SINGLE,
-        DOUBLE,
-    }
     st = st.replace(/&lt;/g, "<");
-    let state = State.NORMAL;
-    let lastIndex = 0;
     const outputList: string[] = [];
+    let i = 0;
+    let normalStart = 0;
 
-    for (let i = 0; i < st.length; i++) {
-        const isDouble =
-            st.charAt(i) === "$" && i + 1 < st.length && st.charAt(i + 1) === "$";
-        const currentToken = isDouble
-            ? State.DOUBLE
-            : st.charAt(i) === "$"
-            ? State.SINGLE
-            : State.NORMAL;
+    while (i < st.length) {
+        const ch = st.charAt(i);
+        const ch2 = i + 1 < st.length ? st.charAt(i + 1) : "";
 
-        if (state === State.NORMAL) {
-            if (currentToken !== State.NORMAL) {
-                outputList.push(st.substring(lastIndex, i));
-                state = currentToken;
-                lastIndex = i;
-            }
-        } else if (currentToken !== State.NORMAL) {
-            if (state === currentToken) {
-                // Matching closing delimiter — render the math
-                const mathStr = st.substring(
-                    lastIndex + (state === State.DOUBLE ? 2 : 1),
-                    i
-                );
-                outputList.push(renderToString(mathStr, { throwOnError: false }));
-                lastIndex = i + (state === State.DOUBLE ? 2 : 1);
-                state = State.NORMAL;
-            } else if (state === State.SINGLE && currentToken === State.DOUBLE) {
-                // $a$$ case: the first $ of $$ closes the inline expression.
-                // i-- counters the upcoming i++ for DOUBLE so the net advance is +1,
-                // letting the next iteration start at i+1 (the second $ of $$).
-                const mathStr = st.substring(lastIndex + 1, i);
-                outputList.push(renderToString(mathStr, { throwOnError: false }));
-                lastIndex = i + 1;
-                state = State.NORMAL;
-                i--;
+        if (ch === "$" && ch2 === "$") {
+            outputList.push(st.substring(normalStart, i));
+            const contentStart = i + 2;
+            const closeIdx = st.indexOf("$$", contentStart);
+            if (closeIdx === -1) {
+                outputList.push("$$");
+                i = contentStart;
             } else {
-                // state === DOUBLE, currentToken === SINGLE: stray $ inside display math.
-                // Treat the opening $$ as literal text and restart from after it.
-                outputList.push(st.substring(lastIndex, lastIndex + 2));
-                i = lastIndex + 1;
-                lastIndex = lastIndex + 2;
-                state = State.NORMAL;
-                continue;
+                outputList.push(
+                    renderToString(st.substring(contentStart, closeIdx), {
+                        throwOnError: false,
+                        displayMode: true,
+                    })
+                );
+                i = closeIdx + 2;
             }
-        }
-
-        if (currentToken === State.DOUBLE) {
+            normalStart = i;
+        } else if (ch === "$") {
+            outputList.push(st.substring(normalStart, i));
+            const contentStart = i + 1;
+            const closeIdx = st.indexOf("$", contentStart);
+            if (closeIdx === -1) {
+                outputList.push("$");
+                i = contentStart;
+            } else {
+                outputList.push(
+                    renderToString(st.substring(contentStart, closeIdx), {
+                        throwOnError: false,
+                    })
+                );
+                i = closeIdx + 1;
+            }
+            normalStart = i;
+        } else if (ch === "\\" && ch2 === "[") {
+            outputList.push(st.substring(normalStart, i));
+            const contentStart = i + 2;
+            const closeIdx = st.indexOf("\\]", contentStart);
+            if (closeIdx === -1) {
+                outputList.push("\\[");
+                i = contentStart;
+            } else {
+                outputList.push(
+                    renderToString(st.substring(contentStart, closeIdx), {
+                        throwOnError: false,
+                        displayMode: true,
+                    })
+                );
+                i = closeIdx + 2;
+            }
+            normalStart = i;
+        } else if (ch === "\\" && ch2 === "(") {
+            outputList.push(st.substring(normalStart, i));
+            const contentStart = i + 2;
+            const closeIdx = st.indexOf("\\)", contentStart);
+            if (closeIdx === -1) {
+                outputList.push("\\(");
+                i = contentStart;
+            } else {
+                outputList.push(
+                    renderToString(st.substring(contentStart, closeIdx), {
+                        throwOnError: false,
+                    })
+                );
+                i = closeIdx + 2;
+            }
+            normalStart = i;
+        } else {
             i++;
         }
     }
 
-    // Unmatched delimiter at end of string — emit everything from the opening
-    // delimiter onwards as literal text (handles stray currency $ etc.)
-    outputList.push(st.substring(lastIndex));
+    outputList.push(st.substring(normalStart));
     return outputList.join("");
 }
 
