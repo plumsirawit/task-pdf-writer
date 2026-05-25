@@ -50,7 +50,7 @@ export default withAuthGuard(function Contest() {
     if (!outputDiv) {
       return;
     }
-    outputDiv.innerHTML = marked.parse(markdownInput.replaceAll(/\\/g, "\\\\"));
+    outputDiv.innerHTML = marked.parse(markdownInput);
     renderMathInElement(outputDiv, {
       delimiters: [
         { left: "$$", right: "$$", display: true },

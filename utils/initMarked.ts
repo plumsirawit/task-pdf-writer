@@ -69,4 +69,20 @@ marked.setOptions({
   smartypants: false,
 });
 
+// Pass all backslash sequences through to KaTeX unmodified.
+// Without this, marked's escape tokenizer converts \\ → \ (eating one
+// backslash), which corrupts constructs like \\\vdots (LaTeX matrix row break
+// + vertical dots) and makes a lone \ display as \\.
+marked.use({
+  tokenizer: {
+    escape(src: string) {
+      const cap = /^\\([!"#$%&'()*+,\-./:;<=>?@\[\]\\^_`{|}~])/.exec(src);
+      if (cap) {
+        return { type: "text", raw: cap[0], text: cap[0] };
+      }
+      return false as any;
+    },
+  },
+});
+
 export default marked;
