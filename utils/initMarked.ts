@@ -4,7 +4,7 @@ import katex from "katex";
 const parser: marked.Parser = new marked.Parser();
 const renderer: marked.Renderer = parser.renderer;
 const original_table_renderer = renderer.table.bind({ parser });
-let IMAGES_URL: string;
+let IMAGES_URL: string | undefined;
 
 // enable resize option for images
 renderer.image = function (href: string, title: string, text: string) {
