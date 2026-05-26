@@ -1,17 +1,8 @@
-import initAuth from "../../initAuth";
 import type { NextApiRequest, NextApiResponse } from "next";
-import firebase from "firebase/app";
-import "firebase/auth";
-import { getFirebaseAdmin } from "next-firebase-auth";
 import * as t from "io-ts";
 import { isLeft } from "fp-ts/Either";
 import { wrapApi } from "../../utils/apiWrapper";
-import { firebaseConfig } from "../../constants";
-
-initAuth();
-let firebaseClient =
-  firebase.apps.find((app) => app.name === "client") ||
-  firebase.initializeApp(firebaseConfig, "client");
+import admin from "../../utils/firebaseAdmin";
 
 const Body = t.type({
   email: t.string,
@@ -29,27 +20,24 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     return;
   }
   const { email, password, fullname, displayname } = bodyDecoded.right;
-  let userCred = await firebaseClient
-    .auth()
-    .createUserWithEmailAndPassword(email, password)
-    .catch((e) => {
-      console.log("createUser error", e);
-      res.status(400).send({ error: e.message });
+  let userRecord;
+  try {
+    userRecord = await admin.auth().createUser({
+      email,
+      password,
+      displayName: displayname,
     });
-  if (!userCred) {
+  } catch (e: any) {
+    console.log("createUser error", e);
+    res.status(400).send({ error: e.message });
     return;
   }
   try {
-    const user = userCred?.user;
-    if (!user) {
-      throw Error("user not found");
-    }
-    const admin = getFirebaseAdmin();
-    await admin.firestore().collection("users").doc(user.uid).set({
+    await admin.firestore().collection("users").doc(userRecord.uid).set({
       fullname,
       displayname,
     });
-  } catch (e) {
+  } catch (e: any) {
     console.log("internal server error", e);
     res.status(500).send({ error: e.message });
     return;

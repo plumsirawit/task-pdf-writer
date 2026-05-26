@@ -1,17 +1,14 @@
-import { withAuthUser, AuthAction } from "next-firebase-auth";
 import Head from "next/head";
 import styles from "../styles/Login.module.css";
-import firebase from "firebase/app";
-import "firebase/auth";
-import "firebase/firestore";
 import { useState } from "react";
 import { Card } from "../components/Card";
 import { Input, InputHead } from "../components/Input";
 import { Button } from "../components/Button";
 import { Spinner } from "../components/Spinner";
-export default withAuthUser({
-  whenAuthed: AuthAction.REDIRECT_TO_APP,
-})(function Login() {
+import { withGuestGuard } from "../utils/withAuthGuard";
+import firebase from "../utils/firebase";
+
+export default withGuestGuard(function Login() {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);

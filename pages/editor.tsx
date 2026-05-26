@@ -70,7 +70,7 @@ export default function Editor() {
     const respJson = await resp.json();
     setPdfLoading(false);
     const buffer = Buffer.from(respJson.message, "base64");
-    saveAs(new Blob([buffer], { type: "application/pdf" }), "document.pdf");
+    saveAs(new Blob([new Uint8Array(buffer)], { type: "application/pdf" }), "document.pdf");
   };
   const saveMarkdown = () => {
     saveAs(

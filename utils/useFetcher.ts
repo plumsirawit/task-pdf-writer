@@ -1,5 +1,6 @@
-import { AuthUser } from "next-firebase-auth";
+import firebase from "./firebase";
 import { useEffect, useRef } from "react";
+import { saveAs } from "file-saver";
 
 export interface FetchContext {
   pdfLoading: boolean;
@@ -8,7 +9,7 @@ export interface FetchContext {
   taskId: string | null;
   s3Now: number;
   secretSuffix: string;
-  authUser: AuthUser;
+  authUser: firebase.User | null;
 }
 const fetchPdf = async ({
   pdfLoading,
@@ -21,12 +22,12 @@ const fetchPdf = async ({
   if (!pdfLoading) {
     return null;
   }
-  const uidToken = await authUser.getIdToken();
+  const uidToken = await authUser?.getIdToken() ?? "";
   const innerResp = await fetch(
     "https://syzri8p2f1.execute-api.ap-southeast-1.amazonaws.com/Prod/getobject/",
     {
       headers: {
-        "tpw-user-token": uidToken ?? "",
+        "tpw-user-token": uidToken,
         "tpw-contest": contestId ?? "",
         "tpw-task": taskId ?? "",
         "tpw-s3now": `${s3Now}`,
@@ -66,7 +67,6 @@ export const useFetcher = (s3Output: string, fetchContext: FetchContext) => {
               received: false,
             };
           }
-          // await new Promise((res) => setTimeout(res, 5000)); // dirty hack to avoid no key error
           const pdfUrl = data.message;
           fetchContext.setPdfLoading(false);
           const pdfResp = await fetch(pdfUrl);

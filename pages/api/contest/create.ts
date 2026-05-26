@@ -1,14 +1,10 @@
-import initAuth from "../../../initAuth";
 import type { NextApiResponse } from "next";
-import { getFirebaseAdmin } from "next-firebase-auth";
 import { wrapApi } from "../../../utils/apiWrapper";
 import { AuthApiRequest, withAuth } from "../../../utils/withAuth";
-
-initAuth();
+import admin from "../../../utils/firebaseAdmin";
 
 const handler = async (req: AuthApiRequest, res: NextApiResponse) => {
   try {
-    const admin = getFirebaseAdmin();
     const contestDoc = await admin
       .firestore()
       .collection("contests")
@@ -25,7 +21,7 @@ const handler = async (req: AuthApiRequest, res: NextApiResponse) => {
         tasks: [],
       });
     res.status(200).send({ message: "success", contestId: contestDoc.id });
-  } catch (e) {
+  } catch (e: any) {
     console.log("Error", e);
     res.status(500).send({ error: e.message });
   }

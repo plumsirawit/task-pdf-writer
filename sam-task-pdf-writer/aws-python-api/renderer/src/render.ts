@@ -1,66 +1,159 @@
-import { marked } from "marked";
-import * as E from "fp-ts/Either";
+import { marked, Renderer } from "marked";
 import { renderToString } from "katex";
 
-function parseLatex(st: string): E.Either<string, Error> {
-    enum State {
-        NORMAL,
-        SINGLE,
-        DOUBLE,
-    }
+marked.use({
+    gfm: true,
+    breaks: false,
+    pedantic: false,
+});
+
+// Pass backslash sequences through to KaTeX unmodified (mirrors front-end initMarked.ts).
+// Without this, marked's escape tokenizer consumes \\ → \, corrupting constructs
+// like \\\vdots and making a lone \ display as \\.
+marked.use({
+    tokenizer: {
+        escape(src: string) {
+            const cap = /^\\([!"#$%&'()*+,\-./:;<=>?@\[\]\\^_`{|}~])/.exec(src);
+            if (cap) {
+                return { type: "text", raw: cap[0], text: cap[0] };
+            }
+            return false as any;
+        },
+    },
+});
+
+const defaultTableRenderer = Renderer.prototype.table;
+
+marked.use({
+    renderer: {
+        image(href: string, title: string | null, text: string) {
+            let style = "page-break-inside:avoid; ";
+            if (title) {
+                const size = title.split("x");
+                if (size[1]) {
+                    style += `width: ${size[0]}px; height: ${size[1]}px;`;
+                } else {
+                    style += `width: ${size[0]}px;`;
+                }
+            }
+            return `<img src="${href}" alt="${text}" style="${style}">`;
+        },
+        code(code: string, _infostring: string | undefined, escaped: boolean) {
+            // parseLatex replaces &lt; → < globally before marked runs, so
+            // code block content arrives with raw < and > which wkhtmltopdf
+            // would interpret as HTML tags. Re-escape them unless marked
+            // already did so.
+            const safe = escaped
+                ? code
+                : code.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+            return `<pre style="page-break-inside:avoid;"><code>${safe}</code></pre>`;
+        },
+        table(header: string, body: string) {
+            let tags = 'style="page-break-inside:avoid;"';
+            if (header.indexOf("%ltr%") < 0) {
+                tags += ' dir="ltr"';
+                return `<div ${tags}>${defaultTableRenderer.call(this, header, body)}</div>`;
+            } else {
+                const cleanHeader = header.replace("%ltr%", "");
+                return `<div ${tags}>${defaultTableRenderer.call(this, cleanHeader, body)}</div>`;
+            }
+        },
+    },
+});
+
+// Handles $, $$, \[, \( math delimiters — same set as the frontend's
+// renderMathInElement. Uses indexOf for closing delimiters; unmatched
+// openers are emitted as literal text so a stray $ never breaks the page.
+function parseLatex(st: string): string {
     st = st.replace(/&lt;/g, "<");
-    let state = State.NORMAL;
-    let lastIndex = 0;
-    let outputList: String[] = [];
-    for (let i = 0; i < st.length; i++) {
-        if (
-            i + 2 < st.length &&
-            st.charAt(i) == "$" &&
-            st.charAt(i + 1) == "$" &&
-            st.charAt(i + 2) == "$"
-        ) {
-            return E.right(Error("Three consecutive $ found."));
-        }
-        let currentToken =
-            st.charAt(i) == "$" && i + 1 < st.length && st.charAt(i + 1) == "$"
-                ? State.DOUBLE
-                : st.charAt(i) == "$"
-                ? State.SINGLE
-                : State.NORMAL;
-        if (state == State.NORMAL) {
-            if (currentToken != State.NORMAL) {
-                outputList.push(st.substring(lastIndex, i));
-                state = currentToken;
-                lastIndex = i;
+    const outputList: string[] = [];
+    let i = 0;
+    let normalStart = 0;
+
+    while (i < st.length) {
+        const ch = st.charAt(i);
+        const ch2 = i + 1 < st.length ? st.charAt(i + 1) : "";
+
+        if (ch === "$" && ch2 === "$") {
+            outputList.push(st.substring(normalStart, i));
+            const contentStart = i + 2;
+            const closeIdx = st.indexOf("$$", contentStart);
+            if (closeIdx === -1) {
+                outputList.push("$$");
+                i = contentStart;
+            } else {
+                outputList.push(
+                    renderToString(st.substring(contentStart, closeIdx), {
+                        throwOnError: false,
+                        displayMode: true,
+                        output: "html",
+                    })
+                );
+                i = closeIdx + 2;
             }
-        } else if (currentToken != State.NORMAL) {
-            if (state != currentToken) {
-                return E.right(Error("Token mismatched."));
+            normalStart = i;
+        } else if (ch === "$") {
+            outputList.push(st.substring(normalStart, i));
+            const contentStart = i + 1;
+            const closeIdx = st.indexOf("$", contentStart);
+            if (closeIdx === -1) {
+                outputList.push("$");
+                i = contentStart;
+            } else {
+                outputList.push(
+                    renderToString(st.substring(contentStart, closeIdx), {
+                        throwOnError: false,
+                        output: "html",
+                    })
+                );
+                i = closeIdx + 1;
             }
-            const mathStr = st.substring(
-                lastIndex + (state == State.DOUBLE ? 2 : 1),
-                i
-            );
-            const renderedStr = renderToString(mathStr);
-            outputList.push(renderedStr);
-            lastIndex = i + (state == State.DOUBLE ? 2 : 1);
-            state = State.NORMAL;
-        }
-        if (currentToken == State.DOUBLE) {
+            normalStart = i;
+        } else if (ch === "\\" && ch2 === "[") {
+            outputList.push(st.substring(normalStart, i));
+            const contentStart = i + 2;
+            const closeIdx = st.indexOf("\\]", contentStart);
+            if (closeIdx === -1) {
+                outputList.push("\\[");
+                i = contentStart;
+            } else {
+                outputList.push(
+                    renderToString(st.substring(contentStart, closeIdx), {
+                        throwOnError: false,
+                        displayMode: true,
+                        output: "html",
+                    })
+                );
+                i = closeIdx + 2;
+            }
+            normalStart = i;
+        } else if (ch === "\\" && ch2 === "(") {
+            outputList.push(st.substring(normalStart, i));
+            const contentStart = i + 2;
+            const closeIdx = st.indexOf("\\)", contentStart);
+            if (closeIdx === -1) {
+                outputList.push("\\(");
+                i = contentStart;
+            } else {
+                outputList.push(
+                    renderToString(st.substring(contentStart, closeIdx), {
+                        throwOnError: false,
+                        output: "html",
+                    })
+                );
+                i = closeIdx + 2;
+            }
+            normalStart = i;
+        } else {
             i++;
         }
     }
-    if (state != State.NORMAL) {
-        return E.right(Error("Token mismatched at the end."));
-    }
-    outputList.push(st.substring(lastIndex));
-    return E.left(outputList.join(""));
+
+    outputList.push(st.substring(normalStart));
+    return outputList.join("");
 }
 
 export function renderMarkdownToHTML(markdownInput: string): string {
-    const latexDone = parseLatex(markdownInput);
-    if (latexDone._tag == "Right") {
-        return "[ERROR] " + latexDone.right.message;
-    }
-    return marked.parse(latexDone.left) as string;
+    const htmlWithMath = parseLatex(markdownInput);
+    return marked.parse(htmlWithMath) as string;
 }

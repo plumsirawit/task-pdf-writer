@@ -1,13 +1,11 @@
-import initAuth from "../../../initAuth";
 import type { NextApiResponse } from "next";
-import { getFirebaseAdmin } from "next-firebase-auth";
+import { FieldValue } from "firebase-admin/firestore";
 import * as t from "io-ts";
 import { isLeft } from "fp-ts/Either";
 import { wrapApi } from "../../../utils/apiWrapper";
 import { AuthApiRequest, withAuth } from "../../../utils/withAuth";
 import { v4 } from "uuid";
-
-initAuth();
+import admin from "../../../utils/firebaseAdmin";
 
 const Body = t.type({
   contestId: t.string,
@@ -24,7 +22,6 @@ const handler = async (req: AuthApiRequest, res: NextApiResponse) => {
       return;
     }
     const { contestId, taskId } = bodyDecoded.right;
-    const admin = getFirebaseAdmin();
     const contestDoc = await admin
       .firestore()
       .collection("contests")
@@ -66,11 +63,10 @@ const handler = async (req: AuthApiRequest, res: NextApiResponse) => {
       .collection("contests")
       .doc(contestId)
       .update({
-        // @ts-ignore
-        tasks: admin.firestore.FieldValue.arrayUnion(newTaskId),
+        tasks: FieldValue.arrayUnion(newTaskId),
       });
     res.status(200).send({ message: "success", taskId: newTaskId });
-  } catch (e) {
+  } catch (e: any) {
     console.log("Error", e);
     res.status(500).send({ error: e.message });
   }

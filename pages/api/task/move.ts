@@ -1,12 +1,10 @@
-import initAuth from "../../../initAuth";
 import type { NextApiResponse } from "next";
-import { getFirebaseAdmin } from "next-firebase-auth";
+import { FieldValue } from "firebase-admin/firestore";
 import * as t from "io-ts";
 import { isLeft } from "fp-ts/Either";
 import { wrapApi } from "../../../utils/apiWrapper";
 import { AuthApiRequest, withAuth } from "../../../utils/withAuth";
-
-initAuth();
+import admin from "../../../utils/firebaseAdmin";
 
 const Body = t.type({
   srcContestId: t.string,
@@ -17,7 +15,6 @@ const Body = t.type({
 export type Payload = t.TypeOf<typeof Body>;
 
 const getContestData = async (contestId: string) => {
-  const admin = getFirebaseAdmin();
   const contestDoc = await admin
     .firestore()
     .collection("contests")
@@ -25,6 +22,7 @@ const getContestData = async (contestId: string) => {
     .get();
   return contestDoc.data();
 };
+
 const handler = async (req: AuthApiRequest, res: NextApiResponse) => {
   try {
     const bodyDecoded = Body.decode(req.body);
@@ -33,7 +31,6 @@ const handler = async (req: AuthApiRequest, res: NextApiResponse) => {
       return;
     }
     const { srcContestId, destContestId, taskId } = bodyDecoded.right;
-    const admin = getFirebaseAdmin();
     const srcContestData = await getContestData(srcContestId);
     if (!srcContestData || !srcContestData.users) {
       res.status(404).send({ error: `contest ${srcContestId} not found` });
@@ -82,19 +79,17 @@ const handler = async (req: AuthApiRequest, res: NextApiResponse) => {
       .collection("contests")
       .doc(srcContestId)
       .update({
-        // @ts-ignore
-        tasks: admin.firestore.FieldValue.arrayRemove(taskId),
+        tasks: FieldValue.arrayRemove(taskId),
       });
     await admin
       .firestore()
       .collection("contests")
       .doc(destContestId)
       .update({
-        // @ts-ignore
-        tasks: admin.firestore.FieldValue.arrayUnion(taskId),
+        tasks: FieldValue.arrayUnion(taskId),
       });
     res.status(200).send({ message: "success" });
-  } catch (e) {
+  } catch (e: any) {
     console.log("Error", e);
     res.status(500).send({ error: e.message });
   }

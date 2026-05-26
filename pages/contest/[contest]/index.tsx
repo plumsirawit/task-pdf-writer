@@ -1,18 +1,15 @@
-import { AuthAction, withAuthUser, useAuthUser } from "next-firebase-auth";
 import { FullButton, IconButton } from "../../../components/Button";
 import styles from "../../../styles/Contests.module.css";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useState } from "react";
 import { useContestId } from "../../../utils/useContestId";
-import { callCreateTaskApi } from "../../api/task/create";
-import { callListTasksApi } from "../../api/task/list";
-import { callDeleteTaskApi } from "../../api/task/delete";
-import { callMoveTaskApi } from "../../api/task/move";
-import { callDuplicateTaskApi } from "../../api/task/duplicate";
+import { callCreateTaskApi, callListTasksApi, callDeleteTaskApi, callMoveTaskApi, callDuplicateTaskApi } from "../../../utils/apiCalls";
 import Head from "next/head";
 import { FiCopy, FiShuffle, FiPlus, FiTrash } from "react-icons/fi";
 import { FloatingButton } from "../../../components/FloatingButton";
 import { Spinner } from "../../../components/Spinner";
+import { withAuthGuard } from "../../../utils/withAuthGuard";
+import { useAuth } from "../../../utils/AuthContext";
 
 interface ITaskRowProps {
   task: string;
@@ -22,7 +19,7 @@ interface ITaskRowProps {
 }
 const TaskRow = (props: ITaskRowProps) => {
   const router = useRouter();
-  const authUser = useAuthUser();
+  const { user } = useAuth();
   const deleteTask = async () => {
     if (!props.cid) {
       return;
@@ -34,7 +31,7 @@ const TaskRow = (props: ITaskRowProps) => {
     if (answer !== "delete") {
       return;
     }
-    await callDeleteTaskApi(authUser, {
+    await callDeleteTaskApi(user, {
       contestId: props.cid,
       taskId: props.pid,
     });
@@ -55,7 +52,7 @@ const TaskRow = (props: ITaskRowProps) => {
     if (!answer) {
       return;
     }
-    await callMoveTaskApi(authUser, {
+    await callMoveTaskApi(user, {
       srcContestId: props.cid,
       destContestId: answer,
       taskId: props.pid,
@@ -66,7 +63,7 @@ const TaskRow = (props: ITaskRowProps) => {
     if (!props.cid) {
       return;
     }
-    await callDuplicateTaskApi(authUser, {
+    await callDuplicateTaskApi(user, {
       contestId: props.cid,
       taskId: props.pid,
     });
@@ -105,17 +102,15 @@ interface Task {
   pid: string;
 }
 
-export default withAuthUser({
-  whenUnauthedAfterInit: AuthAction.REDIRECT_TO_LOGIN,
-})(function Tasks() {
-  const authUser = useAuthUser();
+export default withAuthGuard(function Tasks() {
+  const { user } = useAuth();
   const [tasks, setTasks] = useState<Task[] | null>(null);
   const contestId = useContestId();
   const fetchTasks = useCallback(async () => {
     if (!contestId) {
       return;
     }
-    const data = await callListTasksApi(authUser, { contestId });
+    const data = await callListTasksApi(user, { contestId });
     if (!data || !data.tasks) {
       return;
     }
@@ -127,7 +122,7 @@ export default withAuthUser({
         }))
         .sort((a, b) => (a.pid < b.pid ? -1 : 1))
     );
-  }, [contestId, authUser]);
+  }, [contestId, user]);
   const rows =
     tasks &&
     tasks.map((task) => (
@@ -140,17 +135,17 @@ export default withAuthUser({
       />
     ));
   useEffect(() => {
-    const uid = authUser.id;
+    const uid = user?.uid;
     if (!uid || !contestId) {
       return;
     }
     fetchTasks();
-  }, [authUser, contestId, fetchTasks]);
+  }, [user, contestId, fetchTasks]);
   const createTask = async () => {
     if (!contestId) {
       return;
     }
-    await callCreateTaskApi(authUser, {
+    await callCreateTaskApi(user, {
       contestId,
     });
     await fetchTasks();

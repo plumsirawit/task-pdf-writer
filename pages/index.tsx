@@ -3,9 +3,7 @@ import Image from "next/image";
 import styles from "../styles/Home.module.css";
 import Link from "next/link";
 import { FiGithub } from "react-icons/fi";
-import { IconButton } from "../components/Button";
 import { FloatingButton } from "../components/FloatingButton";
-import { useEffect } from "react";
 
 export default function Home() {
   return (
@@ -25,27 +23,31 @@ export default function Home() {
         </h1>
 
         <div className={styles.grid}>
-          <Link href="/register">
-            <a className={styles.card}>
-              <h2>Register &rarr;</h2>
-              <p>
-                Register to discover, create, and share simple task statements.
-              </p>
-            </a>
+          <Link href="/register" className={styles.card}>
+            <h2>Register &rarr;</h2>
+            <p>
+              Register to discover, create, and share simple task statements.
+            </p>
           </Link>
 
-          <Link href="/login">
-            <a className={styles.card}>
-              <h2>Login &rarr;</h2>
-              <p>Already have an account? Let&apos;s start!</p>
-            </a>
+          <Link href="/login" className={styles.card}>
+            <h2>Login &rarr;</h2>
+            <p>Already have an account? Let&apos;s start!</p>
           </Link>
 
-          <Link href="/editor" aria-disabled="true" style={{pointerEvents: 'none'}}>
-            <a className={styles.card} aria-disabled="true" style={{pointerEvents: 'none', backgroundColor: "#282f36"}}>
-              <h2>Try &rarr;</h2>
-              <p><span style={{color: "#fe4599", fontWeight: "bold"}}>TEMPORARY DISABLED</span> due to technical problems.</p>
-            </a>
+          <Link
+            href="/editor"
+            aria-disabled="true"
+            style={{ pointerEvents: "none" }}
+            className={styles.card}
+          >
+            <h2>Try &rarr;</h2>
+            <p>
+              <span style={{ color: "#fe4599", fontWeight: "bold" }}>
+                TEMPORARY DISABLED
+              </span>{" "}
+              due to technical problems.
+            </p>
           </Link>
 
           <a
@@ -92,12 +94,6 @@ export default function Home() {
         <FloatingButton theme="dark">
           <FiGithub />
         </FloatingButton>
-        {/* <Image
-          src="/GitHub-Mark-Light-64px.png"
-          alt="GitHub Logo"
-          width={64}
-          height={64}
-        /> */}
       </a>
     </div>
   );
